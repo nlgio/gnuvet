@@ -1,0 +1,19 @@
+sudo su -
+su - postgres
+#createuser -P gnuvet
+createuser -P enno
+???$ Enter name for new role: name
+$ Enter pw for new role: ****
+$ Reenter pw for new role: ****
+$ New role be a superuser? (y/n): y
+
+###
+
+cat ~/.pgpass
+# host:port:db:user:pw
+localhost:5432:*:enno:tatati
+
+createdb gnuvet
+
+cd gnuvet/sql
+psql gnuvet < db.psql

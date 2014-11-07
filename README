@@ -1,0 +1,18 @@
+This is Pre-Alpha incomplete work.
+
+I apologise for any inconvenience.
+
+Prerequisites:
+python2.7 or later
+a fairly recent psycopg2 corresponding to your python
+postgresql 8.4. or later
+pyqt4 4.8 or later
+
+Insert following line at the end of your pg_hba.conf:
+local gnuvet all md5
+
+If you're using a multi-user and multi-computer environment, also add:
+host  gnuvet all IP-Range md5
+
+where IP-Range is a CIDR, e.g. 192.168.0.1/16
+or use a more clever solution.

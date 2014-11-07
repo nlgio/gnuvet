@@ -1,0 +1,89 @@
+/* 
+ * sql/permissions.sql: script to create necessary permissions for mysql gnuvet
+ *
+ * Copyright (c) 2009 Enno Deimel MRCVS <ennodotvetatgmxdotnet>
+ *
+ * This file is part of gnuvet, published under the GNU General Public License
+ * (GPL in short).  See the file GPL for more Information.
+ *
+ * This script has to be run with mysql-root privilege
+ * like mysql -u root -p < permissions.sql
+ */
+
+grant all
+ on gnuvet.* to 'GnuVet'@'localhost' identified by 'GnuVetPassword'
+ with grant option;
+
+/* equivalent to
+
+insert user (Host, User, Password) values ('localhost', 'GnuVet', password('GnuVetPassword'));
+
+insert db(Db, User, Select_priv, Insert_priv, Update_priv, Delete_priv, Create_priv, Drop_priv, Grant_priv, References_priv, Index_priv, Alter_priv) values ('localhost', 'gnuvet', 'GnuVet', 'Y','Y','Y','Y','Y','Y','Y','Y','Y','Y');
+*/
+
+grant select, insert, update, delete, create, drop, alter on gnuvet.* to 'Vet'@'localhost' identified by 'VetPassword'; # Index?
+
+grant select, insert, update, create on gnuvet.* to 'Nurse'@'localhost' identified by 'NursePassword';
+
+#untested:  ???
+//revoke insert, update, delete, create, drop, alter on dblive from 'GnuVet'@'localhost', 'Vet'@'localhost', 'Nurse'@'localhost';
+
+#grant create on gnuvet.ch% # doesn't work
+
+// ...
+
+/* mysql.tables: user db tables_priv columns_priv func host
+ *
+ * user (Host, User, Password,
+ *  Select_priv, Insert_priv, Update_priv, Delete_priv,
+ *  Create_priv, Drop_priv, Reload_priv, Shutdown_priv,
+ *  Process_priv, File_priv, Grant_priv, References_priv[unused],
+ *  Index_priv, Alter_priv) -- all privs default 'N';
+ *
+ * db   (Host, Db, User,
+ *  Select_priv, Insert_priv, Update_priv, Delete_priv,
+ *  Create_priv, Drop_priv, Grant_priv, References_priv[unused],
+ *  Index_priv, Alter_priv) -- all privs default 'N';
+ *
+ * tables_priv (Host, Db, User, Table_name,
+ *  Grantor[unused], Timestamp[unused],
+ *  Table_priv set('Select', 'Insert', 'Update', 'Delete', 'Create',
+ *		   'Drop', 'Grant', 'References', 'Index', 'Alter'),
+ *  Column_priv set('Select', 'Insert', 'Update', 'References'));
+ *
+ * host (Host, Db,
+ *  Select_priv, Insert_priv, Update_priv, Delete_priv,
+ *  Create_priv, Drop_priv, Grant_priv, References_priv[unused],
+ *  Index_priv, Alter_priv) -- all privs default 'N';
+ *
+ * func (name char(64), ret tinyint, dl char(128),
+ *	 type enum('function','aggregate'));
+ *	 defaults: ret 0, type 'function';
+ *
+ * columns_priv (Host, Db, User, Table_name, Column_name,
+ *  Timestamp, Column_priv set(Select Insert Update Reference));
+ *  default: Timestamp NULL
+ */
+
+/* as we need to add users GnuVet will need Insert/Update on user?
+ * or we might do it with Columns_priv?
+ */
+
+/*
+insert db(Db, User, Select_priv, Insert_priv, Update_priv, Delete_priv, Create_priv, Drop_priv, Grant_priv, Index_priv, Alter_priv) values
+ ('gnuvet', 'GnuVet', 'Y','Y','Y','Y','Y','Y','Y','Y','Y');
+
+insert host(Host, Db, Select_priv, Insert_priv, Update_priv, Delete_priv,
+ Create_priv, Drop_priv, Grant_priv, Index_priv, Alter_priv) values
+ ('localhost', 'gnuvet', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'),
+ ('192.168.1.1/255.255.255.0', 'gnuvet', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y');
+
+insert columns_priv(Db, User, Table_name, Column_name, Column_priv)
+ values
+ ('mysql', 'GnuVet', 'user', 'Host', '1,2'),
+ ('mysql', 'GnuVet', 'user', 'User', '1,2,3'),
+ ('mysql', 'GnuVet', 'user', 'Password', '1,2,3'),
+ ('mysql', 'GnuVet', 'user', 'Host', '1,2'),
+ ('mysql', 'GnuVet', 'user', 'User', '1,2,3'),
+ ('mysql', 'GnuVet', 'user', 'Password', '1,2,3');
+*/

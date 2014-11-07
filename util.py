@@ -1,0 +1,97 @@
+"""Common utility functions."""
+from psycopg2 import OperationalError
+
+def ch_conn(caller=None, name='', sig=None, func=None):
+    """Disconnect function conns[name] from signal sigs[name],
+    if args provided make new connection, adapt dict.
+    pyqt Bug: disconnect() w/o arg segfaults."""
+    if name in caller.conns:
+        try:
+            caller.sigs[name].disconnect(caller.conns[name])
+        except (TypeError, AttributeError) as e:
+            print('disconn failed for "{}" sig {} func {}:\n{}'.format(
+                name, sig, caller.conns[name], e))
+            pass
+        del caller.conns[name]
+        del caller.sigs[name]
+    if func:
+        sig.connect(func)
+        caller.conns[name] = func
+        caller.sigs[name] = sig
+
+def gprice(nprice=0, vatrate=0):
+    if not 'Decimal' in locals():
+        from decimal import Decimal
+    return (nprice * (vatrate+1)).quantize(Decimal('0.00'))
+
+def money(val, mult=1):
+    if not 'Decimal' in locals():
+        from decimal import Decimal
+    return (val * mult).quantize(Decimal('0.00'))
+
+def percent(val):
+    if int(val) == val:
+        if not 'Decimal' in locals():
+            from decimal import Decimal
+        return Decimal(str(int(val)))
+    else:
+        return val.normalize()
+    
+def prep_txt(entry='', escape=False):
+    """Prepare entry for sql query, quote 'dangerous' chars.
+    escape=True for select, False for insert."""
+    seps = ['\\', "'"]
+    if escape:
+        seps.extend(['%', '_'])
+    entry=str(entry)
+    for sep in seps:
+        if escape and sep == '\\':
+            entry = entry.replace(sep, '\\\\\\\\')
+        else:
+            entry = entry.replace(sep, '\\{}'.format(sep))
+    return ' '.join(entry.split())
+
+def querydb(caller, query, qtuple=None, debug=False):
+    try:
+        if qtuple:
+            if debug:
+                print(caller.curs.mogrify(query, qtuple))
+            caller.curs.execute(query, qtuple)
+        else:
+            caller.curs.execute(query)
+        return caller.curs.fetchall()
+    except OperationalError as e:
+        caller.db_state(e)
+
+def sysinfo():
+    """Return sys-dependent syspath userpath and options_filename."""
+    if not 'os_name' in locals():
+        from os import name as os_name
+    if os_name == 'posix':
+        syspath = '/usr/share/gnuvet'
+        userdir = '.gnuvet'
+        optfile = '.options'
+    elif os_name == 'nt':
+        syspath = '/Program Files/gnuvet'
+        userdir = 'gnuvet'
+        optfile = 'options'
+    else:
+        syspath = 'Not implemented: {}'.format(os_name)
+        userdir = ''
+        optfile = ''
+    return syspath, userdir, optfile
+
+def wildcard(entry='', ahead=False):
+    """Add sql wildcards, replace *."""
+    if not entry or entry == '*':
+        return '%'
+    while entry.count('**'):
+        entry = entry.replace('**', '*')
+    while entry.count('*'):
+        entry = entry.replace('*', '%')
+    if ahead:
+        if not entry.startswith('%'):
+            entry = '%' + entry
+    if not entry.endswith('%'):
+        entry += '%'
+    return entry

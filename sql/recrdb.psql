@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+echo -n '    Going to roll in db.psql: '
+psql gnuvet < ./db.psql 2>&1 | egrep ERR\|FEH && ERR=1
+echo 'done'
+echo -n '    Going to roll in populate.psql: '
+psql gnuvet < ./populate.psql 2>&1 | egrep ERR\|FEH && ERR=1
+echo 'done'
+echo -n '    Going to roll in sample-entries.psql: '
+psql gnuvet < ./sample-entries.psql 2>&1 | egrep ERR\|FEH && ERR=1
+echo 'done'
+[ "$ERR" ] && echo "    Db re-created with Errors." || echo "    Db re-created successfully."
