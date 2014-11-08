@@ -10,6 +10,7 @@
 # gvdir reconsider: for startup other than login
 # Reconsider switchoff things with db loss
 # special search (medication, clin hist)
+# Add group/institution in payment -- for TGD|Racetrack etc.
 
 from sys import argv, stderr
 from os import path as os_path
@@ -29,7 +30,6 @@ class Gnuv_MainWin(QMainWindow):
     """The GnuVet Main Window."""
     # signals
     gvquit = pyqtSignal(bool)
-    clid     = pyqtSignal(int) # client id
     dbconnect = pyqtSignal()
     dbstate  = pyqtSignal(object)
     ##helpsig  = pyqtSignal(str) ?
@@ -38,12 +38,10 @@ class Gnuv_MainWin(QMainWindow):
     # patid        = pyqtSignal(int)
 
     # vars
-    connected = False # are we connected to the db?
+    connected = False # are we connected to the db? Obsoleteable? hierwei
     db        = None
-    dberr     = False
     origin      = 'origin'
     offspring = []    # visible children for gv_quitconfirm
-    today     = 0
     user      = None  # are we authenticated?
     x_pos, y_pos = 100, 50
 
@@ -77,7 +75,7 @@ class Gnuv_MainWin(QMainWindow):
         self.vaccremA = QAction(self.tr('&Vacc. Reminders'), self)
         self.vaccremA.setAutoRepeat(0)
         self.vaccremA.setShortcut(self.tr('Ctrl+V'))
-        self.vaccremA.setStatusTip(self.tr('Print vacc. reminder letters'))
+        self.vaccremA.setStatusTip(self.tr('Check vacc. reminders'))
         self.ssearchA = QAction(self.tr('&Special Search'), self)
         self.ssearchA.setAutoRepeat(0)
         self.ssearchA.setShortcut(self.tr('Ctrl+S'))
@@ -119,7 +117,7 @@ class Gnuv_MainWin(QMainWindow):
         self.w.taskM.addAction(chuserA)
         self.w.taskM.addAction(quitA)
         self.w.taskM.setSeparatorsCollapsible(1)
-        # maintM: medA srvA sysA stkA
+        # maintM: medA srvA sysA stkA userA
         self.w.helpM.addAction(helpA)
         self.w.helpM.addSeparator()
         self.w.helpM.addAction(aboutA)
@@ -130,7 +128,7 @@ class Gnuv_MainWin(QMainWindow):
         self.patA.triggered.connect(self.sae_patact)
         self.cliA.triggered.connect(self.sae_cliact)
         self.vaccremA.triggered.connect(self.vacc_reminders)
-        self.appointA.triggered.connect(self.appoint)
+        self.appointA.triggered.connect(self.openapp)
         # self.appointA ordA jouA finA medA srvA sysA stkA
         chuserA.triggered.connect(self.chuser)
         quitA.triggered.connect(self.gv_quitconfirm)
@@ -160,26 +158,15 @@ class Gnuv_MainWin(QMainWindow):
             lang = ('lang' in self.options and self.options['lang'] or 'en')
             self.aboutw = gv_about.About(self, lang)
 
-    def appoint(self): # testing
-        """Open appointment diary."""
-        if not self.today:
-            self.today = date.today()
-        if not hasattr(self, 'appointw'):
-            from appoint import Appointer
-            self.appointw = Appointer(self, self.today)
-        ## else:
-        ##     pass
-        self.appointw.show()
-        
     def chuser(self):
         """Login as different user, closing all open windows but main."""
         if self.db and not isinstance(self.db, str):
             if hasattr(self.db, 'close'):
                 self.db.close()
-        offspring = []
+        ## offspring = []
         for window in self.findChildren(QMainWindow):
-            offspring.append(window)
-        for window in offspring:
+        ##     offspring.append(window)
+        ## for window in offspring:
             window.close()
         self.user = None
         self.passwd = None
@@ -251,9 +238,11 @@ class Gnuv_MainWin(QMainWindow):
 
     def db_state(self, msg=''):
         """Actions to be taken on db loss or gain."""
-        self.dberr = msg and True or False
-        self.w.no_dbconn.setVisible(self.dberr)
-        self.dbdep_enable(not self.dberr)
+        dberr = msg and True or False
+        if dberr:
+            self.db = None
+        self.w.no_dbconn.setVisible(dberr)
+        self.dbdep_enable(not dberr)
         if not hasattr(self, 'warnw'):
             from warn import Warning
         if not msg:
@@ -278,7 +267,7 @@ class Gnuv_MainWin(QMainWindow):
         self.w.no_dbconn.setVisible(not yes)
         self.connected = yes
 
-    def debugf(self):
+    def debugf(self): #hierwei spaetestens
         pass
 
     def gvdir(self):
@@ -441,8 +430,32 @@ class Gnuv_MainWin(QMainWindow):
         return None
 
     def openapp(self):
-        """Appointment "dialog"."""
-        pass
+        """Open appointment diary."""
+        if not self.today:
+            self.today = date.today()
+        if not hasattr(self, 'appointw'):
+            from appoint import Appointer
+            self.appointw = Appointer(self, self.today)
+        else:
+            self.appointw.raise_()
+        self.appointw.show()
+        
+    def opencli(self, clid=0):
+        """Launch Client window."""
+        errmsg = self.dbh.db_check(self.curs)
+        if errmsg:
+            self.db_state(errmsg)
+            return
+        wc = 'wc{}'.format(clid)
+        if hasattr(self, wc):
+            self.wc.show()
+            self.wc.raise_()
+            return
+        else:
+            import client
+            self.wc = client.Client(self, clid)
+            self.xy_incr(self.wc)
+        self.wc.show()
 
     def openfin(self):
         """Finalysis "dialog"."""
@@ -497,7 +510,6 @@ class Gnuv_MainWin(QMainWindow):
         
     def sae_cli(self, clid=0, act='s'):
         """Open Search-Add-Edit Client window."""
-        # hierwei adapt this and child to saepat (args etc)
         errmsg = self.dbh.db_check(self.curs)
         if errmsg:
             self.db_state(errmsg)
@@ -530,8 +542,7 @@ class Gnuv_MainWin(QMainWindow):
             return
         if not 'Saepat' in locals():
             from saepat import Saepat
-        setattr(self, sp,
-                Saepat(self, act, patid))
+        setattr(self, sp, Saepat(self, act, patid))
         self.xy_incr(getattr(self, sp))
         getattr(self, sp).show()
             
@@ -572,23 +583,6 @@ class Gnuv_MainWin(QMainWindow):
             types.append(e[1])
         # hierwei: dict?
         
-    def setcli(self, clid=0):
-        """Launch Client window."""
-        errmsg = self.dbh.db_check(self.curs)
-        if errmsg:
-            self.db_state(errmsg)
-            return
-        wc = 'wc{}'.format(clid)
-        if hasattr(self, wc):
-            self.wc.show()
-            self.wc.raise_()
-            return
-        else:
-            import client
-            self.wc = client.Client(self, clid)
-            self.xy_incr(self.wc)
-        self.wc.show()
-
     def state_write(self, save_things=[]):
         """Write unsaved changes to file for later restoration."""
         # hierwei

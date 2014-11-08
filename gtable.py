@@ -14,7 +14,7 @@ HScrollbar default AlwaysOff (1), VScrollbar default AsNeeded (0).
 """
 
 # todo:
-# eliding looks not too bad now
+# add check for table.width() > frame.width() on column-resize -> add HScrollBar
 # height check doesn't work yet
 # add doubleclick on headsep for set_colwidth()? c.toolTip().hideText()?
 # add moving mostright->mostleftnext for calendar and such?

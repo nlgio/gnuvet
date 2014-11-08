@@ -969,9 +969,9 @@ class Saecli(QMainWindow):
     
     def w_cli(self): # hierwei: func name?
         """Signal client ID to whom it may concern."""
-        self.cidsig.connect(self.parent.setcli)
+        self.cidsig.connect(self.parent.opencli)
         self.cidsig.emit(self.cid)
-        self.cidsig.disconnect(self.parent.setcli)
+        self.cidsig.disconnect(self.parent.opencli)
         self.close()
 
     def develf(self):

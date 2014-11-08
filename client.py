@@ -18,6 +18,7 @@ class Client(QMainWindow):
     # signals:
     gvquit   = pyqtSignal(bool)
     helpsig  = pyqtSignal(str)
+    savestate = pyqtSignal(str)
 
     # vars:
     db_err = changes = shutdown = False
@@ -117,10 +118,10 @@ class Client(QMainWindow):
         #    PARENT CONNECTIONS
         if parent: # devel if
             self.dbA.triggered.connect(parent.db_connect)
-            self.aboutA.triggered.connect(parent.about)
+            aboutA.triggered.connect(parent.about)
             parent.gvquit.connect(self.gv_quit)
             parent.dbstate.connect(self.db_state)
-            self.savestate.connect(parent.state_write)
+            ## self.savestate.connect(parent.state_write)
             self.helpsig.connect(parent.gv_help)
             self.db = parent.db
             self.staffid = parent.staffid
@@ -194,11 +195,11 @@ class Client(QMainWindow):
         if pats is None:  return # db error
         pats = [e[0] for e in pats]
         for p in pats:
-            addend = querydb( # hierwei change things re vat: from acc!
+            addend = querydb(
                 self,
-                'select acc_npr,vat_rate,count from acc{0},prod{1},products,'
-                'vats where pr_vat=vat_id and prod{1}.txt=pr_id and acc_idx='
-                'prod{1}.id and acc_pid=%s and acc_invno is null'.format(
+                'select acc_npr,vat_rate,count from acc{0},prod{1},vats '
+                'where acc_vat=vat_id and acc_prid=prod{1}.id and acc_pid='
+                '%s and acc_paid is null'.format(
                     self.clid, p), (p,))
             if addend is None:  return # db error
             for e in addend:
@@ -250,7 +251,7 @@ class Client(QMainWindow):
             self.w.plist.set_colwidth(0, self.w.plist.width())
             return
         pheader = map(self.tr,
-                      ['Name', 'Breed', 'Sex', 'Colour', 'dob', '', ''])
+                      ['Name', 'Breed', 'Sex', 'Colour', 'dob', 'vic', 'rip'])
         self.w.plist.set_headers(pheader)
         for res in result:
             self.w.plist.append_row([
