@@ -945,7 +945,7 @@ class Saepat(QMainWindow):
         ch_conn(self, 'backpb', self.w.backPb.clicked, self.prep_s)
         ch_conn(self, 'mainpb', self.w.mainPb.clicked, self.w_pat)
         ch_conn(self, '2ndpb', self.w.secondPb.clicked, self.w_cli)
-        ch_conn(self, 'selch', self.w.plist.selchanged, self.trackrow)
+        ch_conn(self, 'selch', self.w.plist.rowchanged, self.trackrow)
         self.w.plist.select_row(row=0)
         self.w.plist.setFocus()
         self.w.matchFr.show()

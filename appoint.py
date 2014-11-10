@@ -88,6 +88,14 @@ border-radius: 3px;
         helpA.setAutoRepeat(False)
         helpA.setShortcut(self.tr('F1'))
         helpA.setStatusTip(self.tr('Context sensitive help'))
+        self.opencA = QAction(self.tr("Open patient"), self)
+        self.opencA.setAutoRepeat(False)
+        self.opencA.setShortcut(self.tr('Ctrl+C'))
+        self.opencA.setStatusTip(self.tr('Open selected client'))
+        self.openpA = QAction(self.tr("Open client"), self)
+        self.openpA.setAutoRepeat(False)
+        self.openpA.setShortcut(self.tr('Ctrl+P'))
+        self.openpA.setStatusTip(self.tr('Open selected patient'))
         self.markM = QMenu(self.tr('&Mark appointment as'), self)
         markopenA = QAction(QIcon(':/images/markopen.png'),
                             self.tr('open'), self)
@@ -134,6 +142,9 @@ border-radius: 3px;
         taskM.addAction(self.selectA)
         taskM.addAction(self.todayA)
         taskM.addSeparator()
+        taskM.addAction(self.opencA)
+        taskM.addAction(self.openpA)
+        taskM.addSeparator()
         taskM.addMenu(self.markM)
         taskM.addSeparator()
         taskM.addAction(closeA)
@@ -149,6 +160,9 @@ border-radius: 3px;
         self.calM.addAction(self.delA)
         self.calM.addAction(self.selectA)
         self.calM.addSeparator()
+        self.calM.addAction(self.openpA)
+        self.calM.addAction(self.opencA)
+        self.calM.addSeparator()
         self.calM.addMenu(self.markM)
         self.w.menubar.addMenu(taskM)
         self.w.menubar.addMenu(newM)
@@ -158,6 +172,8 @@ border-radius: 3px;
         self.delA.triggered.connect(self.app_del)
         self.editA.triggered.connect(self.app_edit)
         helpA.triggered.connect(self.help_self)
+        self.opencA.triggered.connect(self.opencli)
+        self.openpA.triggered.connect(self.openpat)
         markopenA.triggered.connect(self.markopen)
         markdoneA.triggered.connect(self.markdone)
         markmissedA.triggered.connect(self.markmissed)
@@ -420,6 +436,35 @@ border-radius: 3px;
                 elif self.options['cal_res'] == 1:
                     self.times.append(time(i, 30))
 
+        for a in (self.editA, self.newappA, self.delA, self.markM):
+            a.setEnabled(yes)
+
+    def ck_actions(self, c):
+        toenable = [self.newappA]
+        todisable = []
+        if c.data:
+            toenable.extend([self.delA, self.editA, self.markM])
+            res = querydb(
+                self,
+                'select app_cid, app_pid from appointments where app_id=%s',
+                (c.data,))
+            if res is None:  return # db error
+            if res[0][0]:
+                toenable.append(self.opencA)
+            else:
+                todisable.append(self.opencA)
+            if res[0][1]:
+                toenable.append(self.openpA)
+            else:
+                todisable.append(self.openpA)
+        else:
+            todisable.extend([
+                self.editA, self.delA, self.markM, self.opencA, self.openpA])
+        for a in toenable:
+            a.setEnabled(True)
+        for a in todisable:
+            a.setEnabled(False)
+
     def confhide(self):
         self.w.confirm.hide()
 
@@ -442,8 +487,8 @@ border-radius: 3px;
     
     def dbdep_enable(self, yes=True):
         """En- or disable db dependent actions."""
-        for a in (self.editA, self.newappA, self.delA, self.markM):
-            a.setEnabled(yes)
+        if self.w.calendar.selcell.data:
+            self.ck_actions(self.w.calendar.selcell)
         self.dbA.setVisible(not yes)
         self.dbA.setEnabled(not yes)
         
@@ -681,6 +726,8 @@ border-radius: 3px;
         self.logname = self.logname[0][0]
         self.w.lLb.setText(self.logname)
 
+    ##def alldata(self): # three times same query w/just minor change? simplify!
+
     def get_daydata(self):
         data = querydb(
             self,
@@ -811,6 +858,30 @@ border-radius: 3px;
         elif appstat == 'm':
             nc.setStyleSheet("background: red")
 
+    def opencli(self, cell):
+        """Open client window."""
+        cli = querydb(
+            self,
+            'select app_cid from appointments where app_id=%s',
+            (self.w.calendar.selcell.data,))
+        if cli is None:  return # db error
+        if cli[0][0] is None:
+            self.app_edit()
+            return
+        cli = cli[0][0]
+        if self.origin:
+            self.origin.opencli(cli)
+        else: # devel
+            if hasattr(self, 'wc'):
+                self.wc.clid = cli
+                self.wc.cli_data()
+                self.wc.show()
+                self.wc.raise_()
+            else:
+                import client # from client import Client?  Well, only devel
+                self.wc = client.Client(self, cli)
+                self.wc.show()
+
     def openpat(self, cell): # 141017 hierwei
         """Open patient window."""
         if not self.w.calendar.selcell.data:
@@ -858,12 +929,13 @@ border-radius: 3px;
             self.today = datetime.strptime(
                 str(self.w.calendar.lrows[c.row()-1][c.col].text()
                     ).replace('<b>', ''), '%a %d.%m.%Y')
-        if self.w.calendar.selcell.data:
-            for a in (self.delA, self.editA, self.markM):
-                a.setEnabled(True)
-        else:
-            for a in (self.delA, self.editA, self.markM):
-                a.setEnabled(False)
+        ## if self.w.calendar.selcell.data:
+        ##     for a in (self.delA, self.editA, self.markM):
+        ##         a.setEnabled(True)
+        ## else:
+        ##     for a in (self.delA, self.editA, self.markM):
+        ##         a.setEnabled(False)
+        self.ck_actions(c)
         
     def sel_display(self):
         if self.disp == 1: # day

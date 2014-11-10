@@ -1433,7 +1433,7 @@ class Patient(QMainWindow):
         self.w.htable.align_data(0, 'r')
         self.w.htable.align_data(2, 'r')
         self.w.htable.rows2contents()
-        ch_conn(self, 'selch', self.w.htable.selchanged, self.trackitem)
+        ch_conn(self, 'selch', self.w.htable.rowchanged, self.trackitem)
         self.w.htable.rightclicked.connect(self.rclick)
 
     def payment(self): # hierwei: currently unused

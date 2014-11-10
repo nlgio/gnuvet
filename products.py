@@ -949,7 +949,7 @@ class Products(QMainWindow):
         self.w.plist.set_colwidth(3, 70)
         ch_conn(self, 'dclick',
                 self.w.plist.doubleclicked, self.sel_amount)
-        ch_conn(self, 'cic', self.w.plist.selchanged, self.trackp)
+        ch_conn(self, 'cic', self.w.plist.rowchanged, self.trackp)
         ch_conn(self, 'enter', self.keycheck.enter, self.w.okPb.click)
         ch_conn(self, 'ok', self.w.okPb.clicked, self.sel_amount)
         self.w.plist.select_row(row=0)

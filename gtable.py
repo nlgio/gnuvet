@@ -153,7 +153,7 @@ class Gtable(QScrollArea):
     """Main widget."""
     doubleclicked = pyqtSignal(object)
     rightclicked  = pyqtSignal(object) # is QPoint
-    selchanged = pyqtSignal(int)
+    rowchanged = pyqtSignal(int)
     selected = pyqtSignal(object)
 
     debug = False
@@ -823,7 +823,7 @@ border-radius: 3px;
             e.setStyleSheet(self.gcellss.format(*self.selection))
         self.selrow = self.lrows.index(self.lrows[row]) # for row=-1
         self.ensureWidgetVisible(self.lrows[row][0], 0, 0)
-        self.selchanged.emit(self.selrow)
+        self.rowchanged.emit(self.selrow)
 
     def set_colwidth(self, col, width=0): # hierwei: ck new test for col?
         if col < len(self.colwids):

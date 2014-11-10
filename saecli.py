@@ -797,7 +797,7 @@ class Saecli(QMainWindow):
         self.w.backPb.show()
         ch_conn(self, 'backPb', self.w.backPb.clicked, self.cli_search)
         ch_conn(self, 'mainPb', self.w.mainPb.clicked, self.w_cli)
-        ch_conn(self, 'clist', self.w.clist.selchanged, self.trackrow)
+        ch_conn(self, 'clist', self.w.clist.rowchanged, self.trackrow)
         self.w.clist.select_row(row=0)
         self.w.clist.setFocus()
         self.w.matchFr.show()
