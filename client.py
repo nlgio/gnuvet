@@ -195,12 +195,12 @@ class Client(QMainWindow):
         if pats is None:  return # db error
         pats = [e[0] for e in pats]
         for p in pats:
+            ## hierwei: error if no accN table!
             addend = querydb(
                 self,
                 'select acc_npr,vat_rate,count from acc{0},prod{1},vats '
                 'where acc_vat=vat_id and acc_prid=prod{1}.id and acc_pid='
-                '%s and acc_paid is null'.format(
-                    self.clid, p), (p,))
+                '%s and acc_paid is null'.format(self.clid, p), (p,))
             if addend is None:  return # db error
             for e in addend:
                 cbal += money(gprice(e[0], e[1]), e[2])
