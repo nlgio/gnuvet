@@ -937,10 +937,7 @@ if __name__ == '__main__':
         b.select_row(row=0)
 
     def develf():
-        ## b.set_colwidth(1, 140)
-        ## print('table: {} x {}'.format(b.table.width(), b.table.height()))
-        print('develf called by doubleclick')
-        ## b.create_entry_cell(b.cell(2, 1), 'Shtuff.', b.cell(2, 1).col)
+        b.append_row(['one', 'two', 'tre'])
         
     from PyQt4.QtGui import QAction, QApplication, QLineEdit
     a = QApplication([])
@@ -953,11 +950,11 @@ if __name__ == '__main__':
     d = QLineEdit(c)
     d.setGeometry(30, 200, 50, 24)
     clearA = QAction(b)
-    clearA.setShortcut('Ctrl+D')
+    clearA.setShortcut('Ctrl+C')
     clearA.setAutoRepeat(0)
     clearA.triggered.connect(b.clear)
     devA = QAction(b)
-    devA.setShortcut('Ctrl+B')
+    devA.setShortcut('Ctrl+D')
     devA.setAutoRepeat(0)
     devA.triggered.connect(develf)
     fillA  = QAction(b)

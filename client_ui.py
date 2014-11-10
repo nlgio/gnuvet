@@ -87,7 +87,7 @@ class Ui_Client(object):
         self.newPb.setGeometry(330, 130, 140, 24)
         self.ripPb = QPushButton(self.centralwidget)
         self.ripPb.setGeometry(490, 130, 140, 24)
-        self.plist = Gtable(self.centralwidget, resizecols=True)
+        self.plist = Gtable(self.centralwidget, resizecols=True, scrollh=0)
         self.plist.setGeometry(10, 180, 921, 371)
         self.plist.setMinimumSize(621, 371)
         self.balLb = QLabel(self.centralwidget)
