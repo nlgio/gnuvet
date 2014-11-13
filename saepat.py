@@ -1,5 +1,4 @@
 """Search Add Edit patient interface."""
-# introduce querydb?
 # recheck all -- still functional, useful? connect.s? g|setattr(self, what)!!!
 #     avoid dependence on gnuv.py, should be ready for other modules as well
 # add search for breed, spec, col, loc, ins
@@ -16,10 +15,11 @@
 
 from datetime import date, timedelta
 from psycopg2 import OperationalError
-from PyQt4.QtCore import pyqtSignal, Qt # effin Qt for ItemFlags
-from PyQt4.QtGui import (QAction, QApplication, QCheckBox, QComboBox,
-                         QCompleter, QDateEdit, QLineEdit, QMainWindow,
-                         QMenu, QRadioButton, QSpinBox, QStringListModel)
+# eliminated: Qt # effin Qt for ItemFlags
+from PyQt4.QtCore import pyqtSignal
+# eliminated: QCheckBox,QComboBox,QDateEdit,QLineEdit,QRadioButton,QSpinBox, 
+from PyQt4.QtGui import (QAction, QApplication, QCompleter, QMainWindow,
+                         QMenu, QStringListModel)
 import gv_qrc
 from keycheck import Keycheck
 from util import ch_conn, querydb
@@ -29,11 +29,10 @@ class Saepat(QMainWindow):
     """Search|Add|Edit Patient."""
     # signals:
     gvquit = pyqtSignal(bool)
-    clidsig   = pyqtSignal(int)
+    cidsig   = pyqtSignal(int)
     dbstate   = pyqtSignal(bool)
     helpsig   = pyqtSignal(str)
-    needclid  = pyqtSignal(tuple) # check this, makes sense?
-    arestore  = pyqtSignal(tuple)
+    needcid  = pyqtSignal(tuple) # check this, makes sense?
     restoreme = pyqtSignal(tuple)
     savestate = pyqtSignal(tuple)
     addedspec = pyqtSignal(int)
@@ -45,10 +44,11 @@ class Saepat(QMainWindow):
     changes = currentspec = 0
     completed = ''
     curs = None
+    origin = None
     seen = None
     unsaved = False # unsaved changes anywhere?
 
-    def __init__(self, parent=None, pid=0, clid=0, act='s'):
+    def __init__(self, parent=None, pid=0, cid=0, act='s'):
         super(Saepat, self).__init__(parent)
         self.parent = parent
         self.pid = pid
@@ -68,7 +68,7 @@ class Saepat(QMainWindow):
         self.dbA.setAutoRepeat(0)
         self.dbA.setStatusTip(self.tr('Try to reconnect to database'))
         self.dbA.setShortcut(self.tr('Ctrl+R'))
-        self.clichangeA = QAction(self.tr('&Change Client'), self)
+        self.clichangeA = QAction(self.tr('&Change Owner'), self)
         self.clichangeA.setAutoRepeat(0)
         self.clichangeA.setStatusTip(self.tr('Change owner of current patient'))
         closeA = QAction(self.tr('Close'), self)
@@ -292,7 +292,7 @@ class Saepat(QMainWindow):
         if act == 's':
             self.prep_s()
         elif act == 'a':
-            self.pat_add(clid)
+            self.pat_add(cid)
         elif act == 'e':
             self.pat_edit(pid)
 
@@ -1035,9 +1035,9 @@ class Saepat(QMainWindow):
         """Wrapper for action signal."""
         self.pat_add()
 
-    def pat_add(self, clid=0):
+    def pat_add(self, cid=0):
         """Add a new patient to the db."""
-        self.cid = clid
+        self.cid = cid
         self.stage = 'a'
         self.setWindowTitle('GnuVet: ' + self.tr('Add Patient'))
         self.prep_ae()
@@ -1156,14 +1156,14 @@ class Saepat(QMainWindow):
                 self.w.clientLb.setText(self.tr('Client unassigned'))
                 return
         if not self.cid: # hierwei c_id und signal?
-            self.parent.clid.connect(self.pat_addsetcli) # ? parent!
-            self.needclid.connect(self.parent.sae_cli)
+            self.parent.cid.connect(self.pat_addsetcli) # ? parent!
+            self.needcid.connect(self.parent.sae_cli)
             self.w.saeFr.setEnabled(0)
             if len(clis):
-                self.needclid.emit(('c', self, clis))
+                self.needcid.emit(('c', self, clis))
             else:
-                self.needclid.emit(('c', self))
-            self.needclid.disconnect(self.parent.sae_cli)
+                self.needcid.emit(('c', self))
+            self.needcid.disconnect(self.parent.sae_cli)
             return
         # Does this client have a(nother) living patient of same name?
         print('double name check')
@@ -1246,7 +1246,7 @@ class Saepat(QMainWindow):
         self.nameok = False
 
     def pat_addsetcli(self, args):
-        """Set client id from clid signal."""
+        """Set client id from cid signal."""
         self.w.saeFr.setEnabled(1)
         if len(args) > 1:
             sender = args[1]
@@ -1460,7 +1460,6 @@ class Saepat(QMainWindow):
                 nentry = True
             if not 'prep_txt' in locals():
                 from util import prep_txt
-            # self.curs.execute( # hierwei
             res = querydb(
                 self,
                 query_s, (
@@ -2233,9 +2232,9 @@ class Saepat(QMainWindow):
         self.cid = self.cids[row]
 
     def w_cli(self):
-        self.clidsig.connect(self.parent.w_cli)
-        self.clidsig.emit(self.cid)
-        self.clidsig.disconnect(self.parent.w_cli)
+        self.cidsig.connect(self.parent.w_cli)
+        self.cidsig.emit(self.cid)
+        self.cidsig.disconnect(self.parent.w_cli)
         self.close()
 
     def w_pat(self):

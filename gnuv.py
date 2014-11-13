@@ -440,20 +440,20 @@ class Gnuv_MainWin(QMainWindow):
             self.appointw.raise_()
         self.appointw.show()
         
-    def opencli(self, clid=0):
+    def opencli(self, cid=0):
         """Launch Client window."""
         errmsg = self.dbh.db_check(self.curs)
         if errmsg:
             self.db_state(errmsg)
             return
-        wc = 'wc{}'.format(clid)
+        wc = 'wc{}'.format(cid)
         if hasattr(self, wc):
             self.wc.show()
             self.wc.raise_()
             return
         else:
             import client
-            self.wc = client.Client(self, clid)
+            self.wc = client.Client(self, cid)
             self.xy_incr(self.wc)
         self.wc.show()
 
@@ -508,7 +508,7 @@ class Gnuv_MainWin(QMainWindow):
         """Wrapper for action signal."""
         self.sae_cli()
         
-    def sae_cli(self, clid=0, act='s'):
+    def sae_cli(self, cid=0, act='s'):
         """Open Search-Add-Edit Client window."""
         errmsg = self.dbh.db_check(self.curs)
         if errmsg:
@@ -521,7 +521,7 @@ class Gnuv_MainWin(QMainWindow):
             return
         if not 'Saecli' in locals():
             from saecli import Saecli
-        setattr(self, cp, Saecli(self, act, clid))
+        setattr(self, cp, Saecli(self, act, cid))
         self.xy_incr(getattr(self, cp))
         getattr(self, cp).show()
 

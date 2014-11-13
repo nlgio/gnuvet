@@ -364,7 +364,7 @@ border-radius: 3px;
         
     def app_set(self, data): # hierwei ck overlapping apps
         ch_conn(self, 'datefix')
-        # app_dt app_txt app_clid app_pid app_staff app_dur action
+        # app_dt app_txt app_cid app_pid app_staff app_dur action
         self.savedata = data
         test = querydb(
             self,
@@ -873,7 +873,7 @@ border-radius: 3px;
             self.origin.opencli(cli)
         else: # devel
             if hasattr(self, 'wc'):
-                self.wc.clid = cli
+                self.wc.cid = cli
                 self.wc.cli_data()
                 self.wc.show()
                 self.wc.raise_()

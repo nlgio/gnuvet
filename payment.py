@@ -10,11 +10,11 @@ from payment_ui import Ui_Payment
 
 class Payment(QMainWindow):
     def __init__(self, parent=None, db=None, options={},
-                 clid=0, patid=0, staffid=0):
+                 cid=0, patid=0, staffid=0):
         super(Payment, self).__init__(parent)
         self.db = db
         self.options = options
-        self.clid = clid
+        self.cid = cid
         self.patid = patid
         self.staffid = staffid
         self.w = Ui_Payment()

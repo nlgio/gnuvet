@@ -23,11 +23,11 @@ class Client(QMainWindow):
     # vars:
     db_err = changes = shutdown = False
 
-    def __init__(self, parent=None, clid=0):
+    def __init__(self, parent=None, cid=0):
         super(Client, self).__init__(parent)
         self.conns  = {} # pyqt bug, disconnect() w/o arg can segfault
         self.sigs   = {}
-        self.clid = clid
+        self.cid = cid
         self.w = Ui_Client()
         self.w.setupUi(self)
         keych = Keycheck(self)
@@ -161,37 +161,37 @@ class Client(QMainWindow):
         
     def cli_data(self):
         """Collect client data."""
-        result = querydb(
+        res = querydb(
             self,
             'select t_title,c_sname,c_mname,c_fname,housen,street,village,city,'
             'region,postcode,c_telhome,c_telwork,c_mobile1,c_mobile2,c_email,'
             'baddebt,c_reg,c_last,c_anno from clients,titles,addresses where '
             't_id=c_title and c_address=addr_id and c_id=%s',
-            (self.clid,))
-        if result is None:  return # db error
-        for res in result:
-            name = ' '.join([res[0], res[1]])
-            if res[2]:
-                name = ', '.join([name, res[2]])
-            name = ' '.join([name, res[3]])
+            (self.cid,))
+        if res is None:  return # db error
+        for e in res:
+            name = ' '.join([e[0], e[1]])
+            if e[2]:
+                name = ', '.join([name, e[2]])
+            name = ' '.join([name, e[3]])
             self.w.nameLb.setText(name)
-            self.w.addr1Lb.setText(', '.join([e for e in res[4:6] if e]))
-            self.w.addr2Lb.setText(', '.join([e for e in res[6:8] if e]))
-            self.w.addr3Lb.setText(res[9])
-            self.w.telhomeLb.setText(self.tr('Home: ') + res[10])
-            self.w.telworkLb.setText(self.tr('Work: ') + res[11])
-            self.w.mobile1Lb.setText(res[12])
-            self.w.mobile2Lb.setText(res[13])
-            self.w.emailLb.setText(res[14])
-            self.w.bdPix.setVisible(res[15])
-            self.w.regdateLb.setText(res[16].strftime('%d.%m.%y'))
-            self.w.ldateLb.setText(res[17].strftime('%d.%m.%y'))
-            ## self.w.annotxtLb.setText(res[18])
+            self.w.addr1Lb.setText(', '.join([s for s in e[4:6] if s]))
+            self.w.addr2Lb.setText(', '.join([s for s in e[6:8] if s]))
+            self.w.addr3Lb.setText(e[9])
+            self.w.telhomeLb.setText(self.tr('Home: ') + e[10])
+            self.w.telworkLb.setText(self.tr('Work: ') + e[11])
+            self.w.mobile1Lb.setText(e[12])
+            self.w.mobile2Lb.setText(e[13])
+            self.w.emailLb.setText(e[14])
+            self.w.bdPix.setVisible(e[15])
+            self.w.regdateLb.setText(e[16].strftime('%d.%m.%y'))
+            self.w.ldateLb.setText(e[17].strftime('%d.%m.%y'))
+            ## self.w.annotxtLb.setText(e[18])
             self.w.annotxtLb.setText('This is our first client, being the first sentient being to have brought patients to our GnuVet practice.')
         cbal = D('0.00')
         pats = querydb(
             self,
-            'select p_id from patients where p_cid=%s', (self.clid,))
+            'select p_id from patients where p_cid=%s', (self.cid,))
         if pats is None:  return # db error
         pats = [e[0] for e in pats]
         for p in pats:
@@ -200,7 +200,7 @@ class Client(QMainWindow):
                 self,
                 'select acc_npr,vat_rate,count from acc{0},prod{1},vats '
                 'where acc_vat=vat_id and acc_prid=prod{1}.id and acc_pid='
-                '%s and acc_paid is null'.format(self.clid, p), (p,))
+                '%s and acc_paid is null'.format(self.cid, p), (p,))
             if addend is None:  return # db error
             for e in addend:
                 cbal += money(gprice(e[0], e[1]), e[2])
@@ -234,7 +234,7 @@ class Client(QMainWindow):
 
     def get_pats(self):
         """Collect this client's patients."""
-        result = querydb(
+        res = querydb(
             self,
             'select p_name,xbreed,breed_abbr,breed_name,sex,neutd,case when '
             "b1.bcol is not null then b1.bcol else '' end||case when b2.bcol "
@@ -243,9 +243,9 @@ class Client(QMainWindow):
             'from patients,breeds,colours,basecolours b1,basecolours b2,'
             'basecolours b3 where p_cid=%s and breed=breed_id and colour='
             'col_id and b1.bcol_id=col1 and b2.bcol_id=col2 and b3.bcol_id='
-            'col3 order by p_name', (self.clid,))
-        if result is None:  return # db error
-        if not result:
+            'col3 order by p_name', (self.cid,))
+        if res is None:  return # db error
+        if not res:
             self.w.plist.append_row(
                 [self.tr('No patients on this clients record')])
             self.w.plist.set_colwidth(0, self.w.plist.width())
@@ -253,17 +253,17 @@ class Client(QMainWindow):
         pheader = map(self.tr,
                       ['Name', 'Breed', 'Sex', 'Colour', 'dob', 'vic', 'rip'])
         self.w.plist.set_headers(pheader)
-        for res in result:
+        for e in res:
             self.w.plist.append_row([
-                res[0],
-                res[1] and res[2] + '-X' or res[2], # breed
-                res[4]+(res[5] is None and '-n?' or res[5] and '-n' or ''), #sex
-                res[6], # colour
-                res[8] and '({})'.format(res[7].strftime('%d.%m.%y')) or
-                res[7].strftime('%d.%m.%y'), # dob
-                res[9] and 'v' or '',
-                res[10] and 'rip' or ''])
-            self.w.plist.cell(len(self.w.plist.lrows)-1, 2).setToolTip(res[3])
+                e[0],
+                e[1] and e[2] + '-X' or e[2], # breed
+                e[4]+(e[5] is None and '-n?' or e[5] and '-n' or ''), #sex
+                e[6], # colour
+                e[8] and '({})'.format(e[7].strftime('%d.%m.%y')) or
+                e[7].strftime('%d.%m.%y'), # dob
+                e[9] and 'v' or '',
+                e[10] and 'rip' or ''])
+            self.w.plist.cell(len(self.w.plist.lrows)-1, 1).setToolTip(e[3])
         self.w.plist.set_colwidth(0, 100)
         self.w.plist.set_colwidth(1, 100)
         self.w.plist.set_colwidth(2, 100)

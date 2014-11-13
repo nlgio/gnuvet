@@ -1,4 +1,4 @@
-N = clid
+N = cid
 Z = pid
 invoices:
 invoice_id serial primary key
@@ -21,7 +21,7 @@ brt = net * (1 + vat)
 brt/(1 + vat) = net
 
 INVOICE START:
-invoice = self.querydb('select p_id from patients where p_cid=%s', (self.clid,))
+invoice = self.querydb('select p_id from patients where p_cid=%s', (self.cid,))
 pids = [e[0] for e in curs.fetchall()]
 invoice = []
 for e in pids:
@@ -34,4 +34,4 @@ where
  pr_id=med{1}.txt and
  acc_pid=p_id and
  acc_invno is null
-.format(self.clid,self.pid)
+.format(self.cid,self.pid)

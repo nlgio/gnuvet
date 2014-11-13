@@ -466,7 +466,7 @@ class Patient(QMainWindow):
         res = querydb(
             self,
             'insert into acc{}(acc_pid,acc_prid,acc_npr,acc_vat)values'
-            '(%s,%s,%s,%s)returning acc_id'.format(self.clid),
+            '(%s,%s,%s,%s)returning acc_id'.format(self.cid),
             (self.pid, prodid, args[3][0], args[3][1]+1))
         if res is None:  return # db error
         self.update_balance(args[3][0], args[4], self.vats[args[3][1]][2])
@@ -533,7 +533,7 @@ class Patient(QMainWindow):
         res = querydb(
             self,
             'insert into acc{}(acc_pid,acc_prid,acc_npr,acc_vat)values'
-            '(%s,%s,%s,%s)returning acc_id'.format(self.clid),
+            '(%s,%s,%s,%s)returning acc_id'.format(self.cid),
             (self.pid, prodid, args[3][0], args[3][1]+1))
         if res is None:  return # db error
         if 'usestock' in self.options and self.options['usestock']:
@@ -618,7 +618,7 @@ class Patient(QMainWindow):
         res = querydb(
             self,
             'insert into acc{}(acc_pid,acc_prid,acc_npr,acc_vat)values'
-            '(%s,%s,%s,%s)returning acc_id'.format(self.clid),
+            '(%s,%s,%s,%s)returning acc_id'.format(self.cid),
             (self.pid, prodid, args[3][0], args[3][1]+1))
         if res is None:  return # db error
         vtype = querydb( # hierwei this coulbe put into stored proc
@@ -708,7 +708,7 @@ class Patient(QMainWindow):
     def ck_balance(self): # hierwei recheck this on diff pats of same cli
         """Calculate current balance of client and patient."""
         pats = querydb(self, 'select p_id from patients where p_cid=%s',
-                       (self.clid,))
+                       (self.cid,))
         if pats is None:  return # db error
         pats = [e[0] for e in pats]
         cbal = pbal = Decimal('0.00')
@@ -723,7 +723,7 @@ class Patient(QMainWindow):
             res = querydb(
                 self,
                 "select tablename from pg_tables where tablename='acc{}'"
-                .format(self.clid))
+                .format(self.cid))
             if res is None:  return # db error
             if not res:
                 break
@@ -732,7 +732,7 @@ class Patient(QMainWindow):
                 'select acc_pid,acc_npr,vat_rate,count from acc{0},prod{1},'
                 'vats where acc_vat=vat_id and acc_prid=prod{1}.id and '
                 'acc_pid=%s and acc_paid is null'.format(
-                    self.clid, p), (p,))
+                    self.cid, p), (p,))
             if addend is None:  return # db error
             for e in addend:
                 if e[0] == self.pid:
@@ -824,7 +824,7 @@ class Patient(QMainWindow):
         res = querydb(
             self,
             "select tablename from pg_tables where tablename='inv{}'".format(
-                self.clid)) # [] or [('accN',)] # devel for Elsa, should: acc{}
+                self.cid)) # [] or [('accN',)] # devel for Elsa, should: acc{}
         if res is None:  return # db error
         if not res: # no such table: create accC, invC, payC
             try: # hierwei: commented for devel as acc2 exists
@@ -832,20 +832,21 @@ class Patient(QMainWindow):
                 ##     "create table acc{}(acc_id serial primary key,acc_pid "
                 ##     "integer not null references patients,acc_prid integer "
                 ##     "not null references prod{},acc_npr numeric(9,2) not "
-                ##     "null,acc_vat integer not null references vats)".format(
-                ##         self.clid, self.pid))
+                ##     "null,acc_vat integer not null references vats,acc_paid"
+                ##     " bool not null default false)".format(
+                ##         self.cid, self.pid))
                 self.curs.execute(
                     "create table inv{0}(inv_id serial primary key,inv_no "
                     "integer not null references acc{0}(_acc_invno_),inv_pid "
                     "integer not null references patients,inv_prid integer not "
                     "null references products,inv_npr numeric(9,2) not null,"
                     "inv_vat integer not null references vats default 1)".
-                    format(self.clid))
+                    format(self.cid))
                 ## self.curs.execute(
                 ##     "create table pay{0}(pay_id serial primary key,pay_invno "
                 ##     "integer not null references acc{0}(acc_invno),pay_date "
                 ##     "date not null default current_date,pay_amount numeric(9,2)"
-                ##     "not null)".format(self.clid))
+                ##     "not null)".format(self.cid))
             except OperationalError as e:
                 self.db_state(e)
                 return
@@ -1180,7 +1181,7 @@ class Patient(QMainWindow):
             self,
             # 0 p_name 1 xbreed 2 breed_name 3 sex 4 neutd 5 dob 6 dobest
             # 7 vicious 8 rip 9 bc1 10  bc2 11 bc3 12 l_id 13 l_name 14 anno
-            # 15 clid 16 title 17 csname 18 cfname 19 baddebt 20 telhome
+            # 15 cid 16 title 17 csname 18 cfname 19 baddebt 20 telhome
             # 21 telwork 22 mobile1 23 mobile2 24 housen 25 street 26 village
             # 27 city 28 postcode 29 chronics 30 ident 31 petpass 32 insurance
             # 33 lastseen 34 c_id
@@ -1234,8 +1235,8 @@ class Patient(QMainWindow):
                 self.w.annoLb.setText(r[14])
             else:
                 self.w.aLb.setEnabled(False)
-            self.clid = r[15]
-            if self.clid == 1:
+            self.cid = r[15]
+            if self.cid == 1:
                 self.w.cnameLb.setText(self.tr('Owner unknown'))
                 sname = 'nn' # hierwei: sname ref'd before assignment
             else:
@@ -1440,7 +1441,7 @@ class Patient(QMainWindow):
         if not hasattr(self, 'payment'):
             import payment
         self.paym = payment.Payment(self, self.db, self.options,
-                                    self.clid, self.pid, self.staffid)
+                                    self.cid, self.pid, self.staffid)
         self.paym.move(self.x()+50, self.y()+40)
         self.paym.show()
         # put here from book_cons where it made no sense:

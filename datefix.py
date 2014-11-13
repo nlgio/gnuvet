@@ -87,7 +87,7 @@ class Datefix(QMainWindow):
         self.popultimes()
         self.populmarks()
         self.pid = apppid
-        self.clid = appcid
+        self.cid = appcid
         self.w.shortCb.stateChanged.connect(self.toggleshort)
         self.update_disp(appid, appdt, apptxt, appcid,
                          apppid, appstf, appdur)
@@ -178,7 +178,7 @@ class Datefix(QMainWindow):
         self.data.emit(
             (datetime(datum.year, datum.month, datum.day, h, m),
              str(self.w.tLe.toPlainText()),
-             self.clid,
+             self.cid,
              self.pid,
              self.appstaffid,
              timedelta(0, dur),
@@ -195,7 +195,7 @@ class Datefix(QMainWindow):
         else:
             self.cliw.raise_()
         self.cliw.show()
-        self.cliw.clidsig.connect(self.setcli)
+        self.cliw.cidsig.connect(self.setcli)
 
     def getpat(self):
         if not hasattr(self, 'patw'):
@@ -294,11 +294,11 @@ class Datefix(QMainWindow):
         if not stfid:
             self.appstaffid = None
 
-    def setcli(self, clid): # hierwei confirm owner change?
-        self.clid = clid
+    def setcli(self, cid): # hierwei confirm owner change?
+        self.cid = cid
         self.csname = querydb(
             self,
-            'select c_sname from clients where c_id=%s', (clid,))
+            'select c_sname from clients where c_id=%s', (cid,))
         if self.csname is None:  return # db error
         self.csname = self.csname[0][0]
         self.w.cliPb.setText(self.tr('&Cli: ') + self.csname)
@@ -309,11 +309,11 @@ class Datefix(QMainWindow):
             self,
             'select p_name,p_cid from patients where p_id=%s', (pid,))
         if self.pname is None:  return # db error
-        self.clid = self.pname[0][1]
+        self.cid = self.pname[0][1]
         self.pname = self.pname[0][0]
         self.csname = querydb(
             self,
-            'select c_sname from clients where c_id=%s', (self.clid,))
+            'select c_sname from clients where c_id=%s', (self.cid,))
         if self.csname is None:  return # db error
         self.csname = self.csname[0][0]
         self.w.patPb.setText(self.tr('&Pat: ') + self.pname)
@@ -353,7 +353,7 @@ class Datefix(QMainWindow):
                 self.w.staffDd.findData(appstf, 32))
             if apppid:
                 self.setpat(apppid)
-            if appcid and (self.clid != appcid):
+            if appcid and (self.cid != appcid):
                 self.setcli(appcid)
             if self.appdur:
                 self.w.durDd.setCurrentIndex(self.w.durDd.findText(
