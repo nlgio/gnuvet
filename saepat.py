@@ -135,7 +135,7 @@ class Saepat(QMainWindow):
         taskM.addSeparator()
         taskM.addAction(closeA)
         taskM.addAction(quitA)
-        taskM.setSeparatorsCollapsible(1)
+        taskM.setSeparatorsCollapsible(True)
         self.newM.addAction(self.newpatA)
         self.newM.addSeparator()
         self.newM.addAction(self.newbreedA)
@@ -166,17 +166,22 @@ class Saepat(QMainWindow):
         self.newcolA.triggered.connect(self.add_col)
         self.newlocA.triggered.connect(self.add_loc)
         self.newinsA.triggered.connect(self.add_ins)
+        #    ORIGIN
+        if parent.origin == 'origin':
+            self.origin = parent
+        else:
+            self.origin = parent.origin
         #    PARENT CONNECTIONS
         if parent: # devel if
-            self.options = parent.options
-            self.db = parent.db
-            self.dbA.triggered.connect(parent.dbconnect)
-            aboutA.triggered.connect(parent.about)
-            parent.gvquit.connect(self.gv_quit)
-            parent.dbstate.connect(self.db_state)
-            self.helpsig.connect(parent.gv_help)
-            self.savestate.connect(parent.state_write)
-            self.staffid = parent.staffid
+            self.options = self.origin.options
+            self.db = self.origin.db
+            self.dbA.triggered.connect(self.origin.dbconnect)
+            aboutA.triggered.connect(self.origin.about)
+            self.origin.gvquit.connect(self.gv_quit)
+            self.origin.dbstate.connect(self.db_state) # ? hierwei
+            self.helpsig.connect(self.origin.gv_help)
+            self.savestate.connect(self.origin.state_write)
+            self.staffid = self.origin.staffid
         else:
             from options import read_options
             self.options = read_options()
@@ -587,11 +592,11 @@ class Saepat(QMainWindow):
         """Change owner of edited patient."""
         print('saepat.cli_change: nyi')
     
-    def closeEvent(self, ev):
+    def closeEvent(self, ev): # hierwei: devel
         ## if self.unsaved:
         ##     self.state_write()
-        if hasattr(self.parent, 'xy_decr'):
-            self.parent.xy_decr()
+        if hasattr(self.origin, 'xy_decr'):
+            self.origin.xy_decr()
     
     def compl_b(self, txt):
         """Breed completer."""
@@ -849,9 +854,9 @@ class Saepat(QMainWindow):
         if quitnow:
             self.close()
 
-    def gv_quitconfirm(self):
-        if self.parent:
-            self.parent.gv_quitconfirm()
+    def gv_quitconfirm(self): # hierwei devel
+        if self.origin:
+            self.origin.gv_quitconfirm()
         else:
             exit()
 
@@ -1156,14 +1161,14 @@ class Saepat(QMainWindow):
                 self.w.clientLb.setText(self.tr('Client unassigned'))
                 return
         if not self.cid: # hierwei c_id und signal?
-            self.parent.cid.connect(self.pat_addsetcli) # ? parent!
-            self.needcid.connect(self.parent.sae_cli)
+            self.origin.cid.connect(self.pat_addsetcli) # ? parent!
+            self.needcid.connect(self.origin.sae_cli)
             self.w.saeFr.setEnabled(0)
             if len(clis):
                 self.needcid.emit(('c', self, clis))
             else:
                 self.needcid.emit(('c', self))
-            self.needcid.disconnect(self.parent.sae_cli)
+            self.needcid.disconnect(self.origin.sae_cli)
             return
         # Does this client have a(nother) living patient of same name?
         print('double name check')
@@ -2232,15 +2237,15 @@ class Saepat(QMainWindow):
         self.cid = self.cids[row]
 
     def w_cli(self):
-        self.cidsig.connect(self.parent.w_cli)
+        self.cidsig.connect(self.origin.w_cli)
         self.cidsig.emit(self.cid)
-        self.cidsig.disconnect(self.parent.w_cli)
+        self.cidsig.disconnect(self.origin.w_cli)
         self.close()
 
     def w_pat(self):
-        self.pidsig.connect(self.parent.openpat)
+        self.pidsig.connect(self.origin.openpat)
         self.pidsig.emit(self.pid)
-        self.pidsig.disconnect(self.parent.openpat)
+        self.pidsig.disconnect(self.origin.openpat)
         self.close()
 
     def debugf(self):
