@@ -1,11 +1,12 @@
 sudo su -
 su - postgres
 #createuser -P gnuvet
-createuser -P enno
-???$ Enter name for new role: name
+#createuser -P enno
+## after upgrade to 9.4:
+createuser -s -P enno
 $ Enter pw for new role: ****
 $ Reenter pw for new role: ****
-$ New role be a superuser? (y/n): y
+## $ New role be a superuser? (y/n): y
 
 ###
 

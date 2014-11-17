@@ -4,10 +4,12 @@ from psycopg2 import connect, OperationalError
 class Db_handler:
     db = None
     dbname = 'gnuvet'
-    def __init__(self, user='enno', passwd=None, host=None): # user=None
+    def __init__(self, user='enno', passwd=None, host=None, port=None):
+        # production: user=None
         self.user = user
         self.passwd = passwd
         self.host = host
+        self.port = port
 
     def db_close(self):
         if self.db:
@@ -15,7 +17,7 @@ class Db_handler:
                 self.db.close()
             self.db = None
 
-    def db_check(self, curs=None): # obsolete?
+    def db_check(self, curs=None): # not obsolete!
         """Check if db is alive, return error string if not."""
         if not self.db:
             return 'no db connection'
@@ -36,10 +38,13 @@ class Db_handler:
                     args['password'] = self.passwd
             if self.host:
                 args['host'] = self.host
+            if self.port:
+                args['port'] = self.port
             try:
                 self.db = connect(**args)
                 cur = self.db.cursor()
-                cur.execute("set NAMES 'LATIN1'")
+                ## cur.execute("set NAMES 'LATIN1'") # this may be obsolete, as
+                ## Qt's all Unicode?
             except OperationalError as e:
                 return e.message
         return self.db
