@@ -65,18 +65,19 @@ def querydb(caller, query, qtuple=None, debug=False):
 
 def sysinfo():
     """Return sys-dependent syspath userpath and options_filename."""
-    if not 'os_name' in locals():
-        from os import name as os_name
-    if os_name == 'posix':
+    # needs some work i guess, for user paths on win32
+    if not 'sys_platform' in locals():
+        from sys import platform as sys_platform
+    if sys_platform.startswith('linux'):
         syspath = '/usr/share/gnuvet'
         userdir = '.gnuvet'
         optfile = '.options'
-    elif os_name == 'nt':
+    elif sys_platform.startswith('win32'):
         syspath = '/Program Files/gnuvet'
         userdir = 'gnuvet'
         optfile = 'options'
     else:
-        syspath = 'Not implemented: {}'.format(os_name)
+        syspath = 'Not implemented: {}'.format(sys_platform)
         userdir = ''
         optfile = ''
     return syspath, userdir, optfile

@@ -9,7 +9,7 @@
 # Reconsider switchoff things with db loss
 # Add group/institution in payment -- for TGD|Racetrack etc.
 
-from sys import argv, stderr
+from sys import argv, platform, stderr
 from os import path as os_path
 from getopt import gnu_getopt, GetoptError
 from datetime import date
@@ -117,7 +117,6 @@ class Gnuv_MainWin(QMainWindow):
         self.w.helpM.addSeparator()
         self.w.helpM.addAction(aboutA)
         #    CONNECTIONS
-        #self.w.logOk.connect(self.gv_login)
         self.dbA.triggered.connect(self.db_reconnect)
         self.patA.triggered.connect(self.sae_patact)
         self.cliA.triggered.connect(self.sae_cliact)
@@ -136,7 +135,7 @@ class Gnuv_MainWin(QMainWindow):
         self.user = 'enno'
         self.staffid = 1
         self.db_connect(self.user)
-        if self.db:
+        if self.db: # hierwei, gvdir_check ghört weiter rauf glaubich
             self.w.lLb.setText(self.user)
             self.gvdir_check()
         if not(hasattr(self, 'warning') and self.warning.isVisible()):
@@ -260,7 +259,7 @@ class Gnuv_MainWin(QMainWindow):
     def debugf(self): #hierwei spaetestens
         pass
 
-    def gvdir(self):
+    def gvdir(self): # hierwei, s. util.py re win32
         """Return name of working dir."""
         # win: (winApiPath, 'gnuvet')
         # mac: (homePath, 'Library/Preferences/gnuvet')
