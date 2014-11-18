@@ -26,6 +26,9 @@ create database gnuvet;
 
 \c gnuvet
 
+-- test 141117:
+set client_encoding to 'UTF-8';
+
 create table boxroles(
  boxr_id serial primary key,
  boxr_name varchar(120) not null);

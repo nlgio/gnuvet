@@ -1,15 +1,12 @@
 #!/usr/bin/python
 """The GnuVet main program."""
 # TODO:
-# g|setattr(self, cp) won't work: w_cli
-# here and client: move no_dbconn into _ui like in saecli/pat
-# adapt knowledge to login|gv_auth()
-# add considerate db checking poss via signals from and to like in patient?
-#     avoid overkill db checking wcli, wpat etc
-# book vacc without booking cons?
-# gvdir reconsider: for startup other than login
-# Reconsider switchoff things with db loss
+# reorganise db_state thing:  If db dont work set db None (or so)
 # special search (medication, clin hist)
+# g|setattr(self, cp) won't work: w_cli -- well don't see why: test
+# adapt knowledge to login|gv_auth()
+# gvdir reconsider: for startup other than login # ???
+# Reconsider switchoff things with db loss
 # Add group/institution in payment -- for TGD|Racetrack etc.
 
 from sys import argv, stderr
@@ -30,18 +27,15 @@ class Gnuv_MainWin(QMainWindow):
     """The GnuVet Main Window."""
     # signals
     gvquit = pyqtSignal(bool)
-    dbconnect = pyqtSignal()
     dbstate  = pyqtSignal(object)
     ##helpsig  = pyqtSignal(str) ?
     # addcli       = pyqtSignal(tuple)
     # addedcli     = pyqtSignal(tuple)
     # patid        = pyqtSignal(int)
 
-    # vars
-    connected = False # are we connected to the db? Obsoleteable? hierwei
+    # instance vars
     db        = None
     origin      = 'origin'
-    offspring = []    # visible children for gv_quitconfirm
     user      = None  # are we authenticated?
     x_pos, y_pos = 100, 50
 
@@ -50,6 +44,7 @@ class Gnuv_MainWin(QMainWindow):
         self.w = Ui_Mainform()
         self.w.setupUi(self)
         self.options = options
+        self.offspring = []    # visible children for gv_quitconfirm
         self.w.yesPb.clicked.connect(self.gv_exit)
         self.w.noPb.clicked.connect(self.gv_quitno)
         #    ACTIONS
@@ -123,7 +118,6 @@ class Gnuv_MainWin(QMainWindow):
         self.w.helpM.addAction(aboutA)
         #    CONNECTIONS
         #self.w.logOk.connect(self.gv_login)
-        self.dbconnect.connect(self.db_connect)
         self.dbA.triggered.connect(self.db_reconnect)
         self.patA.triggered.connect(self.sae_patact)
         self.cliA.triggered.connect(self.sae_cliact)
@@ -163,10 +157,7 @@ class Gnuv_MainWin(QMainWindow):
         if self.db and not isinstance(self.db, str):
             if hasattr(self.db, 'close'):
                 self.db.close()
-        ## offspring = []
         for window in self.findChildren(QMainWindow):
-        ##     offspring.append(window)
-        ## for window in offspring:
             window.close()
         self.user = None
         self.passwd = None
@@ -188,11 +179,11 @@ class Gnuv_MainWin(QMainWindow):
         if dbhost:
             args['host'] = dbhost
         self.dbh = dbmod.Db_handler(**args)
-        # devel:
-        self.user = user
-        self.passwd = passwd
-        self.dbhost = dbhost
-        # end devel
+        ## # devel:
+        ## self.user = user
+        ## self.passwd = passwd
+        ## self.dbhost = dbhost
+        ## # end devel
         self.db = self.dbh.db_connect()
         if not self.db or isinstance(self.db, str):
             self.db_state(self.db)
@@ -265,7 +256,6 @@ class Gnuv_MainWin(QMainWindow):
         if yes:
             self.w.statusbar.showMessage(self.tr('Ready ...'), 10000)
         self.w.no_dbconn.setVisible(not yes)
-        self.connected = yes
 
     def debugf(self): #hierwei spaetestens
         pass
@@ -406,7 +396,7 @@ class Gnuv_MainWin(QMainWindow):
         self.w.qFr.setEnabled(0)
         self.w.qFr.hide()
         self.w.gnuLb.show()
-        if not self.connected:
+        if not self.db or isinstance(self.db, str):
             self.w.no_dbconn.show()
         self.w.menubar.setEnabled(1)
         for window in self.offspring:

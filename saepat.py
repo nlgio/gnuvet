@@ -175,7 +175,7 @@ class Saepat(QMainWindow):
         if parent: # devel if
             self.options = self.origin.options
             self.db = self.origin.db
-            self.dbA.triggered.connect(self.origin.dbconnect)
+            self.dbA.triggered.connect(self.origin.db_reconnect)
             aboutA.triggered.connect(self.origin.about)
             self.origin.gvquit.connect(self.gv_quit)
             self.origin.dbstate.connect(self.db_state) # ? hierwei

@@ -2,7 +2,6 @@
 from psycopg2 import connect, OperationalError
 
 class Db_handler:
-    db = None
     dbname = 'gnuvet'
     def __init__(self, user='enno', passwd=None, host=None, port=None):
         # production: user=None
@@ -10,6 +9,7 @@ class Db_handler:
         self.passwd = passwd
         self.host = host
         self.port = port
+        self.db = None
 
     def db_close(self):
         if self.db:
@@ -45,6 +45,8 @@ class Db_handler:
                 cur = self.db.cursor()
                 ## cur.execute("set NAMES 'LATIN1'") # this may be obsolete, as
                 ## Qt's all Unicode?
+                ## default seems to be LATIN9, is LATIN1 + "Euro" and accents
+                ## or try UTF-8?
             except OperationalError as e:
                 return e.message
         return self.db

@@ -17,7 +17,6 @@ class Datefix(QMainWindow):
     # signals
     about = pyqtSignal()
     data = pyqtSignal(tuple)
-    dbconnect = pyqtSignal() # hierwei: implementieren
     dbstate = pyqtSignal(object)
     gvquit = pyqtSignal(bool)
     helpsig = pyqtSignal(str)
@@ -139,7 +138,7 @@ class Datefix(QMainWindow):
     ##         self.setWindowTitle('GnuVet: ' + self.tr('Edit Appointment'))
     ##         self.action = 'e' # edit
 
-    def db_reconnect(self): # copied from gnuv.py, args from where?
+    def db_reconnect(self): # copied from gnuv.py, remodel to self.origin!
         args = {}
         if self.user:
             args['user'] = self.user

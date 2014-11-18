@@ -18,7 +18,6 @@ from gtable import Gcell
 class Appointer(QMainWindow):
     # signals
     gvquit = pyqtSignal(bool)
-    ## dbconnect = pyqtSignal()
     dbstate = pyqtSignal(object) # False: err
     helpsig = pyqtSignal(str)
     savestate = pyqtSignal(dict)
@@ -204,7 +203,7 @@ border-radius: 3px;
             else:
                 self.origin = parent.origin
             self.db = parent.db
-            self.dbA.triggered.connect(parent.dbconnect)
+            self.dbA.triggered.connect(self.origin.db_reconnect)
             aboutA.triggered.connect(parent.about)
             parent.gvquit.connect(self.gv_quit)
             parent.dbstate.connect(self.db_state)
