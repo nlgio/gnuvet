@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """The GnuVet main program."""
 # TODO:
+# options howto: if gnuv.py in /usr/bin, get gvdir? etc.
+# ck self.gvdir()!
 # reorganise db_state thing:  If db dont work set db None (or so)
 # special search (medication, clin hist)
 # g|setattr(self, cp) won't work: w_cli -- well don't see why: test
@@ -307,11 +309,11 @@ class Gnuv_MainWin(QMainWindow):
 
     def gv_auth(self): # hierwei include gvdir_check
         """Try connecting to db with given user and pass."""
-        user = str(self.w.logname.text().toLatin1())
-        passwd = str(self.w.logpass.text().toLatin1())
-        self.w.logname.setText('')
-        self.w.logpass.setText('')
-        self.w.logname.setFocus()
+        user = str(self.w.lognameLe.text().toLatin1())
+        passwd = str(self.w.logpassLe.text().toLatin1())
+        self.w.lognameLe.setText('')
+        self.w.logpassLe.setText('')
+        self.w.lognameLe.setFocus()
         dbhost = 'dbnost' in self.options and self.options['dbhost'] or None
         self.db_connect(user, passwd, dbhost)
         if not self.db or isinstance(self.db, str):
