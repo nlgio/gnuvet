@@ -45,6 +45,7 @@ class Gnuv_MainWin(QMainWindow):
         self.w.setupUi(self)
         self.options = options
         self.offspring = []    # visible children for gv_quitconfirm
+        self.gvdir_check() # hierwei delegate this to gv_auth?
         self.w.yesPb.clicked.connect(self.gv_exit)
         self.w.noPb.clicked.connect(self.gv_quitno)
         #    ACTIONS
@@ -127,17 +128,16 @@ class Gnuv_MainWin(QMainWindow):
         quitA.triggered.connect(self.gv_quitconfirm)
         helpA.triggered.connect(self.gv_helpmain)
         aboutA.triggered.connect(self.about)
+        #    INIT
         self.keycheck = Keycheck(self)
         self.installEventFilter(self.keycheck)
-        # login:
+        #    LOGIN
         #self.gv_authq()
-        # devel
+        # devel:
         self.user = 'enno'
-        self.staffid = 1
         self.db_connect(self.user)
-        if self.db: # hierwei, gvdir_check ghört weiter rauf glaubich
+        if self.db:
             self.w.lLb.setText(self.user)
-            self.gvdir_check()
         if not(hasattr(self, 'warning') and self.warning.isVisible()):
             self.show()
         # end devel
@@ -192,22 +192,17 @@ class Gnuv_MainWin(QMainWindow):
         self.dbhost = dbhost
         self.dbdep_enable()
         self.curs = self.db.cursor()
-        try:
-            res = querydb(
-                self,
-                'select stf_func,stf_id from staff where stf_logname=%s',
-                (user,))
-            if res is None:  return # db error hierwei check db_state!
-            res = self.curs.fetchall()
-        except (OperationalError, AttributeError):
-            self.db_state(self.db)
-            return
+        res = querydb(
+            self,
+            'select stf_func,stf_id from staff where stf_logname=%s',
+            (user,))
+        if res is None:  return # db error, self.db_state has been called
+        res = self.curs.fetchall()
         if not res:
             return
-        for p in res:
-            self.staffrole = p[0]
-            # devel:
-            #self.staffid = p[1]
+        self.staffrole, self.staffid = res[0]
+        # devel:
+        self.staffid = 1
 
     def db_reconnect(self):
         """Try reconnecting to db."""
@@ -229,18 +224,16 @@ class Gnuv_MainWin(QMainWindow):
     def db_state(self, msg=''):
         """Actions to be taken on db loss or gain."""
         dberr = msg and True or False
-        if dberr:
-            self.db = None
         self.w.no_dbconn.setVisible(dberr)
         self.dbdep_enable(not dberr)
-        if not hasattr(self, 'warnw'):
-            from warn import Warning
-        if not msg:
-            msg = self.tr('Unspecified db error.')
-        self.warnw = Warning(self, self.tr('GnuVet: Db Error'), msg)
-        if not self.isVisible():
-            self.warnw.closed.connect(self.show)
-        self.w.statusbar.clearMessage()
+        if dberr:
+            self.db = None
+            if not hasattr(self, 'warnw'):
+                from warn import Warning
+            self.warnw = Warning(self, self.tr('GnuVet: Db Error'), msg)
+            if not self.isVisible():
+                self.warnw.closed.connect(self.show)
+            self.w.statusbar.clearMessage()
     
     def dbdep_enable(self, yes=True):
         """En- or disable db dependent features, signal children of db state."""
@@ -312,7 +305,7 @@ class Gnuv_MainWin(QMainWindow):
                          format(gvdir))
             exit(13)
 
-    def gv_auth(self):
+    def gv_auth(self): # hierwei include gvdir_check
         """Try connecting to db with given user and pass."""
         user = str(self.w.logname.text().toLatin1())
         passwd = str(self.w.logpass.text().toLatin1())
@@ -493,6 +486,12 @@ class Gnuv_MainWin(QMainWindow):
             from options import write_options
         pass
 
+    def readsaved(self): # redundant w/ state_restore?
+        """Read optional savedstate file on startup."""
+        gvdir = self.gvdir()
+        if os_path.exists(gvdir + 'savestate'):
+            pass # for now
+
     def sae_cliact(self, trg=0): # triggered(checked=False) hierwei
         """Wrapper for action signal."""
         self.sae_cli()
@@ -547,12 +546,6 @@ class Gnuv_MainWin(QMainWindow):
         """Search-Add-Edit Stock window."""
         pass
 
-    def savedread(self):
-        """Read optional savedstate file on startup."""
-        gvdir = self.gvdir()
-        if os_path.exists(gvdir + 'savestate'):
-            pass # for now
-
     def state_restore(self):
         """Restore pre-crash state."""
         pass
@@ -581,7 +574,7 @@ class Gnuv_MainWin(QMainWindow):
             except TypeError:
                 pass
         self.gvdir_check()
-        sfile = os_path.join(self.gvdir(), 'savestate')
+        sfile = os_path.join(self.userdir, 'savestate')
         try:
             f = open(sfile, 'w')
             f.write('\n'.join(save_things))
