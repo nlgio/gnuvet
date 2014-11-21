@@ -61,7 +61,10 @@ def querydb(caller, query, qtuple=None, debug=False):
             caller.curs.execute(query)
         return caller.curs.fetchall()
     except OperationalError as e:
-        caller.db_state(e)
+        if caller.origin == 'origin': # new 141120 test for origin
+            caller.db_state(e)
+        else:
+            caller.origin.db_state(e)
 
 def sysinfo():
     """Return sys-dependent syspath userpath and options_filename."""

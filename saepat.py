@@ -671,7 +671,7 @@ class Saepat(QMainWindow):
         if len(dd.currentText()) > dd.olen:
             dd.lineEdit().setSelection(dd.olen, 80)
 
-    def db_state(self, db=None):
+    def db_state(self, db=None): # hierwei ck vs origin from gnuv.py
         """Actions to be taken on db loss and gain."""
         errmsg = ''
         if isinstance(db, str):
@@ -681,7 +681,7 @@ class Saepat(QMainWindow):
         self.w.no_dbconn.setVisible(self.db_err)
         self.dbA.setVisible(self.db_err)
         self.dbA.setEnabled(self.db_err)
-        self.dbstate.emit(not self.db_err)
+        ##self.dbstate.emit(not self.db_err) # c'd 141120 shb done by origin
         self.actions_enable(not self.db_err)
         if not errmsg:
             self.db = db

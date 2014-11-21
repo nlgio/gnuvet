@@ -1,14 +1,18 @@
 #!/usr/bin/python
 """The GnuVet main program."""
 # TODO:
-# options howto: if gnuv.py in /usr/bin, get gvdir? etc.
-# ck self.gvdir()!
+##   File "/usr/bin/gnuvet", line 526, in sae_patact
+##     self.sae_pat()
+##   File "/usr/bin/gnuvet", line 541, in sae_pat
+##     setattr(self, sp, Saepat(self, act, patid))
+##   File "/usr/local/enno/src/py/gnuvet/saepat.py", line 237, in __init__
+##     logname = logname[0][0]
+## IndexError: list index out of range
+
 # reorganise db_state thing:  If db dont work set db None (or so)
 # special search (medication, clin hist)
 # g|setattr(self, cp) won't work: w_cli -- well don't see why: test
 # adapt knowledge to login|gv_auth()
-# gvdir reconsider: for startup other than login # ???
-# Reconsider switchoff things with db loss
 # Add group/institution in payment -- for TGD|Racetrack etc.
 
 from sys import argv, platform, stderr
@@ -36,9 +40,10 @@ class Gnuv_MainWin(QMainWindow):
     # patid        = pyqtSignal(int)
 
     # instance vars
-    db        = None
-    origin      = 'origin'
-    user      = None  # are we authenticated?
+    db      = None
+    origin  = 'origin'
+    staffid = None
+    user    = None  # are we authenticated?
     x_pos, y_pos = 100, 50
 
     def __init__(self, options={}):
@@ -47,7 +52,7 @@ class Gnuv_MainWin(QMainWindow):
         self.w.setupUi(self)
         self.options = options
         self.offspring = []    # visible children for gv_quitconfirm
-        self.gvdir_check() # hierwei delegate this to gv_auth?
+        ## self.syspath, self.userdir, self.optfile = None ?
         self.w.yesPb.clicked.connect(self.gv_exit)
         self.w.noPb.clicked.connect(self.gv_quitno)
         #    ACTIONS
@@ -137,10 +142,11 @@ class Gnuv_MainWin(QMainWindow):
         #self.gv_authq()
         # devel:
         self.user = 'enno'
+        self.staffid = 1
         self.db_connect(self.user)
         if self.db:
             self.w.lLb.setText(self.user)
-        if not(hasattr(self, 'warning') and self.warning.isVisible()):
+        if not(hasattr(self, 'warnw') and self.warnw.isVisible()):
             self.show()
         # end devel
 
@@ -182,7 +188,6 @@ class Gnuv_MainWin(QMainWindow):
         self.dbh = dbmod.Db_handler(**args)
         ## # devel:
         ## self.user = user
-        ## self.passwd = passwd
         ## self.dbhost = dbhost
         ## # end devel
         self.db = self.dbh.db_connect()
@@ -190,7 +195,6 @@ class Gnuv_MainWin(QMainWindow):
             self.db_state(self.db)
             return
         self.user = user
-        self.passwd = passwd
         self.dbhost = dbhost
         self.dbdep_enable()
         self.curs = self.db.cursor()
@@ -211,16 +215,10 @@ class Gnuv_MainWin(QMainWindow):
         args = {}
         if self.user:
             args['user'] = self.user
-        if self.passwd:
-            args['passwd'] = self.passwd
         if self.dbhost:
             args['host'] = self.dbhost
-        self.dbh = dbmod.Db_handler(**args)
-        self.db = self.dbh.db_connect()
-        if not self.db or isinstance(self.db, str):
-            return
-        self.dbdep_enable()
-        self.curs = self.db.cursor()
+        self.w.lognameLe.setText(self.user)
+        self.gv_authq()
         self.dbstate.emit(self.db)
 
     def db_state(self, msg=''):
@@ -236,6 +234,7 @@ class Gnuv_MainWin(QMainWindow):
             if not self.isVisible():
                 self.warnw.closed.connect(self.show)
             self.w.statusbar.clearMessage()
+            self.dbstate.emit(None) # new 141120
     
     def dbdep_enable(self, yes=True):
         """En- or disable db dependent features, signal children of db state."""
@@ -251,11 +250,11 @@ class Gnuv_MainWin(QMainWindow):
             self.w.statusbar.showMessage(self.tr('Ready ...'), 10000)
         self.w.no_dbconn.setVisible(not yes)
 
-    def debugf(self): #hierwei spaetestens
+    def debugf(self):
         pass
 
-    def gvdir(self): # hierwei, s. util.py re win32
-        """Return name of working dir."""
+    def gvdir_check(self):
+        """Check working dir (at startup), create if necessary."""
         # win: (winApiPath, 'gnuvet')
         # mac: (homePath, 'Library/Preferences/gnuvet')
         # *nx: ('/usr/share/gnuvet' or '~' + /.gnuvet)
@@ -263,48 +262,46 @@ class Gnuv_MainWin(QMainWindow):
             from util import sysinfo
         self.syspath, self.userdir, self.optfile = sysinfo()
         if self.staffid == 1:
-            return self.syspath
+            home = self.syspath
+            self.userdir = self.syspath
         else:
             home = '~' + self.user
-            if os_path.expanduser(home) != home:
-                return os_path.join(os_path.expanduser(home), self.userdir)
-            else: # no such user on system
-                return self.syspath
-
-    def gvdir_check(self):
-        """Check working dir (at startup), create if necessary."""
-        gvdir = self.gvdir()
+        if os_path.expanduser(home) != home:
+            self.userdir = os_path.join(os_path.expanduser(home), self.userdir)
+        else: # no such user on system
+            self.userdir = None
         if not 'os_access' in locals():
             from os import access as os_access
-        if not os_path.exists(gvdir):
+        if not os_path.exists(self.userdir):
             if not 'os_mkdir' in locals():
                 from os import mkdir as os_mkdir
             try:
-                os_mkdir(gvdir)
+                os_mkdir(self.userdir)
             except OSError:
-                stderr.write('Couldn\'t create dir "{}"\n'.format(gvdir))
+                stderr.write('Couldn\'t create dir "{}"\n'.format(self.userdir))
                 exit(13)
-        elif not os_path.isdir(gvdir):
+        elif not os_path.isdir(self.userdir):
             if not 'os_rename' in locals():
                 from os import rename as os_rename
             try:
-                os_rename(gvdir, gvdir + '.bak')
+                os_rename(self.userdir, self.userdir + '.bak')
                 stderr.write('WARN: renamed existing file "{0}" to '
-                             '"{0}.bak"\n'.format(gvdir))
+                             '"{0}.bak"\n'.format(self.userdir))
             except OSError:
                 stderr.write('Couldn\'t rename "{0}" to "{0}.bak"\n'.
-                             format(gvdir))
+                             format(self.userdir))
                 exit(13)
             if not 'os_mkdir' in locals():
                 from os import mkdir as os_mkdir
             try:
-                os_mkdir(gvdir)
+                os_mkdir(self.userdir)
             except OSError:
-                stderr.write('Couldn\'t create dir "{}"!\n'.format(gvdir))
+                stderr.write(
+                    'Couldn\'t create dir "{}"!\n'.format(self.userdir))
                 exit(13)
-        elif not os_access(gvdir, 7):
+        elif not os_access(self.userdir, 7):
             stderr.write('WARN: Directory "{}" is not writeable!\n'.
-                         format(gvdir))
+                         format(self.userdir))
             exit(13)
 
     def gv_auth(self): # hierwei include gvdir_check
@@ -314,19 +311,20 @@ class Gnuv_MainWin(QMainWindow):
         self.w.lognameLe.setText('')
         self.w.logpassLe.setText('')
         self.w.lognameLe.setFocus()
-        dbhost = 'dbnost' in self.options and self.options['dbhost'] or None
+        dbhost = 'dbhost' in self.options and self.options['dbhost'] or None
         self.db_connect(user, passwd, dbhost)
         if not self.db or isinstance(self.db, str):
             self.w.statusbar.showMessage(self.tr('Login incorrect'), 20000)
+            self.staffid = None
         else:
             self.w.lFr.setEnabled(0)
             self.w.lFr.hide()
             self.w.lLb.setText(user)
             self.w.logokPb.clicked.disconnect(self.gv_auth)
+            self.gvdir_check()
             self.optread(user)
             self.savedread()
             self.user = user
-            self.passwd = passwd
             self.dbhost = dbhost
 
     def gv_authq(self):
@@ -490,11 +488,10 @@ class Gnuv_MainWin(QMainWindow):
 
     def readsaved(self): # redundant w/ state_restore?
         """Read optional savedstate file on startup."""
-        gvdir = self.gvdir()
-        if os_path.exists(gvdir + 'savestate'):
+        if os_path.exists(self.userdir + 'savestate'):
             pass # for now
 
-    def sae_cliact(self, trg=0): # triggered(checked=False) hierwei
+    def sae_cliact(self, trg=0): # triggered(checked=False)
         """Wrapper for action signal."""
         self.sae_cli()
         
@@ -575,7 +572,6 @@ class Gnuv_MainWin(QMainWindow):
                 self.warning.closed.disconnect(self.show)
             except TypeError:
                 pass
-        self.gvdir_check()
         sfile = os_path.join(self.userdir, 'savestate')
         try:
             f = open(sfile, 'w')
