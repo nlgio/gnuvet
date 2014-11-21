@@ -342,8 +342,7 @@ class Gnuv_MainWin(QMainWindow):
             self.helpw.raise_()
             self.helpw.show_help(help_doc)
         else:
-            if not 'gv_help' in locals():
-                import gv_help
+            import gv_help
             self.helpw = gv_help.Help(self, help_doc)
 
     def gv_helpmain(self):
@@ -353,8 +352,7 @@ class Gnuv_MainWin(QMainWindow):
             self.helpw.raise_()
             self.helpw.show_help('mainform.html')
         else:
-            if not 'gv_help' in locals():
-                import gv_help
+            import gv_help
             self.helpw = gv_help.Help(self, 'mainform.html')
 
     def gv_quitconfirm(self):

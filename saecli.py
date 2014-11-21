@@ -256,8 +256,7 @@ class Saecli(QMainWindow):
     def ck_email(self):
         if not self.w.emailLe.text():
             return True
-        if not 're' in locals():
-            import re
+        import re
         if not 'emailre' in locals():
             emailre = re.compile(
                 r'([A-Z]|[a-z]|[0-9]){1,}([A-Z]|[a-z]|[0-9]|[\.])*([A-'
@@ -268,8 +267,7 @@ class Saecli(QMainWindow):
         return True
 
     def ck_entries(self):
-        if not 're' in locals():
-            import re
+        import re
         # for non-english languages these have to be adapted:
         if not 'namere' in locals():
             namere = re.compile(r"[A-Z][a-z']*([-\ ]?[A-Z][a-z']*)*$")
