@@ -1,15 +1,7 @@
 #!/usr/bin/python
 """The GnuVet main program."""
 # TODO:
-##   File "/usr/bin/gnuvet", line 526, in sae_patact
-##     self.sae_pat()
-##   File "/usr/bin/gnuvet", line 541, in sae_pat
-##     setattr(self, sp, Saepat(self, act, patid))
-##   File "/usr/local/enno/src/py/gnuvet/saepat.py", line 237, in __init__
-##     logname = logname[0][0]
-## IndexError: list index out of range
-
-# reorganise db_state thing:  If db dont work set db None (or so)
+# test multiple win_open via name_newwin
 # special search (medication, clin hist)
 # g|setattr(self, cp) won't work: w_cli -- well don't see why: test
 # adapt knowledge to login|gv_auth()
@@ -304,7 +296,7 @@ class Gnuv_MainWin(QMainWindow):
                          format(self.userdir))
             exit(13)
 
-    def gv_auth(self): # hierwei include gvdir_check
+    def gv_auth(self):
         """Try connecting to db with given user and pass."""
         user = str(self.w.lognameLe.text().toLatin1())
         passwd = str(self.w.logpassLe.text().toLatin1())

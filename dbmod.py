@@ -47,6 +47,9 @@ class Db_handler:
                 ## Qt's all Unicode?
                 ## default seems to be LATIN9, is LATIN1 + "Euro" and accents
                 ## or try UTF-8?
+                ## cur.execute("set client_encoding='UTF-8'") # works 'upstream'
+                #      but not down to Qt: Umlaut represented like in Eterm
+                cur.execute("set client_encoding='LATIN9'") # seems 2 work well
             except OperationalError as e:
                 return e.message
         return self.db
