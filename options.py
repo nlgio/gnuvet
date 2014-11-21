@@ -52,18 +52,12 @@ def readopt(s):
     except ValueError:
         return s
 
-def read_options(user=None):
+def read_options(userdir=None, optfile=None): # hierwei
     """Set options according to options file if it exists, is readable
     and not suspiciously large.  Otherwise return defaults."""
-    if not 'sysinfo' in locals():
-        from util import sysinfo
-    syspath, userdir, optfile = sysinfo()
-    if not optfile:
-        stderr.write(syspath + '\n')
-        return
     if not 'os_path' in locals():
         from os import path as os_path
-    if user:
+    if userdir:
         optfile = os_path.join(os_path.expanduser('~'+user), userdir, optfile)
     else:
         optfile = os_path.join(syspath, os_path.split(optfile)[-1])

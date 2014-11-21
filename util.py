@@ -75,15 +75,18 @@ def sysinfo():
         syspath = '/usr/share/gnuvet'
         userdir = '.gnuvet'
         optfile = '.options'
+        system  = 'linux'
     elif sys_platform.startswith('win32'):
         syspath = '/Program Files/gnuvet'
         userdir = 'gnuvet'
         optfile = 'options'
+        system  = 'win32'
     else:
         syspath = 'Not implemented: {}'.format(sys_platform)
         userdir = ''
         optfile = ''
-    return syspath, userdir, optfile
+        system  = 'not supported'
+    return syspath, userdir, optfile, system
 
 def wildcard(entry='', ahead=False):
     """Add sql wildcards, replace *."""

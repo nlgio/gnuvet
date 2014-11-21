@@ -252,12 +252,12 @@ class Gnuv_MainWin(QMainWindow):
         # *nx: ('/usr/share/gnuvet' or '~' + /.gnuvet)
         if not 'sysinfo' in locals():
             from util import sysinfo
-        self.syspath, self.userdir, self.optfile = sysinfo()
+        self.syspath, self.userdir, self.optfile, self.system = sysinfo()
+        # e.g. '/usr/share/gnuvet', '.gnuvet', '.options' # hierwei
         if self.staffid == 1:
-            home = self.syspath
-            self.userdir = self.syspath
+            self.userdir = ''
         else:
-            home = '~' + self.user
+            self.userdir = '~' + self.user
         if os_path.expanduser(home) != home:
             self.userdir = os_path.join(os_path.expanduser(home), self.userdir)
         else: # no such user on system
