@@ -32,6 +32,7 @@ class Gnuv_MainWin(QMainWindow):
     # patid        = pyqtSignal(int)
 
     # instance vars
+    cwins   = 0 # client windows
     db      = None
     origin  = 'origin'
     staffid = None
@@ -125,7 +126,7 @@ class Gnuv_MainWin(QMainWindow):
         # self.appointA ordA jouA finA medA srvA sysA stkA
         chuserA.triggered.connect(self.chuser)
         quitA.triggered.connect(self.gv_quitconfirm)
-        helpA.triggered.connect(self.gv_helpmain)
+        helpA.triggered.connect(self.gv_helpself)
         aboutA.triggered.connect(self.about)
         #    INIT
         self.keycheck = Keycheck(self)
@@ -253,15 +254,16 @@ class Gnuv_MainWin(QMainWindow):
         if not 'sysinfo' in locals():
             from util import sysinfo
         self.syspath, self.userdir, self.optfile, self.system = sysinfo()
-        # e.g. '/usr/share/gnuvet', '.gnuvet', '.options' # hierwei
+        # e.g. '/usr/share/gnuvet', '.gnuvet', '.options'
         if self.staffid == 1:
-            self.userdir = ''
+            self.userdir = self.syspath
         else:
             self.userdir = '~' + self.user
-        if os_path.expanduser(home) != home:
-            self.userdir = os_path.join(os_path.expanduser(home), self.userdir)
-        else: # no such user on system
-            self.userdir = None
+            if os_path.expanduser(home) != home:
+                self.userdir = os_path.join(
+                    os_path.expanduser(home), self.userdir)
+            ## else: # no such user on system, shouldn't happen
+            ##     self.userdir = None
         if not 'os_access' in locals():
             from os import access as os_access
         if not os_path.exists(self.userdir):
@@ -269,8 +271,9 @@ class Gnuv_MainWin(QMainWindow):
                 from os import mkdir as os_mkdir
             try:
                 os_mkdir(self.userdir)
-            except OSError:
-                stderr.write('Couldn\'t create dir "{}"\n'.format(self.userdir))
+            except OSError as e:
+                stderr.write('Couldn\'t create dir "{}"\n{}\n'.format(
+                    self.userdir, e))
                 exit(13)
         elif not os_path.isdir(self.userdir):
             if not 'os_rename' in locals():
@@ -279,17 +282,17 @@ class Gnuv_MainWin(QMainWindow):
                 os_rename(self.userdir, self.userdir + '.bak')
                 stderr.write('WARN: renamed existing file "{0}" to '
                              '"{0}.bak"\n'.format(self.userdir))
-            except OSError:
-                stderr.write('Couldn\'t rename "{0}" to "{0}.bak"\n'.
-                             format(self.userdir))
+            except OSError as e:
+                stderr.write('Couldn\'t rename "{0}" to "{0}.bak"\n{1}\n'.
+                             format(self.userdir, e))
                 exit(13)
             if not 'os_mkdir' in locals():
                 from os import mkdir as os_mkdir
             try:
                 os_mkdir(self.userdir)
-            except OSError:
+            except OSError as e:
                 stderr.write(
-                    'Couldn\'t create dir "{}"!\n'.format(self.userdir))
+                    'Couldn\'t create dir "{}"!\n{}\n'.format(self.userdir, e))
                 exit(13)
         elif not os_access(self.userdir, 7):
             stderr.write('WARN: Directory "{}" is not writeable!\n'.
@@ -345,7 +348,7 @@ class Gnuv_MainWin(QMainWindow):
             import gv_help
             self.helpw = gv_help.Help(self, help_doc)
 
-    def gv_helpmain(self):
+    def gv_helpself(self):
         """Launch help window and display mainform.html"""
         if hasattr(self, 'helpw'):
             self.helpw.show()
@@ -398,6 +401,7 @@ class Gnuv_MainWin(QMainWindow):
             else:
                 continue
         if name != startname:
+            print(name)
             return name
         return None
 
@@ -414,6 +418,13 @@ class Gnuv_MainWin(QMainWindow):
         
     def opencli(self, cid=0):
         """Launch Client window."""
+        if not cnt:
+            cnt = ('maxwinnum' in self.options and
+                   self.options['maxwinnum'] or 3)
+        if self.cwins == cnt:
+            self.w.statusbar.showMessage(self.tr(
+                'Open client windows maximum count reached.'), 10000)
+            return
         errmsg = self.dbh.db_check(self.curs)
         if errmsg:
             self.db_state(errmsg)
@@ -427,6 +438,7 @@ class Gnuv_MainWin(QMainWindow):
             import client
             self.wc = client.Client(self, cid)
             self.xy_incr(self.wc)
+        self.cwins += 1
         self.wc.show()
 
     def openfin(self):
@@ -594,8 +606,7 @@ class Gnuv_MainWin(QMainWindow):
 def main():
     shopts = 'hV'
     lopts  = ['help', 'version']
-    from options import read_options
-    options = read_options()
+    from options import defaults as options
     lang = 'lang' in options and options['lang'] or 'en'
     try:
         opts, args = gnu_getopt(argv[1:], shopts, lopts)
