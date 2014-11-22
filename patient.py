@@ -281,8 +281,8 @@ class Patient(QMainWindow):
             # end devel
             self.options = parent.options
         else:
-            from options import read_options
-            self.options = read_options()
+            from options import defaults as options
+            self.options = options
         self.contime = 0
         if 'contime' in self.options:
             self.contime = self.options['contime']

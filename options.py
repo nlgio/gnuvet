@@ -52,15 +52,16 @@ def readopt(s):
     except ValueError:
         return s
 
-def read_options(userdir=None, optfile=None): # hierwei
+def read_options(userdir=None, optfile=None):
     """Set options according to options file if it exists, is readable
     and not suspiciously large.  Otherwise return defaults."""
+    # hierwei this needs different handling for devel and production
     if not 'os_path' in locals():
         from os import path as os_path
-    if userdir:
-        optfile = os_path.join(os_path.expanduser('~'+user), userdir, optfile)
+    if userdir and optfile:
+        optfile = os_path.join(userdir, optfile)
     else:
-        optfile = os_path.join(syspath, os_path.split(optfile)[-1])
+        return {}
     if not path.exists(optfile):
         return defaults
     if stat(optfile).st_size > 2048:
@@ -70,8 +71,9 @@ def read_options(userdir=None, optfile=None): # hierwei
     try:
         with open(optfile, 'r', 1) as f:
             of = StringIO(f.read())
-    except IOError:
-        stderr.write("Couldn't open options file, using defaults.\n")
+    except IOError as e:
+        stderr.write("Couldn't open options file, using defaults.\n{}\n".format(
+            e))
         return defaults
     for line in of:
         if (not (line or line.__contains__('=')) or

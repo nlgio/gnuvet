@@ -210,8 +210,8 @@ border-radius: 3px;
             self.helpsig.connect(parent.gv_help)
             self.staffid = parent.staffid
         else:
-            from options import read_options
-            self.options = read_options()
+            from options import defaults as options
+            self.options = options
             import dbmod
             dbh = dbmod.Db_handler('enno')
             self.db = dbh.db_connect()

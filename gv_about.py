@@ -43,8 +43,7 @@ class About(QMainWindow):
 
 if __name__ == '__main__':
     from PyQt4.QtGui import QApplication
-    from options import read_options
-    options = read_options()
+    from options import defaults as options
     a = QApplication([])
     b = About(None, options['lang'])
     b.show()

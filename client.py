@@ -131,8 +131,8 @@ class Client(QMainWindow):
             dbh = dbmod.Db_handler('enno')
             self.db = dbh.db_connect()
             self.staffid = 1
-            from options import read_options
-            self.options = read_options()
+            from options import defaults as options
+            self.options = options
         #    BUTTON CONNECTIONS
         self.w.cancelPb.clicked.connect(self.close)
         #    INIT

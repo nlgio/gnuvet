@@ -34,6 +34,7 @@ class Gnuv_MainWin(QMainWindow):
     # instance vars
     cwins   = 0 # client windows
     db      = None
+    dbhost  = None
     origin  = 'origin'
     staffid = None
     user    = None  # are we authenticated?
@@ -211,6 +212,7 @@ class Gnuv_MainWin(QMainWindow):
         if self.dbhost:
             args['host'] = self.dbhost
         self.w.lognameLe.setText(self.user)
+        self.w.logpassLe.setFocus()
         self.gv_authq()
         self.dbstate.emit(self.db)
 
@@ -397,13 +399,17 @@ class Gnuv_MainWin(QMainWindow):
         for i in xrange(cnt):
             if not hasattr(self, name+str(i+1)):
                 name = name + str(i+1)
+                new = True
                 break
-            else:
-                continue
+            elif not getattr(self, name+str(i+1)).isVisible():
+                name = name + str(i+1)
+                new = False
+                break
+            ## else:
+            ##     continue
         if name != startname:
-            print(name)
-            return name
-        return None
+            return (name, new)
+        return (None, False)
 
     def openapp(self):
         """Open appointment diary."""
@@ -503,17 +509,23 @@ class Gnuv_MainWin(QMainWindow):
         if errmsg:
             self.db_state(errmsg)
             return
-        cp = self.name_newwin('saecliw')
+        cp, new = self.name_newwin('saecliw')
         if not cp:
             self.w.statusbar.showMessage(self.tr(
                 'Open client windows maximum count reached.'), 10000)
             return
-        if not 'Saecli' in locals():
-            from saecli import Saecli
-        setattr(self, cp, Saecli(self, act, cid))
-        self.xy_incr(getattr(self, cp))
-        getattr(self, cp).show()
-
+        if new:
+            if not 'Saecli' in locals():
+                from saecli import Saecli
+            setattr(self, cp, Saecli(self, act, cid))
+            self.xy_incr(getattr(self, cp))
+            getattr(self, cp).show()
+        else:
+            cp = getattr(self, cp)
+            cp.reset()
+            cp.show()
+            cp.raise_()
+            
     def sae_patact(self, trg=0): # triggered(checked=False)
         """Wrapper for action signal."""
         self.sae_pat()
@@ -524,16 +536,22 @@ class Gnuv_MainWin(QMainWindow):
         if errmsg:
             self.db_state(errmsg)
             return
-        sp = self.name_newwin('saepatw')
+        sp, new = self.name_newwin('saepatw')
         if not sp:
             self.w.statusbar.showMessage(self.tr(
                 'Open patient windows maximum count reached.'), 10000)
             return
-        if not 'Saepat' in locals():
-            from saepat import Saepat
-        setattr(self, sp, Saepat(self, act, patid))
-        self.xy_incr(getattr(self, sp))
-        getattr(self, sp).show()
+        if new:
+            if not 'Saepat' in locals():
+                from saepat import Saepat
+            setattr(self, sp, Saepat(self, act, patid))
+            self.xy_incr(getattr(self, sp))
+            getattr(self, sp).show()
+        else:
+            sp = getattr(self, sp)
+            sp.reset()
+            sp.show()
+            sp.raise_()
             
     def sae_med(self):
         """Search-Add-Edit Medication window."""

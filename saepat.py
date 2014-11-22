@@ -183,8 +183,8 @@ class Saepat(QMainWindow):
             self.savestate.connect(self.origin.state_write)
             self.staffid = self.origin.staffid
         else:
-            from options import read_options
-            self.options = read_options()
+            from options import defaults as options
+            self.options = options
             import dbmod
             dbh = dbmod.Db_handler('enno')
             self.db = dbh.db_connect()
@@ -1773,7 +1773,7 @@ class Saepat(QMainWindow):
         # CONNECTIONS
         ch_conn(self, 'mainpb', self.w.mainPb.clicked, self.list_pats)
         ch_conn(self, 'enter', self.keycheck.enter, self.w.mainPb.click)
-        ch_conn(self, '2ndpb', self.w.secondPb.clicked, self.reset_form)
+        ch_conn(self, '2ndpb', self.w.secondPb.clicked, self.reset)
         self.w.saeFr.setEnabled(1)
         self.w.saeFr.show()
         self.w.detailedCb.show()
@@ -1986,7 +1986,7 @@ class Saepat(QMainWindow):
     def regde_toggle(self, state):
         self.w.regDe.setEnabled(state)
 
-    def reset_form(self):
+    def reset(self):
         """As the name suggests."""
         # check sequence of index setting to avoid unnec calls (colDd?)
         self.w.noMFr.hide()

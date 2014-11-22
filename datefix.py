@@ -62,8 +62,8 @@ class Datefix(QMainWindow):
             self.db = parent.db
             self.staffid = parent.staffid
         else:
-            from options import read_options
-            self.options = read_options()
+            from options import defaults as options
+            self.options = options
             self.staffid = 1
             import dbmod
             dbh = dbmod.Db_handler('enno')

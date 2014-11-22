@@ -143,8 +143,8 @@ class Products(QMainWindow):
                 return
             self.curs = self.db.cursor()
             self.markups = {}
-            from options import read_options
-            self.options = read_options()
+            from options import defaults as options
+            self.options = options
             self.pat = ['Sophie', 'Boxer', 'f', '7 a', '18 kg', 'Deimel']
             self.staffid = 1
             self.symptoms = {}
