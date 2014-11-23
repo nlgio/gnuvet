@@ -3,9 +3,8 @@
 # TODO:
 # test multiple win_open via name_newwin
 # special search (medication, clin hist)
-# g|setattr(self, cp) won't work: w_cli -- well don't see why: test
 # adapt knowledge to login|gv_auth()
-# Add group/institution in payment -- for TGD|Racetrack etc.
+# Add group/institution in payment -- for TGD|Racetrack etc.?
 
 from sys import argv, platform, stderr
 from os import path as os_path
@@ -320,7 +319,7 @@ class Gnuv_MainWin(QMainWindow):
             self.w.logokPb.clicked.disconnect(self.gv_auth)
             self.gvdir_check()
             self.optread(user)
-            self.savedread()
+            self.readsaved()
             self.user = user
             self.dbhost = dbhost
 
@@ -494,9 +493,9 @@ class Gnuv_MainWin(QMainWindow):
             from options import write_options
         pass
 
-    def readsaved(self): # redundant w/ state_restore?
+    def readsaved(self):
         """Read optional savedstate file on startup."""
-        if os_path.exists(self.userdir + 'savestate'):
+        if os_path.exists(os_path.join(self.userdir, 'savestate')):
             pass # for now
 
     def sae_cliact(self, trg=0): # triggered(checked=False)
@@ -564,25 +563,6 @@ class Gnuv_MainWin(QMainWindow):
     def sae_stk(self):
         """Search-Add-Edit Stock window."""
         pass
-
-    def state_restore(self):
-        """Restore pre-crash state."""
-        pass
-
-    def vacc_reminders(self):
-        """Prepare printing of vacc reminder letters."""
-        today = date.today()
-        res = querydb(
-            self,
-            'select vd_pid,vt_type from vdues,vtypes,patients where vt_id='
-            'vd_type and vd_pid=p_id and not rip and vd_due<%s', (today,))
-        if res is None:  return # db error
-        pats = []
-        types = []
-        for e in res:
-            pats.append(e[0])
-            types.append(e[1])
-        # hierwei: dict?
         
     def state_write(self, save_things=[]):
         """Write unsaved changes to file for later restoration."""
@@ -618,6 +598,21 @@ class Gnuv_MainWin(QMainWindow):
         child.move(self.x_pos, self.y_pos)
         self.x_pos += 25
         self.y_pos += 20
+
+    def vacc_reminders(self):
+        """Prepare printing of vacc reminder letters."""
+        today = date.today()
+        res = querydb(
+            self,
+            'select vd_pid,vt_type from vdues,vtypes,patients where vt_id='
+            'vd_type and vd_pid=p_id and not rip and vd_due<%s', (today,))
+        if res is None:  return # db error
+        pats = []
+        types = []
+        for e in res:
+            pats.append(e[0])
+            types.append(e[1])
+        # hierwei: dict?
 
 # ==================================================
 

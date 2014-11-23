@@ -1991,8 +1991,6 @@ class Saepat(QMainWindow):
         # check sequence of index setting to avoid unnec calls (colDd?)
         self.w.noMFr.hide()
         self.w.matchFr.hide()
-        self.w.saeFr.setEnabled(1)
-        self.w.saeFr.show()
         # DEVEL:
         # self.w.pfindDd.setCurrentIndex(0)
         #self.w.pfindDd.setCurrentIndex(2)
@@ -2016,11 +2014,11 @@ class Saepat(QMainWindow):
         self.w.regDe.clear()
         self.w.csnameLe.clear()
         self.w.cfnameLe.clear()
-        self.w.mainPb.setEnabled(1)
         self.w.insDd.setCurrentIndex(0)
         self.w.annoTe.clear()
         self.age_toggle()
         self.w.pnameLe.setFocus()
+        self.prep_s()
 
     def resizeEvent(self, event):
         if event.oldSize().width() == -1:
