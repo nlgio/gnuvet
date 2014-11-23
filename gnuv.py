@@ -119,8 +119,8 @@ class Gnuv_MainWin(QMainWindow):
         self.w.helpM.addAction(aboutA)
         #    CONNECTIONS
         self.dbA.triggered.connect(self.db_reconnect)
-        self.patA.triggered.connect(self.sae_patact)
-        self.cliA.triggered.connect(self.sae_cliact)
+        self.patA.triggered.connect(self.sae_patwrap)
+        self.cliA.triggered.connect(self.sae_cliwrap)
         self.vaccremA.triggered.connect(self.vacc_reminders)
         self.appointA.triggered.connect(self.openapp)
         # self.appointA ordA jouA finA medA srvA sysA stkA
@@ -488,17 +488,17 @@ class Gnuv_MainWin(QMainWindow):
 
     def optwrite(self):
         """Write customised settings to user file."""
-        # hierwei: implement
         if not 'write_options' in locals():
             from options import write_options
         write_options(self.userdir, self.optfile, self.options)
 
     def readsaved(self):
         """Read optional savedstate file on startup."""
-        if os_path.exists(os_path.join(self.userdir, 'savestate')):
-            pass # for now
+        # hierwei implement
+        ## if os_path.exists(os_path.join(self.userdir, 'savestate')):
+        pass
 
-    def sae_cliact(self, trg=0): # triggered(checked=False)
+    def sae_cliwrap(self, trg=0): # triggered(checked=False)
         """Wrapper for action signal."""
         self.sae_cli()
         
@@ -525,7 +525,7 @@ class Gnuv_MainWin(QMainWindow):
             cp.show()
             cp.raise_()
             
-    def sae_patact(self, trg=0): # triggered(checked=False)
+    def sae_patwrap(self, trg=0): # triggered(checked=False)
         """Wrapper for action signal."""
         self.sae_pat()
         
