@@ -567,13 +567,13 @@ class Gnuv_MainWin(QMainWindow):
     def state_write(self, save_things=[]):
         """Write unsaved changes to file for later restoration."""
         # hierwei
-        if hasattr(self, 'warning'):
-            try:
-                self.warning.closed.disconnect(self.show)
-            except TypeError:
-                pass
         if not save_things:
             return
+        if hasattr(self, 'warnw'):
+            try:
+                self.warnw.closed.disconnect(self.show)
+            except TypeError:
+                pass
         sstring = '\n'.join(save_things)
         if not 'os_path' in locals():
             from os import path as os_path
@@ -582,12 +582,12 @@ class Gnuv_MainWin(QMainWindow):
             with open(sfile, 'w') as f:
                 f.write(sstring)
         except IOError:
-            if not hasattr(self, 'warning'):
+            if not hasattr(self, 'warnw'):
                 from warn import Warning
-        self.warning = Warning(self, self.tr('GnuVet: Warning'), 
-                               self.tr("Couldn't save unsaved Changes!"))
-        self.warning.setWindowModality(2) # be top of w-tree
-        #self.warning.show()
+            self.warnw = Warning(self, self.tr('GnuVet: Warning'), 
+                                 self.tr("Couldn't save unsaved Changes!"))
+            self.warning.setWindowModality(2) # be top of w-tree, works???
+            #self.warning.show()
 
     def xy_decr(self):
         """Adjust position for new child window -- after closing another one.
