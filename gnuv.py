@@ -318,7 +318,7 @@ class Gnuv_MainWin(QMainWindow):
             self.w.lLb.setText(user)
             self.w.logokPb.clicked.disconnect(self.gv_auth)
             self.gvdir_check()
-            self.optread(user)
+            self.optread()
             self.readsaved()
             self.user = user
             self.dbhost = dbhost
@@ -480,18 +480,18 @@ class Gnuv_MainWin(QMainWindow):
         """System "dialog"."""
         pass
 
-    def optread(self, user=None):
+    def optread(self):
         """Read (optional) options file for customised settings."""
         if not 'read_options' in locals():
             from options import read_options
-        self.options.update(read_options(user))
+        self.options.update(read_options(self.userdir, self.optfile))
 
-    def optwrite(self, userfile=''):
+    def optwrite(self):
         """Write customised settings to user file."""
         # hierwei: implement
         if not 'write_options' in locals():
             from options import write_options
-        pass
+        write_options(self.userdir, self.optfile, self.options)
 
     def readsaved(self):
         """Read optional savedstate file on startup."""

@@ -55,7 +55,6 @@ def readopt(s):
 def read_options(userdir=None, optfile=None):
     """Set options according to options file if it exists, is readable
     and not suspiciously large.  Otherwise return defaults."""
-    # hierwei this needs different handling for devel and production
     if not 'os_path' in locals():
         from os import path as os_path
     if userdir and optfile:
@@ -72,8 +71,7 @@ def read_options(userdir=None, optfile=None):
         with open(optfile, 'r', 1) as f:
             of = StringIO(f.read())
     except IOError as e:
-        stderr.write("Couldn't open options file, using defaults.\n{}\n".format(
-            e))
+        stderr.write("Couldn't open options file.\n{}\n".format(e))
         return defaults
     for line in of:
         if (not (line or line.__contains__('=')) or
@@ -86,10 +84,18 @@ def read_options(userdir=None, optfile=None):
             defaults[option] = readopt(setting)
     return defaults
 
-def write_options(user=None):
+def write_options(userdir=None, optfile=None, options):
     """Write customised options to file."""
     # hierwei: implement
-    gvdir = '.'
-    if 'workdir' in defaults:
-        gvdir=defaults['workdir']
-    pass
+    if not 'os_path' in locals():
+        from os import path as os_path
+    if userdir and optfile:
+        optfile = os_path.join(userdir, optfile)
+    ostring = ''
+    for k, v in in options.items():
+        ostring += '{}: {}\n'.format(k, str(v))
+    try:
+        with open(optfile, 'w', 1) as f:
+            f.write(ostring)
+    except IOError as e:
+        stderr.write("Couldn't write options file.\n{}\n".format(e))
