@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """The GnuVet main program."""
 # TODO:
-# test multiple win_open via name_newwin
+# add ch_conn?
 # special search (medication, clin hist)
 # adapt knowledge to login|gv_auth()
 # Add group/institution in payment -- for TGD|Racetrack etc.?
@@ -572,11 +572,15 @@ class Gnuv_MainWin(QMainWindow):
                 self.warning.closed.disconnect(self.show)
             except TypeError:
                 pass
+        if not save_things:
+            return
+        sstring = '\n'.join(save_things)
+        if not 'os_path' in locals():
+            from os import path as os_path
         sfile = os_path.join(self.userdir, 'savestate')
         try:
-            f = open(sfile, 'w')
-            f.write('\n'.join(save_things))
-            f.close()
+            with open(sfile, 'w') as f:
+                f.write(sstring)
         except IOError:
             if not hasattr(self, 'warning'):
                 from warn import Warning
