@@ -605,12 +605,19 @@ class Gnuv_MainWin(QMainWindow):
 
     def vacc_reminders(self):
         """Prepare printing of vacc reminder letters."""
-        today = date.today()
+        if not 'timedelta' in locals():
+            from datetime import timedelta
+        vw = 'vaccwarn' in self.options and self.options['vaccwarn'] or 7
+        vday = date.today() + timedelta(vw)
         res = querydb(
             self,
             'select vd_pid,vt_type from vdues,vtypes,patients where vt_id='
-            'vd_type and vd_pid=p_id and not rip and vd_due<%s', (today,))
+            'vd_type and vd_pid=p_id and not rip and vd_vdue<%s', (vday,))
         if res is None:  return # db error
+        if not 'vaccremindw' in locals():
+            pass # hierwei: show list (w/ client data for calls)|print letters
+        if len(res):
+            pass
         pats = []
         types = []
         for e in res:

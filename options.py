@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Functions dealing with the options and their file."""
 # TODO:
-# put all os-specific stuff in here?
+# put all os-specific stuff in here?  No!
+# import warn?  Or delegate this to origin?  stderr suboptimal...
 
 from sys import stderr
 from os import path, stat
@@ -41,6 +42,7 @@ defaults = {
     'hist_col':  'black',
     # alternatively always use black (delete or comment out above options)
     # and setAlternatingRowColors()
+    'vaccwarn':  7, # days before due to start warn
     }
 
 def readopt(s):

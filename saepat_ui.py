@@ -16,7 +16,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import (QApplication, QCheckBox, QComboBox, QDateEdit, QFont,
                          QFrame, QGridLayout, QGroupBox, QLabel, QLineEdit,
                          QPixmap, QPlainTextEdit, QPushButton, QRadioButton,
-                         QSpacerItem,QSpinBox,QTableWidget,QWidget)
+                         QSpacerItem,QSpinBox,QWidget)
 from gtable import Gtable
 
 class Ui_Saepat(object):
