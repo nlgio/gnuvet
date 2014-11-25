@@ -12,7 +12,7 @@ from PyQt4.QtGui import QApplication, QLabel, QFont, QPushButton
 
 class Ui_About(object):
     def setupUi(self, About):
-        About.setWindowModality(Qt.NonModal)
+        ## About.setWindowModality(Qt.NonModal)
         About.resize(361,275)
         ## sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
         ##                                QtGui.QSizePolicy.Fixed)

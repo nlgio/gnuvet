@@ -206,10 +206,9 @@ class Ui_Patient(object):
         self.addLb.setText(
             QApplication.translate("Patient", "&Add:", None, 1))
         self.addchPb.setText(
-            QApplication.translate("Patient", "Add &Case History", None, 1))
+            QApplication.translate("Patient", "Add &Text", None, 1))
         self.addchPb.setToolTip(
-            QApplication.translate(
-                "Patient", "Add history to selected consultation", None, 1))
+            QApplication.translate("Patient", "Add text to history", None, 1))
         self.addconsPb.setText(QApplication.translate(
             "Patient", "Add C&onsultation", None, 1))
         self.addconsPb.setToolTip(

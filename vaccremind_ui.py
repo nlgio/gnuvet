@@ -9,8 +9,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import (QApplication, QCheckBox, QFont,
-                         QFrame, QLabel, QPushButton, QWidget)
+from PyQt4.QtGui import (QApplication, QCheckBox, QFont, QFrame, QLabel,
+                         QPushButton, QRadioButton, QWidget)
 from gtable import Gtable
 
 class Ui_Vaccremind(object):
@@ -37,8 +37,8 @@ class Ui_Vaccremind(object):
         self.noVFr.setFrameShape(QFrame.StyledPanel)
         self.noVFr.setFrameShadow(QFrame.Raised)
         self.noVLb = QLabel(self.noVFr)
-        self.noVLb.setGeometry(230, 100, 421, 261)
-        self.noVLb.setAlignment(Qt.AlignLeft)
+        self.noVLb.setGeometry(20, 20, 400, 26)
+        ##self.noVLb.setAlignment(Qt.AlignLeft)
         self.noVLb.setTextFormat(Qt.PlainText)
         self.noVFr.hide()
 
@@ -54,14 +54,24 @@ class Ui_Vaccremind(object):
         self.matchnLb.setTextFormat(Qt.PlainText)
         self.sortbyLb = QLabel(self.matchFr)
         self.sortbyLb.setGeometry(251, 8, 53, 19)
-        self.sbydateRb = QRadioButton(self.matchFr)
-        self.sbydateRb.setGeometry(425, 6, 90, 25)
         self.sbynameRb = QRadioButton(self.matchFr)
         self.sbynameRb.setGeometry(325, 6, 90, 25)
+        self.sbydateRb = QRadioButton(self.matchFr)
+        self.sbydateRb.setGeometry(425, 6, 90, 25)
+        self.sbycliRb = QRadioButton(self.matchFr)
+        self.sbycliRb.setGeometry(525, 6, 90, 25)
         self.plist = Gtable(self.matchFr, scrollh=0, resizecols=True)
         self.plist.setGeometry(0, 34, 850, 455)
         self.plist.setMinimumSize(850, 455)
-        self.matchFr.hide()
+        ## self.matchFr.hide()
+
+        # buttons
+        self.mainPb = QPushButton(Vaccremind)
+        self.mainPb.setGeometry(177, 540, 107, 24)
+        self.closePb = QPushButton(Vaccremind)
+        self.closePb.setGeometry(290, 540, 107, 24)
+        
+        self.retranslateUi(Vaccremind)
 
     def retranslateUi(self, Vaccremind):
         self.noVLb.setText(
@@ -69,10 +79,16 @@ class Ui_Vaccremind(object):
                                    None, 1))
         self.sortbyLb.setText(
             QApplication.translate("Vaccremind", "order by", None, 1))
-        self.sbydateRb.setText(
-            QApplication.translate("Vaccremind", "Last &Seen", None, 1))
         self.sbynameRb.setText(
             QApplication.translate("Vaccremind", "&Name", None, 1))
+        self.sbydateRb.setText(
+            QApplication.translate("Vaccremind", "Vacc &due", None, 1))
+        self.sbycliRb.setText(
+            QApplication.translate("Vaccremind", "&Client", None, 1))
+        self.mainPb.setText(
+            QApplication.translate("Vaccremind", "Print Letters", None, 1))
+        self.closePb.setText(
+            QApplication.translate("Vaccremind", "Close", None, 1))
         self.no_dbconn.setText(
             QApplication.translate('Vaccremind', 'No db connection...', None, 1))
 

@@ -6,6 +6,8 @@ startdt: datetime for entry -> this to save in db for one consid?
 """
 
 # TODO:
+# add adding text w/o consult for e.g. calling information (vacc reminders etc)
+#     s. products.add_hist()
 # ck time not within constime?
 #
 # introduce serial id into tc for editing entries?
@@ -328,7 +330,7 @@ class Patient(QMainWindow):
         
     def add_hist(self): # hierwei: implement
         """Add additional clinical history independent of product cycle."""
-        self.consid = row2data[self.row][0]
+        self.consid = self.row2data[self.row][0]
         self.add_prod(action='h')
         print('patient.add_hist: not yet implemented.')
 

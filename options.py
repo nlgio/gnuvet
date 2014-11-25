@@ -86,7 +86,7 @@ def read_options(userdir=None, optfile=None):
             defaults[option] = readopt(setting)
     return defaults
 
-def write_options(userdir=None, optfile=None, options):
+def write_options(userdir=None, optfile=None, options={}):
     """Write customised options to file."""
     # hierwei: implement
     if not 'os_path' in locals():
@@ -94,10 +94,14 @@ def write_options(userdir=None, optfile=None, options):
     if userdir and optfile:
         optfile = os_path.join(userdir, optfile)
     ostring = ''
-    for k, v in in options.items():
+    for k, v in options.items():
         ostring += '{}: {}\n'.format(k, str(v))
     try:
         with open(optfile, 'w', 1) as f:
             f.write(ostring)
     except IOError as e:
         stderr.write("Couldn't write options file.\n{}\n".format(e))
+
+if __name__ == '__main__':
+    print('Not yet implemented.')
+    
