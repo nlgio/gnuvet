@@ -241,8 +241,6 @@ insert into acc2(acc_pid,acc_prid,acc_npr,acc_vat,acc_paid)values
  (20,3,20,1,TRUE),
  (20,4,1.28,2,TRUE);
 
-drop table if exists appointments;
-create table appointments(app_id serial primary key,app_dt timestamp not null,app_text varchar(128) not null,app_cid integer references clients,app_pid integer references patients,app_staffid integer references staff,app_dur interval not null default '0:00');
 insert into appointments(app_dt,app_text,app_cid,app_pid,app_staffid,app_dur)values
  ('2013-5-31 9:30','Cat spay',null,null,1,'1:00'),
  ('2013-5-31 11:30','Dog consultation',2,20,2,'0:30'),
