@@ -998,7 +998,7 @@ border-radius: 3px;
             self.disp = 0 # week
         self.sel_display()
 
-    def warning(self, heading='', msg=''):
+    def warning(self, heading='', msg=''): # devel function
         if not hasattr(self, 'warnw'):
             from warn import Warning
         if not msg:
