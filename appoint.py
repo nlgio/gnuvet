@@ -197,18 +197,18 @@ border-radius: 3px;
         self.w.calendar.rightclicked.connect(self.calmenu)
         #    INIT
         if parent: # devel if
-            self.options = parent.options
             if parent.origin == 'origin':
                 self.origin = parent
             else:
                 self.origin = parent.origin
-            self.db = parent.db
+            self.options = self.origin.options
+            self.db = self.origin.db
             self.dbA.triggered.connect(self.origin.db_reconnect)
-            aboutA.triggered.connect(parent.about)
-            parent.gvquit.connect(self.gv_quit)
-            parent.dbstate.connect(self.db_state)
-            self.helpsig.connect(parent.gv_help)
-            self.staffid = parent.staffid
+            aboutA.triggered.connect(self.origin.about)
+            self.origin.gvquit.connect(self.gv_quit)
+            self.origin.dbstate.connect(self.db_state)
+            self.helpsig.connect(self.origin.gv_help)
+            self.staffid = self.origin.staffid
         else:
             from options import defaults as options
             self.options = options
@@ -220,7 +220,7 @@ border-radius: 3px;
                 return # ?
             self.staffid = 1
         if 'lang' in self.options and self.options['lang'] == 'en':
-            setlocale(LC_ALL, 'C')
+            setlocale(LC_ALL, 'C') # whats this?
         else:
             resetlocale()
         try:
@@ -278,8 +278,8 @@ border-radius: 3px;
         ## print('add  x: {}'.format(self.w.calendar.selcell.x()))
         self.datefixw.move(self.w.calendar.selcell.x()-10,
                           self.w.calendar.selcell.y()+10)
+        ch_conn(self, 'datefix', self.datefixw.data, self.app_set)
         self.datefixw.show()
-        ch_conn(self, 'datefix', self.datefixw.data, self.setapp)
 
     def app_del_confirm(self):
         self.w.confirmeditPb.hide()
@@ -315,8 +315,7 @@ border-radius: 3px;
                 self,
                 'select app_dt,app_text,app_cid,app_pid,app_staffid,app_dur,'
                 'app_status from appointments where app_id=%s', (self.appid,))
-            if app is None:
-                return # db error
+            if app is None:  return # db error
             app = app[0]
         if not hasattr(self, 'datefixw'):
             from datefix import Datefix
@@ -329,12 +328,12 @@ border-radius: 3px;
                 appcid=app[2], apppid=app[3], appstf=app[4], appdur=app[5])
         if self.w.calendar.selcell.parent == self.w.calendar.table:
             x, y = self.w.calendar.selcell.x(), self.w.calendar.selcell.y()
-        else:
+        else: # hierwei this if still nec?  Suppose not!
             x, y = (self.w.calendar.selcell.parent.x(),
                     self.w.calendar.selcell.parent.y())
         self.datefixw.move(x-10, y+10)
+        ch_conn(self, 'datefix', self.datefixw.data, self.app_set)
         self.datefixw.show()
-        ch_conn(self, 'datefix', self.datefixw.data, self.setapp)
         
     def app_save(self): # add app_status
         # ch_conn nec?
@@ -497,7 +496,7 @@ border-radius: 3px;
         self.w.no_dbconn.setVisible(self.dberr)
         self.dbstate.emit(not self.dberr)
         self.dbdep_enable(not self.dberr)
-        if not self.parent:
+        if not self.origin:
             self.warning(msg=msg)
             if not self.isVisible(): # devel
                 self.warnw.closed.connect(self.show)
@@ -789,8 +788,8 @@ border-radius: 3px;
             self.close()
 
     def gv_quitconfirm(self):
-        if self.parent:
-            self.parent.gv_quitconfirm()
+        if self.origin:
+            self.origin.gv_quitconfirm()
         else:
             for w in self.findChildren(QMainWindow):
                 w.close()
@@ -971,10 +970,10 @@ border-radius: 3px;
         self.sel_display()
 
     def state_write(self, data=None):
-        if self.parent: # devel if
-            self.savestate.connect(self.parent.state_write)
+        if self.origin: # devel if
+            self.savestate.connect(self.origin.state_write)
             self.savestate.emit(data)
-            self.savestate.disconnect(self.parent.state_write)
+            self.savestate.disconnect(self.origin.state_write)
             
     def testmove(self):
         for row in xrange(9):
