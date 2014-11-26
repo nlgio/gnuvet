@@ -117,15 +117,19 @@ class Client(QMainWindow):
         self.rippatA.triggered.connect(self.rip)
         #    PARENT CONNECTIONS
         if parent: # devel if
-            self.dbA.triggered.connect(parent.db_connect)
-            aboutA.triggered.connect(parent.about)
-            parent.gvquit.connect(self.gv_quit)
-            parent.dbstate.connect(self.db_state)
-            ## self.savestate.connect(parent.state_write)
-            self.helpsig.connect(parent.gv_help)
-            self.db = parent.db
-            self.staffid = parent.staffid
-            self.options = parent.options
+            if parent.origin == 'origin':
+                self.origin = parent
+            else:
+                self.origin = parent.origin
+            self.dbA.triggered.connect(self.origin.db_connect)
+            aboutA.triggered.connect(self.origin.about)
+            self.origin.gvquit.connect(self.gv_quit)
+            self.origin.dbstate.connect(self.db_state)
+            ## self.savestate.connect(self.origin.state_write)
+            self.helpsig.connect(self.origin.gv_help)
+            self.db = self.origin.db
+            self.staffid = self.origin.staffid
+            self.options = self.origin.options
         else:
             import dbmod
             dbh = dbmod.Db_handler('enno')
@@ -135,7 +139,7 @@ class Client(QMainWindow):
             self.options = options
         #    BUTTON CONNECTIONS
         self.w.cancelPb.clicked.connect(self.close)
-        #    INIT
+        #    INIT # hierwei ck old file
         #ch_conn(self, 'enter', self.keych.enter, self.w.mainPb.click)
         #self.w.mainPb.clicked.connect(self.whatever)
         self.dbA.setVisible(0)
@@ -207,8 +211,8 @@ class Client(QMainWindow):
         self.w.balanceLb.setText(str(cbal))
         
     def closeEvent(self, ev):
-        if self.parent():
-            self.parent().xy_decr()
+        if self.origin:
+            self.origin.xy_decr()
 
     def dbdep_enable(self, yes=True):
         """En- or disable db dependent actions."""
@@ -281,8 +285,8 @@ class Client(QMainWindow):
             self.close()
     
     def gv_quitconfirm(self):
-        if self.parent():
-            self.parent().gv_quitconfirm()
+        if self.origin:
+            self.origin.gv_quitconfirm()
         else:
             exit()
         

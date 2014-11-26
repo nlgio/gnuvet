@@ -37,25 +37,32 @@ class Ui_Client(object):
         self.nameLb.setMaximumSize(291, 19)
         self.addr1Lb = QLabel(self.centralwidget)
         self.addr1Lb.setGeometry(10, 30, 241, 19)
-        self.addr1Lb.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.addr1Lb.setTextInteractionFlags(
+            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.addr2Lb = QLabel(self.centralwidget)
         self.addr2Lb.setGeometry(10, 50, 241, 19)
-        self.addr2Lb.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.addr2Lb.setTextInteractionFlags(
+            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.addr3Lb = QLabel(self.centralwidget)
         self.addr3Lb.setGeometry(10, 70, 241, 19)
-        self.addr3Lb.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.addr3Lb.setTextInteractionFlags(
+            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.telhomeLb = QLabel(self.centralwidget)
         self.telhomeLb.setGeometry(10, 90, 150, 19)
-        self.telhomeLb.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.telhomeLb.setTextInteractionFlags(
+            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.telworkLb = QLabel(self.centralwidget)
         self.telworkLb.setGeometry(10, 110, 150, 19)
-        self.telworkLb.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.telworkLb.setTextInteractionFlags(
+            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.mobile1Lb = QLabel(self.centralwidget)
         self.mobile1Lb.setGeometry(175, 90, 150, 19)
-        self.mobile1Lb.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.mobile1Lb.setTextInteractionFlags(
+            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.mobile2Lb = QLabel(self.centralwidget)
         self.mobile2Lb.setGeometry(175, 110, 150, 19)
-        self.mobile2Lb.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.mobile2Lb.setTextInteractionFlags(
+            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.bdPix = QLabel(self.centralwidget)
         self.bdPix.setGeometry(300, 10, 17, 20)
         self.bdPix.setPixmap(QPixmap(":/images/redflag.png"))
@@ -72,7 +79,8 @@ class Ui_Client(object):
         self.regdateLb.setGeometry(450, 70, 75, 18)
         self.annoLb = QLabel(self.centralwidget)
         self.annoLb.setGeometry(680, 10, 81, 19)
-        self.annoLb.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.annoLb.setTextInteractionFlags(
+            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.annotxtLb = QLabel(self.centralwidget)
         self.annotxtLb.setGeometry(680, 30, 251, 131)
         self.annotxtLb.setWordWrap(1)
@@ -127,7 +135,7 @@ class Ui_Client(object):
         self.balanceLb.setText(QApplication.translate(
             "Client", "0.00", None, 1))
         self.ldateLb.setText(QApplication.translate(
-            "Client", "30.4.2009", None, 1))
+            "Client", "30.04.2009", None, 1))
         self.regdateLb.setText(QApplication.translate(
             "Client", "18.12.2008", None, 1))
         # end devel
@@ -167,5 +175,6 @@ if __name__ == '__main__':
     b.setupUi(w)
     b.lLb.setText('client_ui')
     QShortcut('Ctrl+W', w, quit)
+    b.no_dbconn.show()
     w.show()
     exit(a.exec_())
