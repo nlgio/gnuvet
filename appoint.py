@@ -3,7 +3,8 @@
 # TODO:
 # Errors: s. end of file
 #
-# ck overlap in query_db
+# ck position of datefix
+# ck timeslot overlap in query_db
 
 from datetime import date, datetime, time, timedelta
 from locale import LC_ALL, resetlocale, setlocale
@@ -275,9 +276,12 @@ border-radius: 3px;
             self.datefixw = Datefix(self, appdt=self.today)
         else:
             self.datefixw.update_disp(appdt=self.today)
-        ## print('add  x: {}'.format(self.w.calendar.selcell.x()))
-        self.datefixw.move(self.w.calendar.selcell.x()-10,
-                          self.w.calendar.selcell.y()+10)
+        if self.w.calendar.selcell.parent == self.w.calendar.table:
+            x, y = self.w.calendar.selcell.x(), self.w.calendar.selcell.y()
+        else:
+            x, y = (self.w.calendar.selcell.parent.x(),
+                    self.w.calendar.selcell.parent.y())
+        self.datefixw.move(x-10, y+10)
         ch_conn(self, 'datefix', self.datefixw.data, self.app_set)
         self.datefixw.show()
 
