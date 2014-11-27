@@ -2,8 +2,7 @@
 
 # TODO:
 # Errors: s. end of file
-#
-# ck timeslot overlap in query_db
+# Add Open_Patient button?
 
 from datetime import date, datetime, time, timedelta
 from locale import LC_ALL, resetlocale, setlocale
@@ -20,7 +19,6 @@ class Appointer(QMainWindow):
     gvquit = pyqtSignal(bool)
     dbstate = pyqtSignal(object) # False: err
     helpsig = pyqtSignal(str)
-    savestate = pyqtSignal(dict)
     
     # vars
     day_headss = """Gcell {
@@ -45,7 +43,6 @@ border-radius: 3px;
 
     def __init__(self, parent=None, today=None, pid=None):
         super(Appointer, self).__init__(parent)
-        self.parent = parent
         self.realday = datetime.today().date()
         self.pid = pid
         self.today = today
@@ -195,6 +192,12 @@ border-radius: 3px;
         self.w.calendar.selected.connect(self.sel_day)
         self.w.calendar.doubleclicked.connect(self.openpat)
         self.w.calendar.rightclicked.connect(self.calmenu)
+        ch_conn(self, 'confirmok',
+                self.w.confirmokPb.clicked, self.app_save)
+        ch_conn(self, 'confirmedit',
+                self.w.confirmeditPb.clicked, self.app_edit)
+        ch_conn(self, 'confirmcc',
+                self.w.confirmccPb.clicked, self.confhide)
         #    INIT
         if parent: # devel if
             if parent.origin == 'origin':
@@ -309,6 +312,7 @@ border-radius: 3px;
         if not self.w.calendar.selcell.data:
             self.app_add()
             return
+        self.w.confirm.hide()
         if self.savedata:
             self.appid = self.savedata[0]
             app = self.savedata[1:]
@@ -338,8 +342,8 @@ border-radius: 3px;
         ch_conn(self, 'datefix', self.datefixw.data, self.app_set)
         self.datefixw.show()
         
-    def app_save(self): # add app_status
-        # ch_conn nec?
+    def app_save(self):
+        self.w.confirm.hide()
         if self.savedata[6] == 'a':
             suc = querydb(
                 self,
@@ -358,12 +362,12 @@ border-radius: 3px;
                 (self.savedata[0],self.savedata[1],self.savedata[2],
                  self.savedata[3],self.savedata[4],self.savedata[5],
                  self.savedata[7],self.appid))
-        if suc is None: return # db error -- state_write data?
+        if suc is None: return # db error
         self.db.commit()
         self.savedata = None
         self.sel_display()
         
-    def app_set(self, data): # hierwei ck overlapping apps
+    def app_set(self, data):
         ch_conn(self, 'datefix')
         # app_dt app_txt app_cid app_pid app_staff app_dur action
         self.savedata = data
@@ -378,18 +382,13 @@ border-radius: 3px;
             'select stf_logname from staff where stf_id=%s', (data[4],))
         if stf is None:  return # db error
         stf = stf[0][0]
-        if test:
+        if test: # hierwei
             self.w.confirm.msgLb.setText(
                 self.tr('<b>Time slot occupied!</b><br>') +
                 str(stf) +
                 self.tr(' already has appointment on ') +
                 data[0].strftime('%d.%m.%Y %H:%M'))
-            ch_conn(self, 'confirmok',
-                    self.w.confirmokPb.clicked, self.app_save)
-            ch_conn(self, 'confirmedit',
-                    self.w.confirmeditPb.clicked, self.app_edit)
-            ch_conn(self, 'confirmcc',
-                    self.w.confirmccPb.clicked, self.confhide)
+            self.w.confirm.show()
         else:
             self.app_save()
         
@@ -972,12 +971,6 @@ border-radius: 3px;
         self.today = newdate
         self.sel_display()
 
-    def state_write(self, data=None):
-        if self.origin: # devel if
-            self.savestate.connect(self.origin.state_write)
-            self.savestate.emit(data)
-            self.savestate.disconnect(self.origin.state_write)
-            
     def testmove(self):
         for row in xrange(9):
             self.w.calendar.cell(row, 3).setText('First Lines {}'.format(row))
