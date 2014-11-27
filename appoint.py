@@ -3,7 +3,6 @@
 # TODO:
 # Errors: s. end of file
 #
-# ck position of datefix
 # ck timeslot overlap in query_db
 
 from datetime import date, datetime, time, timedelta
