@@ -34,7 +34,7 @@ class Gnuv_MainWin(QMainWindow):
     cwins   = 0 # client windows
     db      = None
     dbhost  = None
-    origin  = 'origin'
+    gaia  = 'gaia'
     staffid = None
     user    = None  # are we authenticated?
     x_pos, y_pos = 100, 50

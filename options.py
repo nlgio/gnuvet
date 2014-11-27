@@ -2,7 +2,7 @@
 """Functions dealing with the options and their file."""
 # TODO:
 # put all os-specific stuff in here?  No!
-# import warn?  Or delegate this to origin?  stderr suboptimal...
+# import warn?  Or delegate this to gaia?  stderr suboptimal...
 
 from sys import stderr
 from os import path, stat

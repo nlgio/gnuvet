@@ -44,7 +44,7 @@ class Saepat(QMainWindow):
     changes = currentspec = 0
     completed = ''
     curs = None
-    origin = None
+    gaia = None
     seen = None
     unsaved = False # unsaved changes anywhere?
 
@@ -166,22 +166,22 @@ class Saepat(QMainWindow):
         self.newcolA.triggered.connect(self.add_col)
         self.newlocA.triggered.connect(self.add_loc)
         self.newinsA.triggered.connect(self.add_ins)
-        #    ORIGIN
-        if parent.origin == 'origin':
-            self.origin = parent
+        #    GAIA
+        if parent.gaia == 'gaia':
+            self.gaia = parent
         else:
-            self.origin = parent.origin
+            self.gaia = parent.gaia
         #    PARENT CONNECTIONS
         if parent: # devel if
-            self.options = self.origin.options
-            self.db = self.origin.db
-            self.dbA.triggered.connect(self.origin.db_reconnect)
-            aboutA.triggered.connect(self.origin.about)
-            self.origin.gvquit.connect(self.gv_quit)
-            self.origin.dbstate.connect(self.db_state) # ? hierwei
-            self.helpsig.connect(self.origin.gv_help)
-            self.savestate.connect(self.origin.state_write)
-            self.staffid = self.origin.staffid
+            self.options = self.gaia.options
+            self.db = self.gaia.db
+            self.dbA.triggered.connect(self.gaia.db_reconnect)
+            aboutA.triggered.connect(self.gaia.about)
+            self.gaia.gvquit.connect(self.gv_quit)
+            self.gaia.dbstate.connect(self.db_state) # ? hierwei
+            self.helpsig.connect(self.gaia.gv_help)
+            self.savestate.connect(self.gaia.state_write)
+            self.staffid = self.gaia.staffid
         else:
             from options import defaults as options
             self.options = options
@@ -595,8 +595,8 @@ class Saepat(QMainWindow):
     def closeEvent(self, ev): # hierwei: devel
         ## if self.unsaved:
         ##     self.state_write()
-        if hasattr(self.origin, 'xy_decr'):
-            self.origin.xy_decr()
+        if hasattr(self.gaia, 'xy_decr'):
+            self.gaia.xy_decr()
     
     def compl_b(self, txt):
         """Breed completer."""
@@ -671,7 +671,7 @@ class Saepat(QMainWindow):
         if len(dd.currentText()) > dd.olen:
             dd.lineEdit().setSelection(dd.olen, 80)
 
-    def db_state(self, db=None): # hierwei ck vs origin from gnuv.py
+    def db_state(self, db=None): # hierwei ck vs gaia from gnuv.py
         """Actions to be taken on db loss and gain."""
         errmsg = ''
         if isinstance(db, str):
@@ -681,7 +681,7 @@ class Saepat(QMainWindow):
         self.w.no_dbconn.setVisible(self.db_err)
         self.dbA.setVisible(self.db_err)
         self.dbA.setEnabled(self.db_err)
-        ##self.dbstate.emit(not self.db_err) # c'd 141120 shb done by origin
+        ##self.dbstate.emit(not self.db_err) # c'd 141120 shb done by gaia
         self.actions_enable(not self.db_err)
         if not errmsg:
             self.db = db
@@ -855,8 +855,8 @@ class Saepat(QMainWindow):
             self.close()
 
     def gv_quitconfirm(self): # hierwei devel
-        if self.origin:
-            self.origin.gv_quitconfirm()
+        if self.gaia:
+            self.gaia.gv_quitconfirm()
         else:
             exit()
 
@@ -1161,14 +1161,14 @@ class Saepat(QMainWindow):
                 self.w.clientLb.setText(self.tr('Client unassigned'))
                 return
         if not self.cid: # hierwei c_id und signal?
-            self.origin.cid.connect(self.pat_addsetcli) # ? parent!
-            self.needcid.connect(self.origin.sae_cli)
+            self.gaia.cid.connect(self.pat_addsetcli) # ? parent!
+            self.needcid.connect(self.gaia.sae_cli)
             self.w.saeFr.setEnabled(0)
             if len(clis):
                 self.needcid.emit(('c', self, clis))
             else:
                 self.needcid.emit(('c', self))
-            self.needcid.disconnect(self.origin.sae_cli)
+            self.needcid.disconnect(self.gaia.sae_cli)
             return
         # Does this client have a(nother) living patient of same name?
         print('double name check')
@@ -2235,15 +2235,15 @@ class Saepat(QMainWindow):
         self.cid = self.cids[row]
 
     def w_cli(self):
-        self.cidsig.connect(self.origin.w_cli)
+        self.cidsig.connect(self.gaia.w_cli)
         self.cidsig.emit(self.cid)
-        self.cidsig.disconnect(self.origin.w_cli)
+        self.cidsig.disconnect(self.gaia.w_cli)
         self.close()
 
     def w_pat(self):
-        self.pidsig.connect(self.origin.openpat)
+        self.pidsig.connect(self.gaia.openpat)
         self.pidsig.emit(self.pid)
-        self.pidsig.disconnect(self.origin.openpat)
+        self.pidsig.disconnect(self.gaia.openpat)
         self.close()
 
     def debugf(self):

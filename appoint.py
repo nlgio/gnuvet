@@ -36,7 +36,7 @@ border-radius: 3px;
     curs = None
     dberr = shutdown = False
     displayed = 0 # week  1 day  2 month
-    origin = None
+    gaia = None
     selstaff = ''
     ## start = True # unused (?)
     starttime = None
@@ -200,18 +200,18 @@ border-radius: 3px;
                 self.w.confirmccPb.clicked, self.confhide)
         #    INIT
         if parent: # devel if
-            if parent.origin == 'origin':
-                self.origin = parent
+            if parent.gaia == 'gaia':
+                self.gaia = parent
             else:
-                self.origin = parent.origin
-            self.options = self.origin.options
-            self.db = self.origin.db
-            self.dbA.triggered.connect(self.origin.db_reconnect)
-            aboutA.triggered.connect(self.origin.about)
-            self.origin.gvquit.connect(self.gv_quit)
-            self.origin.dbstate.connect(self.db_state)
-            self.helpsig.connect(self.origin.gv_help)
-            self.staffid = self.origin.staffid
+                self.gaia = parent.gaia
+            self.options = self.gaia.options
+            self.db = self.gaia.db
+            self.dbA.triggered.connect(self.gaia.db_reconnect)
+            aboutA.triggered.connect(self.gaia.about)
+            self.gaia.gvquit.connect(self.gv_quit)
+            self.gaia.dbstate.connect(self.db_state)
+            self.helpsig.connect(self.gaia.gv_help)
+            self.staffid = self.gaia.staffid
         else:
             from options import defaults as options
             self.options = options
@@ -498,7 +498,7 @@ border-radius: 3px;
         self.w.no_dbconn.setVisible(self.dberr)
         self.dbstate.emit(not self.dberr)
         self.dbdep_enable(not self.dberr)
-        if not self.origin:
+        if not self.gaia:
             self.warning(msg=msg)
             if not self.isVisible(): # devel
                 self.warnw.closed.connect(self.show)
@@ -790,8 +790,8 @@ border-radius: 3px;
             self.close()
 
     def gv_quitconfirm(self):
-        if self.origin:
-            self.origin.gv_quitconfirm()
+        if self.gaia:
+            self.gaia.gv_quitconfirm()
         else:
             for w in self.findChildren(QMainWindow):
                 w.close()
@@ -869,8 +869,8 @@ border-radius: 3px;
             self.app_edit()
             return
         cli = cli[0][0]
-        if self.origin:
-            self.origin.opencli(cli)
+        if self.gaia:
+            self.gaia.opencli(cli)
         else: # devel
             if hasattr(self, 'wc'):
                 self.wc.cid = cli
@@ -896,8 +896,8 @@ border-radius: 3px;
             self.app_edit()
             return
         pat = pat[0][0]
-        if self.origin:
-            self.origin.openpat(pat)
+        if self.gaia:
+            self.gaia.openpat(pat)
         else: # devel:
             if hasattr(self, 'wp'):
                 self.wp.pid = pat
