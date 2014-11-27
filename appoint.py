@@ -302,7 +302,7 @@ border-radius: 3px;
         self.w.confirm.hide()
         self.sel_display()
 
-    def app_edit(self, cell=None):
+    def app_edit(self):
         if not self.w.calendar.selcell.data:
             self.app_add()
             return
@@ -328,7 +328,7 @@ border-radius: 3px;
                 appcid=app[2], apppid=app[3], appstf=app[4], appdur=app[5])
         if self.w.calendar.selcell.parent == self.w.calendar.table:
             x, y = self.w.calendar.selcell.x(), self.w.calendar.selcell.y()
-        else: # hierwei this if still nec?  Suppose not!
+        else:
             x, y = (self.w.calendar.selcell.parent.x(),
                     self.w.calendar.selcell.parent.y())
         self.datefixw.move(x-10, y+10)
