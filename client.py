@@ -3,6 +3,8 @@
 # add buttons for patient: New MarkAsRIP
 #     ChangeOwner only from patient window
 #  and resp Actions/functions
+#  and resp button connections...
+
 from datetime import date
 from decimal import Decimal as D
 from psycopg2 import OperationalError
@@ -139,7 +141,7 @@ class Client(QMainWindow):
             self.options = options
         #    BUTTON CONNECTIONS
         self.w.cancelPb.clicked.connect(self.close)
-        #    INIT # hierwei ck old file
+        #    INIT # hierwei ck old files
         #ch_conn(self, 'enter', self.keych.enter, self.w.mainPb.click)
         #self.w.mainPb.clicked.connect(self.whatever)
         self.dbA.setVisible(0)
@@ -162,9 +164,10 @@ class Client(QMainWindow):
 
     def addpat(self):
         print('client.addpat not yet implemented')
+        self.origin.sae_pat(cid=self.cid, act='a') # hierwei
         
     def cli_data(self):
-        """Collect client data."""
+        """Collect client data including associated patients."""
         res = querydb(
             self,
             'select t_title,c_sname,c_mname,c_fname,housen,street,village,city,'
@@ -190,8 +193,25 @@ class Client(QMainWindow):
             self.w.bdPix.setVisible(e[15])
             self.w.regdateLb.setText(e[16].strftime('%d.%m.%y'))
             self.w.ldateLb.setText(e[17].strftime('%d.%m.%y'))
-            ## self.w.annotxtLb.setText(e[18])
-            self.w.annotxtLb.setText('This is our first client, being the first sentient being to have brought patients to our GnuVet practice.')
+            if e[18]: # devel if
+                self.w.annotxtLb.setText(e[18])
+            else:
+                self.w.annotxtLb.setText(
+                    'This is our first client, being the first sentient being '
+                    'to have brought patients to our GnuVet practice.')
+        tables = querydb( # hierwei ck dependencies of tables for creation!
+            self,
+            "select tablename from pg_tables where tablename='acc{}'".format(
+                self.cid))
+        if tables == None:  return # db error
+        if not tables[0][0]:
+            suc = querydb(
+                self,
+                'create table acc{}(acc_id serial primary key,acc_pid integer '
+                'not null references patients,acc_prid integer not null '
+                'references prod{},acc_npr numeric(9,2) not null,acc_vat '
+                'integer not null references vats,acc_paid boo not null '
+                'default false'.format(self.cid,self.pid))
         cbal = D('0.00')
         pats = querydb(
             self,
