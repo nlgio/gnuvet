@@ -163,10 +163,13 @@ class Client(QMainWindow):
 
     def addpat(self):
         print('client.addpat not yet implemented')
-        self.origin.sae_pat(cid=self.cid, act='a') # hierwei
+        self.origin.sae_pat(cid=self.cid, act='a')
+        ch_conn(self, 'newpat', self.origin.newpat, self.cli_data)
+        # hierwei
         
     def cli_data(self):
         """Collect client data including associated patients."""
+        ch_conn(self, 'newpat')
         res = querydb(
             self,
             'select t_title,c_sname,c_mname,c_fname,housen,street,village,city,'
@@ -209,7 +212,7 @@ class Client(QMainWindow):
                 'create table acc{}(acc_id serial primary key,acc_pid integer '
                 'not null references patients,acc_prid integer not null '
                 'references prod{},acc_npr numeric(9,2) not null,acc_vat '
-                'integer not null references vats,acc_paid boo not null '
+                'integer not null references vats,acc_paid bool not null '
                 'default false'.format(self.cid,self.pid))
         cbal = D('0.00')
         pats = querydb(
