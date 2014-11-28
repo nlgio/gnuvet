@@ -141,7 +141,7 @@ class Client(QMainWindow):
             self.options = options
         #    BUTTON CONNECTIONS
         self.w.cancelPb.clicked.connect(self.close)
-        #    INIT # hierwei ck old files
+        #    INIT
         #ch_conn(self, 'enter', self.keych.enter, self.w.mainPb.click)
         #self.w.mainPb.clicked.connect(self.whatever)
         self.dbA.setVisible(0)
@@ -149,9 +149,8 @@ class Client(QMainWindow):
         try:
             self.curs = self.db.cursor()
         except (OperationalError, AttributeError) as e: # no db connection
-            print('db.cursor(): {}'.format(e))
             self.db_state(e)
-            return
+            return # hierwei ck old files
         logname = 'no login' # neu
         lname = querydb(
             self,

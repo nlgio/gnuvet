@@ -529,7 +529,7 @@ class Gnuv_MainWin(QMainWindow):
         """Wrapper for action signal."""
         self.sae_pat()
         
-    def sae_pat(self, patid=0, act='s'):
+    def sae_pat(self, cid=0, pid=0, act='s'):
         """Search-Add-Edit Patient window."""
         errmsg = self.dbh.db_check(self.curs)
         if errmsg:
@@ -543,7 +543,7 @@ class Gnuv_MainWin(QMainWindow):
         if new:
             if not 'Saepat' in locals():
                 from saepat import Saepat
-            setattr(self, sp, Saepat(self, act, patid))
+            setattr(self, sp, Saepat(self, cid=cid, pid=pid, act=act))
             self.xy_incr(getattr(self, sp))
             getattr(self, sp).show()
         else:

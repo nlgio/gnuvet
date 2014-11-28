@@ -520,7 +520,7 @@ class Saepat(QMainWindow):
         """Set connections for add-edit."""
         ch_conn(self, 'enter', self.keycheck.enter, self.w.mainPb.click)
         # next line new 120521:
-        ch_conn(self, 'mainpb', self.w.mainPb.clicked, self.pat_addcheck)
+        ch_conn(self, 'mainpb', self.w.mainPb.clicked, self.pat_addck)
         self.w.neutdateRb.toggled.connect(self.neutde_toggle)
 
     def age_toggle(self, state=0):
@@ -1105,11 +1105,11 @@ class Saepat(QMainWindow):
             self.w.pnameLe.setFocus()
         self.w.saeFr.show()
 
-    def pat_addcheck(self):
+    def pat_addck(self):
         """Sanity checks on input."""
         # Does patient have a name?
         if not self.w.pnameLe.text():
-            self.pat_addcheck_noname()
+            self.pat_addck_noname()
             return
         # Does the given id already exist (Tattoo!)?
         if self.w.idLe.text() and not self.idok:
@@ -1122,14 +1122,14 @@ class Saepat(QMainWindow):
                     self.tr('There is a different Patient with the ID ') +
                     self.w.idLe.text().toLatin1() + self.tr('!\nSave anyway?'))
                 ch_conn(self, 'errok',
-                        self.w.errOk.clicked, self.pat_addcheck_did)
+                        self.w.errOk.clicked, self.pat_addck_did)
             return
         # Is the dob OK?
         if not self.dobedited:
             self.w.errFr.show()
             self.w.errLb.setText(self.tr(
                 "You haven't changed the date of birth.  Is it OK?"))
-            ch_conn(self, 'errok', self.w.errOk.clicked, self.pat_addcheck_dob)
+            ch_conn(self, 'errok', self.w.errOk.clicked, self.pat_addck_dob)
         # Is the client identified?  registered?
         clis = []
         if not self.cid:
@@ -1200,54 +1200,54 @@ class Saepat(QMainWindow):
                     self.tr('register this new') +
                     self.tr('Patient of the same name.'))
                 ch_conn(self, 'errok',
-                        self.w.errOk.clicked, self.pat_addcheck_name)
+                        self.w.errOk.clicked, self.pat_addck_name)
                 return
         print('checks finished')
         self.pat_save()
 
-    def pat_addcheck_did(self):
+    def pat_addck_did(self):
         """Check reaction to pre-existing ident no."""
         self.w.errFr.hide()
         self.idok = True
-        ch_conn(self, 'errok', self.w.errOk.clicked, self.pat_addcheck_did)
-        self.w.idLe.textEdited.connect(self.pat_addcheck_idok)
+        ch_conn(self, 'errok', self.w.errOk.clicked, self.pat_addck_did)
+        self.w.idLe.textEdited.connect(self.pat_addck_idok)
         self.w.idLe.setFocus()
 
-    def pat_addcheck_dob(self):
+    def pat_addck_dob(self):
         self.w.errFr.hide()
         self.dobedited = True
         ch_conn(self, 'errok')#, self.w.errOk.clicked)
         self.w.dobDe.setFocus()
 
-    def pat_addcheck_idok(self):
+    def pat_addck_idok(self):
         """Reset boolean check value if id# changed."""
-        self.w.idLe.textEdited.disconnect(self.pat_addcheck_idok)
+        self.w.idLe.textEdited.disconnect(self.pat_addck_idok)
         self.idok = False
         
-    def pat_addcheck_noname(self): # hierwei
+    def pat_addck_noname(self): # hierwei
         """Ascertain that patient has a name."""
         self.w.errFr.show()
         self.w.errLb.setText(self.tr(
             'A patient has to have a name.  If the name is unknown, please '
             "use an appropriate pseudonym such as 'nn'."))
-        ch_conn(self, 'errok', self.w.errOk.clicked, self.pat_addcheck_nonameok)
+        ch_conn(self, 'errok', self.w.errOk.clicked, self.pat_addck_nonameok)
 
-    def pat_addcheck_nonameok(self):
+    def pat_addck_nonameok(self):
         """Patient has a name."""
         self.w.errFr.hide()
         ch_conn(self, 'errok')#, self.w.errOk.clicked)
             
-    def pat_addcheck_name(self):
+    def pat_addck_name(self):
         """Check reaction to double name."""
         self.w.errFr.hide()
         self.nameok = True
         ch_conn(self, 'errok')#, self.w.errOk.clicked)
-        self.w.pnameLe.textEdited.connect(self.pat_addcheck_nameok)
+        self.w.pnameLe.textEdited.connect(self.pat_addck_nameok)
         self.w.pnameLe.setFocus()
 
-    def pat_addcheck_nameok(self):
+    def pat_addck_nameok(self):
         """Reset boolean check value if pname changed."""
-        self.w.pnameLe.textEdited.disconnect(self.pat_addcheck_name)
+        self.w.pnameLe.textEdited.disconnect(self.pat_addck_name)
         self.nameok = False
 
     def pat_addsetcli(self, args):
@@ -1260,7 +1260,7 @@ class Saepat(QMainWindow):
                 return
         if len(args):
             self.cid = args[0]
-        self.pat_addcheck()
+        self.pat_addck()
 
     def pat_age(self, p_dob='', rip=False):
         """Calculate patient age from p_dob (ignoring leap years)."""
