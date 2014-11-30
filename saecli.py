@@ -429,61 +429,58 @@ class Saecli(QMainWindow):
         if self.gaia and hasattr(self.gaia, 'xy_decr'):
             self.gaia.xy_decr()
 
-    def compldd(self, dd, txt):
-        """Common actions on text input in Dd."""
+    def complle(self, le, txt):
+        """Common actions on text input in Le."""
         if not txt:
-            dd.olen = 0
-            dd.setCurrentIndex(0)
+            le.olen = 0
             return
-        if not dd.completer():
-            self.setcompleter(dd)
-        if len(txt) <= dd.olen: # bs, del or replace
-            res = dd.query(txt)
-            while len(res) < 2 or len(txt) == dd.olen:
+        if not le.completer():
+            self.setcompleter(le)
+        if len(txt) <= le.olen: # bs, del or replace
+            res = le.query(txt)
+            while len(res) < 2 or len(txt) == le.olen:
                 txt = txt[:-1]
                 if not txt:
-                    dd.olen = 0
-                    dd.setCurrentIndex(0)
+                    le.olen = 0
                     return
-                res = dd.query(txt)
+                res = le.query(txt)
             self.dmodel.setStringList(res)
         else: # text added
-            self.dmodel.setStringList(dd.query(txt))
-        self.complete_dd(dd, txt)
+            self.dmodel.setStringList(le.query(txt))
+        self.complete_le(le, txt)
 
-    def complete_dd(self, dd, txt):
-        """Complete partly entered data in Dd."""
+    def complete_le(self, le, txt):
+        """Complete partly entered data in Le."""
         if len(self.dmodel.stringList()) == 1: # one match
-            dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
-            dd.completer().setWidget(None)
-            dd.setCompleter(None)
-            dd.olen = len(dd.currentText())
+            le.completer().setWidget(None)
+            le.setCompleter(None)
+            le.olen = len(le.currentText())
             return
-        elif len(self.dmodel.stringList()): # several
-            dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
+        ## elif len(self.dmodel.stringList()): # several
+        ##     dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
         else: # None
             idx = 0
             if type(txt) is not str:
                 txt = str(txt)
-            print('c_dd: {} is {}'.format(txt, type(txt)))
+            print('c_le: {} is {}'.format(txt, type(txt)))
             txt = txt[:-1].lower()
             while txt:
-                l = [e for e in dd.list if e.lower().startswith(txt)]
-                l.extend([e for e in dd.list
+                l = [e for e in le.list if e.lower().startswith(txt)]
+                l.extend([e for e in le.list
                           if e.lower().count(txt) and e not in l])
                 if l:
-                    idx = dd.list.index(l[0])
+                    idx = le.list.index(l[0])
                     break
                 else:
                     txt = txt[:-1]
-            dd.setCurrentIndex(idx)
-        dd.olen = len(txt)
-        ch_conn(self, 'activated', self.dcompl.activated, dd.setlen)
+        le.olen = len(txt)
+        ## ch_conn(self, 'activated', self.dcompl.activated, le.setlen) # ???
         self.dcompl.setCompletionPrefix(txt)
         self.dcompl.complete()
-        if len(dd.currentText()) > dd.olen:
-            dd.lineEdit().setSelection(dd.olen, 80)
+        if len(le.currentText()) > le.olen:
+            le.lineEdit().setSelection(le.olen, 80)
         
+    # hierwei: these following compl_ funcs obsoletable?
     def compl_city(self, txt=''):
         if self.db_err or not txt:
             return
@@ -946,8 +943,32 @@ class Saecli(QMainWindow):
         """These query functions are called as le.query."""
         return self.querycomp(self.w.cityLe, txt)
         
-    def query_cfname(self, txt=''):
+    def query_fname(self, txt=''):
         return self.querycomp(self.w.fnameLe, txt)
+
+    def query_housen(self, txt=''):
+        return self.querycomp(self.w.housenLe, txt)
+
+    def query_mname(self, txt=''):
+        return self.querycomp(self.w.mnameLe, txt)
+
+    def query_pname(self, txt=''):
+        return self.querycomp(self.w.pnameLe, txt)
+
+    def query_postcode(self, txt=''):
+        return self.querycomp(self.w.postcodeLe, txt)
+
+    def query_region(self, txt=''):
+        return self.querycomp(self.w.regionLe, txt)
+
+    def query_sname(self, txt=''):
+        return self.querycomp(self.w.snameLe, txt)
+
+    def query_street(self, txt=''):
+        return self.querycomp(self.w.streetLe, txt)
+
+    def query_village(self, txt=''):
+        return self.querycomp(self.w.villageLe, txt)
 
     def query_string(self, s_byname):
         """Construct query string from user input."""
@@ -1074,7 +1095,16 @@ class Saecli(QMainWindow):
     
     def savedrestore(self, saved_things=[]):
         pass
-    
+
+    def setuple(self, le, n):
+        """Called by __init__ to set Le vars for completer."""
+        setattr(le, 'olen', 0)
+        ## setattr(le, 'setlen', getattr(self, 'setlen'+n)) dd-specific
+        setattr(le, 'list', self.complist) # hierwei ck differs from saepat
+        ## setattr(le, 'lname', 'complist') # unused 'lname'
+        setattr(le, 'query', getattr(self, 'query_'+n))
+        le.textEdited.connect(getattr(self, 'compl_'+n)) # ???
+        
     def state_write(self):
         """Signal unsaved changes to gaia for filing for later retrieval."""
         pass

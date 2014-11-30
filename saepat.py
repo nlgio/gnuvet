@@ -2138,7 +2138,7 @@ class Saepat(QMainWindow):
         setattr(dd, 'olen', 0)
         setattr(dd, 'setlen', getattr(self, 'setlen'+n))
         setattr(dd, 'list', getattr(self, n+'list'))
-        setattr(dd, 'lname', n+'list')
+        setattr(dd, 'lname', n+'list') # unused 'lname'
         setattr(dd, 'query', getattr(self, 'query_'+n))
         dd.lineEdit().textEdited.connect(getattr(self, 'compl_'+n))
         dd.activated.connect(dd.setlen)
