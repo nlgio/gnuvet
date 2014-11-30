@@ -3,15 +3,16 @@
 # should hide mobile2, patient, somehow col_hide don't seem to work
 # adapt to saepat.py
 # completer tun nicht wie sollen?
-# jetzt kommt der glyph bug auch bei ToolTips!
+# completer ausschalten on edit?
+# jetzt kommt der glyph bug auch bei ToolTips! # obsolete?
 # add: lLb.setText(self.user)
 # check query_string (insb f qstring)
 # action: a add  e edit  s search  c select
 
 from datetime import date
 from psycopg2 import OperationalError
-from PyQt4.QtCore import QStringList, QVariant, Qt, pyqtSignal
-from PyQt4.QtGui import (QAction, QBrush, QCompleter, QLabel, QMainWindow,
+from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtGui import (QAction, QCompleter, QMainWindow,
                          QMenu, QPixmap, QStringListModel,)
 import gv_qrc
 from saecli_ui import Ui_Saecli
@@ -32,10 +33,11 @@ class Saecli(QMainWindow):
     curs  = None
     gaia = None
     
-    def __init__(self, parent=None, act='s', clis=None):
+    def __init__(self, parent=None, clid=0, act='s', clis=None):
         super(Saecli, self).__init__(parent)
+        self.clid = clid
+        self.act = act
         self.clis = clis
-        self.action = act
         self.w = Ui_Saecli()
         self.w.setupUi(self)
         #    instance vars
@@ -104,11 +106,11 @@ class Saecli(QMainWindow):
         closeA.triggered.connect(self.close)
         self.newcliA.triggered.connect(self.cli_add)
         #    GAIA CONNECTIONS
-        if parent.gaia == 'gaia':
-            self.gaia = parent
-        else:
-            self.gaia = parent.gaia
-        if self.gaia: # devel if
+        if parent: # devel if
+            if parent.gaia == 'gaia':
+                self.gaia = parent
+            else:
+                self.gaia = parent.gaia
             self.options = gaia.options
             self.staffid = gaia.staffid
             self.db = gaia.db
@@ -166,28 +168,41 @@ class Saecli(QMainWindow):
         self.w.lLb.setText(logname)
         self.w.bdPix.hide()
         self.w.ctitleDd.addItem("", 0)
-        result = querydb(
+        res = querydb(
             self, 'select t_id,t_title from titles order by t_id')
-        if result is None:  return # db error
-        for res in result:
-            self.w.ctitleDd.addItem(res[1], res[0])
+        if res is None:  return # db error
+        for e in res:
+            self.w.ctitleDd.addItem(e[1], e[0])
+        #    COMPLETER HELPERS
+        self.les = (self.w.snameLe,self.w.fnameLe,self.w.mnameLe,
+                    self.w.housenLe,self.w.streetLe,self.w.villageLe,
+                    self.w.cityLe,self.w.regionLe,self.w.postcodeLe,
+                    self.w.pnameLe)
+        for le in self.les:
+            setattr(le, 'list', self.complist) # ? differs from saepat
         #    COMPLETER
-        self.qmodel = QStringListModel(self)
-        self.completer = QCompleter(self)
-        self.completer.setCaseSensitivity(0)
-        self.completer.setModelSorting(1)
-        self.completer.setModel(self.qmodel)
-        self.completer.setCompletionMode(0) # was 1
-        for le in (self.w.c_snameLe, self.w.c_mnameLe, self.w.c_fnameLe,
+        ## self.qmodel = QStringListModel(self)
+        ## self.completer = QCompleter(self)
+        ## self.completer.setCaseSensitivity(0)
+        ## self.completer.setModelSorting(1)
+        ## self.completer.setModel(self.qmodel)
+        ## self.completer.setCompletionMode(0) # was 1
+        self.lmodel = QStringListModel(self)
+        self.lcompl = QCompleter(self)
+        self.lcompl.setCaseSensitivity(0)
+        self.lcompl.setCompletionMode(0)
+        self.lcompl.setModel(self.lmodel)
+        
+        for le in (self.w.snameLe, self.w.mnameLe, self.w.fnameLe,
                    self.w.housenLe, self.w.streetLe, self.w.villageLe,
                    self.w.cityLe, self.w.regionLe, self.w.postcodeLe,
                    self.w.telhomeLe, self.w.telworkLe, self.w.mobile1Le,
                    self.w.mobile2Le, self.w.emailLe, self.w.pnameLe):
             le.setCompleter(self.completer)
         #    COMPLETER CONNECTIONS
-        self.w.c_snameLe.textEdited.connect(self.compl_sname)
-        self.w.c_fnameLe.textEdited.connect(self.compl_fname)
-        self.w.c_mnameLe.textEdited.connect(self.compl_mname)
+        self.w.snameLe.textEdited.connect(self.compl_sname)
+        self.w.fnameLe.textEdited.connect(self.compl_fname)
+        self.w.mnameLe.textEdited.connect(self.compl_mname)
         self.w.housenLe.textEdited.connect(self.compl_housen)
         self.w.streetLe.textEdited.connect(self.compl_street)
         self.w.villageLe.textEdited.connect(self.compl_village)
@@ -243,13 +258,6 @@ class Saecli(QMainWindow):
     ##         self.w.matchFr.hide()
     ##         self.w.noMFr.hide()
 
-    def actions_enable(self, yes=True):
-        """En|Disable actions in case of db loss or gain."""
-        #self.a_disabled = True
-        self.newcliA.setEnabled(yes)
-        self.w.secondPb.setEnabled(yes)
-        self.w.mainPb.setDefault(yes)
-        
     def changed(self, change=0):
         """Note if changes have been made for poss emerg save."""
         if change:
@@ -280,17 +288,17 @@ class Saecli(QMainWindow):
             housenre = re.compile(r"(\d*[-]?(\d*|[\ ]?[A-Za-z]+))|([A-Z]["
                                   "a-z]*\b([-\ ]?\b[A-Z][a-z]*)*)$")
         errors = []
-        txt = self.w.c_mnameLe.text().toLatin1()
+        txt = self.w.mnameLe.text().toLatin1()
         if txt:
             if not re.match(mnamere, txt):
                 txt = fix_mname(txt)
                 if re.match(mnamere, txt):
-                    self.w.c_mnameLe.setText(txt)
+                    self.w.mnameLe.setText(txt)
                 else:
                     errors.append[5]
         # iter something here?  use list?
         i = 0
-        for le in (self.w.c_snameLe, self.w.c_fnameLe, self.w.housenLe,
+        for le in (self.w.snameLe, self.w.fnameLe, self.w.housenLe,
                    self.w.streetLe, self.w.villageLe, self.w.cityLe,
                    self.w.regionLe):
             txt = le.text().toLatin1()
@@ -389,9 +397,9 @@ class Saecli(QMainWindow):
         self.w.noMFr.hide()
         self.w.matchFr.hide()
         self.w.saeFr.setEnabled(1)
-        if self.action == 's':
+        if self.act == 's':
             self.setWindowTitle(self.tr('Search Client'))
-        if self.action == 'c':
+        if self.act == 'c':
             self.setWindowTitle(self.tr('Select Client'))
         # 
         self.w.backPb.setDefault(0)
@@ -411,16 +419,71 @@ class Saecli(QMainWindow):
         ch_conn(self, '2ndPb', self.w.secondPb.clicked, self.reset_form)
         self.w.saeFr.setEnabled(1)
         self.w.saeFr.show()
-        self.w.c_snameLe.setFocus()
+        self.w.snameLe.setFocus()
         self.err_no = 0
     
     def closeEvent(self, ev): # ev.accept() seems to be unnec
-        if self.shutdown:
-            if self.db_err:
-                self.state_write()
-        if hasattr(self.gaia, 'xy_decr'):
+        ## if self.shutdown:
+        ##     if self.db_err:
+        ##         self.state_write()
+        if self.gaia and hasattr(self.gaia, 'xy_decr'):
             self.gaia.xy_decr()
 
+    def compldd(self, dd, txt):
+        """Common actions on text input in Dd."""
+        if not txt:
+            dd.olen = 0
+            dd.setCurrentIndex(0)
+            return
+        if not dd.completer():
+            self.setcompleter(dd)
+        if len(txt) <= dd.olen: # bs, del or replace
+            res = dd.query(txt)
+            while len(res) < 2 or len(txt) == dd.olen:
+                txt = txt[:-1]
+                if not txt:
+                    dd.olen = 0
+                    dd.setCurrentIndex(0)
+                    return
+                res = dd.query(txt)
+            self.dmodel.setStringList(res)
+        else: # text added
+            self.dmodel.setStringList(dd.query(txt))
+        self.complete_dd(dd, txt)
+
+    def complete_dd(self, dd, txt):
+        """Complete partly entered data in Dd."""
+        if len(self.dmodel.stringList()) == 1: # one match
+            dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
+            dd.completer().setWidget(None)
+            dd.setCompleter(None)
+            dd.olen = len(dd.currentText())
+            return
+        elif len(self.dmodel.stringList()): # several
+            dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
+        else: # None
+            idx = 0
+            if type(txt) is not str:
+                txt = str(txt)
+            print('c_dd: {} is {}'.format(txt, type(txt)))
+            txt = txt[:-1].lower()
+            while txt:
+                l = [e for e in dd.list if e.lower().startswith(txt)]
+                l.extend([e for e in dd.list
+                          if e.lower().count(txt) and e not in l])
+                if l:
+                    idx = dd.list.index(l[0])
+                    break
+                else:
+                    txt = txt[:-1]
+            dd.setCurrentIndex(idx)
+        dd.olen = len(txt)
+        ch_conn(self, 'activated', self.dcompl.activated, dd.setlen)
+        self.dcompl.setCompletionPrefix(txt)
+        self.dcompl.complete()
+        if len(dd.currentText()) > dd.olen:
+            dd.lineEdit().setSelection(dd.olen, 80)
+        
     def compl_city(self, txt=''):
         if self.db_err or not txt:
             return
@@ -433,8 +496,8 @@ class Saecli(QMainWindow):
             'select distinct city from addresses where city ilike %s order by '
             'city', (txt,))
         if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
+        for e in result:
+            self.complist.append(e[0])
         self.qmodel.setStringList(self.complist)
 
     def compl_email(self, txt=''):
@@ -449,15 +512,15 @@ class Saecli(QMainWindow):
             'select distinct c_email from clients where c_email ilike %s order '
             'by c_email', (txt,))
         if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
+        for e in result:
+            self.complist.append(e[0])
         self.qmodel.setStringList(self.complist)
             
     def compl_fname(self, txt=''):
         if self.db_err or not txt:
             return
         if len(txt) > 80:
-            self.w.c_fnameLe.setText(txt[:80])
+            self.w.fnameLe.setText(txt[:80])
         self.complist = []
         txt = str(txt) + '%'
         result = querydb(
@@ -465,8 +528,8 @@ class Saecli(QMainWindow):
             'select distinct c_fname from clients where c_fname ilike %s order '
             'by c_fname', (txt,))
         if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
+        for e in result:
+            self.complist.append(e[0])
         self.qmodel.setStringList(self.complist)
 
     def compl_housen(self, txt=''):
@@ -489,7 +552,7 @@ class Saecli(QMainWindow):
         if self.db_err or not txt:
             return
         if len(txt) > 25:
-            self.w.c_mnameLe.setText(txt[:25])
+            self.w.mnameLe.setText(txt[:25])
         self.complist = []
         txt = str(txt) + '%'
         result = querydb(
@@ -585,7 +648,7 @@ class Saecli(QMainWindow):
         if self.db_err or not txt:
             return
         if len(txt) > 80:
-            self.w.c_snameLe.setText(txt[:80])
+            self.w.snameLe.setText(txt[:80])
         self.complist = []
         txt = str(txt) + '%'
         result = querydb(
@@ -661,14 +724,21 @@ class Saecli(QMainWindow):
             self.complist.append(res[0])
         self.qmodel.setStringList(self.complist)
                 
-    def db_state(self, db=None): # hierwei
+    def dbdep_enable(self, yes=True):
+        """En|Disable actions in case of db loss or gain."""
+        #self.a_disabled = True
+        self.newcliA.setEnabled(yes)
+        self.w.secondPb.setEnabled(yes)
+        self.w.mainPb.setDefault(yes)
+        self.dbA.setVisible(not yes)
+        self.dbA.setEnabled(not yes)
+        
+    def db_state(self, msg=''):
         """Actions to be taken on db loss and gain."""
-        self.db_err = not db
-        self.w.no_dbconn.setVisible(not self.db_err)
-        self.dbA.setVisible(not self.db_err)
-        self.dbA.setEnabled(not self.db_err)
-        self.dbstate.emit(self.db_err)
-        self.actions_enable(not self.db_err)
+        self.db_err = msg and True or False
+        self.w.no_dbconn.setVisible(self.db_err)
+        self.dbstate.emit(not self.db_err) # hierwei
+        self.dbdep_enable(not self.db_err)
 
     def err_ok(self): # hierwei mainPb.click?
         ch_conn(self, 'enter', self.keycheck.enter, self.w.mainPb.click)
@@ -780,9 +850,9 @@ class Saecli(QMainWindow):
             exit()
     
     def help_self(self):
-        if self.action == 's':
+        if self.act == 's':
             self.helpsig.emit('clisearch.html')
-        elif self.action in ('e', 'a'):
+        elif self.act in ('e', 'a'):
             print('help on add and edit not yet implemented.')
 
     def list_clis(self):
@@ -798,8 +868,8 @@ class Saecli(QMainWindow):
         result = querydb(self, self.query_string(s_byname))
         if result is None:  return # db error
         self.hidecols = {}
-        for res in result:
-            self.filltable(res)
+        for e in result:
+            self.filltable(e)
         if result:
             self.match_list(s_byname)
         else:
@@ -824,7 +894,7 @@ class Saecli(QMainWindow):
                 self.w.clist.col_hide(entry)
             else:
                 self.w.clist.col_show(entry)
-        self.actions_enable(False)
+        self.dbdep_enable(False)
         self.newM.setEnabled(0)
         self.w.backPb.setAutoDefault(0)
         self.w.backPb.setDefault(0)
@@ -865,6 +935,20 @@ class Saecli(QMainWindow):
         ch_conn(self, 'mainPb', self.w.mainPb.clicked, self.cli_add)
         self.w.noMFr.show()
         
+    def querycomp(self, le, txt):
+        """Get list for le completers."""
+        txt = str(txt.toLatin1()).lower()
+        l = [e for e in le.list if e.lower().startswith(txt)]
+        l.extend([e for e in le.list if e.lower().count(txt) and e not in l])
+        return l
+
+    def query_city(self, txt=''):
+        """These query functions are called as le.query."""
+        return self.querycomp(self.w.cityLe, txt)
+        
+    def query_cfname(self, txt=''):
+        return self.querycomp(self.w.fnameLe, txt)
+
     def query_string(self, s_byname):
         """Construct query string from user input."""
         # fields: 0 c_title  1 c_sname  2 c_fname  3 c_mname  4 housen
@@ -891,11 +975,11 @@ class Saecli(QMainWindow):
             query_order = 'c_last desc,' + query_order
         if not 'wildcard' in locals():
             from util import wildcard, prep_txt
-        for le in ('c_sname', 'c_fname', 'c_mname', 'housen', 'street',
+        for le in ('sname', 'fname', 'mname', 'housen', 'street',
                    'village', 'city', 'region'):
             Le = getattr(self.w, le+'Le')
             if Le.text():
-                q = le.startswith('c_') and le or le
+                q = le.endswith('name') and ('c_'+le) or le
                 query_where += ((query_where and ' and ' or '') + q + " ilike '"
                                 + wildcard(prep_txt(Le.text().toLatin1(),
                                                     True)) + "'")
@@ -941,16 +1025,14 @@ class Saecli(QMainWindow):
         if self.w.baddebtCb.isChecked():
             query_where += (query_where and ' and ' or '') + 'baddebt=True'
         query_where += (query_where and ' and ' or '')
-        #print ('select ' + query_sel + ' from ' + query_from + ' where ' +
-        #       query_where + query_walways + ' order by ' + query_order)
         return ('select ' + query_sel + ' from ' + query_from + ' where ' +
                 query_where + query_walways + ' order by ' + query_order)
         
     def reset_form(self):
         self.w.ctitleDd.setCurrentIndex(0)
-        self.w.c_snameLe.clear()
-        self.w.c_fnameLe.clear()
-        self.w.c_mnameLe.clear()
+        self.w.snameLe.clear()
+        self.w.fnameLe.clear()
+        self.w.mnameLe.clear()
         self.w.baddebtCb.setChecked(0)
         #self.w.bdPix.hide()
         self.w.housenLe.clear()
@@ -972,7 +1054,7 @@ class Saecli(QMainWindow):
         self.w.lastDe.clear() #?
         self.w.balspecDd.setCurrentIndex(0)
         self.w.balSb.clear() #?
-        self.w.c_snameLe.setFocus()
+        self.w.snameLe.setFocus()
 
     def resizeEvent(self, ev):
         if ev.oldSize().width() == -1:

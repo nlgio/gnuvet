@@ -58,8 +58,8 @@ class Saepat(QMainWindow):
         self.w.setupUi(self)
         #    instance VARIABLES
         (self.blist, self.slist, self.clist, self.llist, self.ilist) = (
-            [''], [''], [''], [], ['']) # for completers
-        self.cflist, self.cslist, self.plist = [], [], [] # dito but less
+            [''], [''], [''], [], ['']) # for dd completers
+        self.cflist, self.cslist, self.plist = [], [], [] # dito but les
         self.conns = {} # (py)qt bug: segfaults on disconnect() w/o arg
         self.sigs  = {}
         self.pids = []
@@ -167,13 +167,12 @@ class Saepat(QMainWindow):
         self.newcolA.triggered.connect(self.add_col)
         self.newlocA.triggered.connect(self.add_loc)
         self.newinsA.triggered.connect(self.add_ins)
-        #    GAIA
-        if parent.gaia == 'gaia':
-            self.gaia = parent
-        else:
-            self.gaia = parent.gaia
         #    PARENT CONNECTIONS
         if parent: # devel if
+            if parent.gaia == 'gaia':
+                self.gaia = parent
+            else:
+                self.gaia = parent.gaia
             self.options = self.gaia.options
             self.db = self.gaia.db
             self.dbA.triggered.connect(self.gaia.db_reconnect)
@@ -596,7 +595,7 @@ class Saepat(QMainWindow):
     def closeEvent(self, ev): # hierwei: devel
         ## if self.unsaved:
         ##     self.state_write()
-        if hasattr(self.gaia, 'xy_decr'):
+        if self.gaia and hasattr(self.gaia, 'xy_decr'):
             self.gaia.xy_decr()
 
     def compldd(self, dd, txt):

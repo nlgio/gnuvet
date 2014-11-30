@@ -93,21 +93,21 @@ class Ui_Saecli(object):
         self.ctitleDd.setGeometry(52, 29, 57, 21)
         self.ctitleLb = QLabel(self.saeFr)
         self.ctitleLb.setGeometry(52, 53, 60, 19)
-        self.c_snameLe = QLineEdit(self.saeFr)
-        self.c_snameLe.setGeometry(135, 29, 210, 21)
-        self.c_snameLe.setMaxLength(80)
-        self.c_snameLb = QLabel(self.saeFr)
-        self.c_snameLb.setGeometry(135, 53, 99, 19)
-        self.c_fnameLe = QLineEdit(self.saeFr)
-        self.c_fnameLe.setGeometry(365, 29, 210, 21)
-        self.c_fnameLe.setMaxLength(80)
-        self.c_fnameLb = QLabel(self.saeFr)
-        self.c_fnameLb.setGeometry(365, 53, 105, 19)
-        self.c_mnameLe = QLineEdit(self.saeFr)
-        self.c_mnameLe.setGeometry(595, 29, 210, 21)
-        self.c_mnameLe.setMaxLength(25)
-        self.c_mnameLb = QLabel(self.saeFr)
-        self.c_mnameLb.setGeometry(595, 53, 141, 19)
+        self.snameLe = QLineEdit(self.saeFr)
+        self.snameLe.setGeometry(135, 29, 210, 21)
+        self.snameLe.setMaxLength(80)
+        self.snameLb = QLabel(self.saeFr)
+        self.snameLb.setGeometry(135, 53, 99, 19)
+        self.fnameLe = QLineEdit(self.saeFr)
+        self.fnameLe.setGeometry(365, 29, 210, 21)
+        self.fnameLe.setMaxLength(80)
+        self.fnameLb = QLabel(self.saeFr)
+        self.fnameLb.setGeometry(365, 53, 105, 19)
+        self.mnameLe = QLineEdit(self.saeFr)
+        self.mnameLe.setGeometry(595, 29, 210, 21)
+        self.mnameLe.setMaxLength(25)
+        self.mnameLb = QLabel(self.saeFr)
+        self.mnameLb.setGeometry(595, 53, 141, 19)
         self.baddebtCb = QCheckBox(self.saeFr)
         self.baddebtCb.setGeometry(52, 92, 45, 23)
         self.bdPix = QLabel(self.saeFr)
@@ -253,9 +253,9 @@ class Ui_Saecli(object):
         Saecli.setCentralWidget(self.centralwidget)
         # buddies
         self.ctitleLb.setBuddy(self.ctitleDd)
-        self.c_snameLb.setBuddy(self.c_snameLe)
-        self.c_mnameLb.setBuddy(self.c_mnameLe)
-        self.c_fnameLb.setBuddy(self.c_fnameLe)
+        self.snameLb.setBuddy(self.snameLe)
+        self.mnameLb.setBuddy(self.mnameLe)
+        self.fnameLb.setBuddy(self.fnameLe)
         self.housenLb.setBuddy(self.housenLe)
         self.streetLb.setBuddy(self.streetLe)
         self.villageLb.setBuddy(self.villageLe)
@@ -292,9 +292,9 @@ class Ui_Saecli(object):
             QApplication.translate("Saecli", "Cancel", None, 1))
         self.cancelPb.setShortcut(
             QApplication.translate("Saecli", "Esc", None, 1))
-        self.c_fnameLb.setText(
+        self.fnameLb.setText(
             QApplication.translate("Saecli", "Client &Forename", None, 1))
-        self.c_mnameLb.setText(
+        self.mnameLb.setText(
             QApplication.translate("Saecli", "Client &Middle Name(s)", None, 1))
         self.housenLb.setText(
             QApplication.translate("Saecli", "H&ouse Name/Number", None, 1))
@@ -310,7 +310,7 @@ class Ui_Saecli(object):
             QApplication.translate("Saecli", "&Postcode", None, 1))
         self.mobile2Lb.setText(
             QApplication.translate("Saecli", "Mobile &2", None, 1))
-        self.c_snameLb.setText(
+        self.snameLb.setText(
             QApplication.translate("Saecli", "C&lient Surname", None, 1))
         self.ctitleLb.setText(
             QApplication.translate("Saecli", "T&itle", None, 1))
