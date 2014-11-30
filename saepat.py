@@ -598,25 +598,7 @@ class Saepat(QMainWindow):
         ##     self.state_write()
         if hasattr(self.gaia, 'xy_decr'):
             self.gaia.xy_decr()
-    
-    def compl_b(self, txt):
-        """Breed completer."""
-        self.compldd(self.w.breedDd, txt)
 
-    def compl_c(self, txt):
-        """Colour completer."""
-        self.compldd(self.w.colDd, txt)
-
-    def compl_i(self, txt):
-        """Insurance completer."""
-        self.compldd(self.w.insDd, txt)
-
-    def compl_l(self, txt):
-        self.compldd(self.w.locDd, txt)
-
-    def compl_s(self, txt):
-        self.compldd(self.w.specDd, txt)
-        
     def compldd(self, dd, txt):
         """Common actions on text input in Dd."""
         if not txt:
@@ -671,7 +653,25 @@ class Saepat(QMainWindow):
         self.dcompl.complete()
         if len(dd.currentText()) > dd.olen:
             dd.lineEdit().setSelection(dd.olen, 80)
+    
+    def compl_b(self, txt):
+        """Breed completer."""
+        self.compldd(self.w.breedDd, txt)
 
+    def compl_c(self, txt):
+        """Colour completer."""
+        self.compldd(self.w.colDd, txt)
+
+    def compl_i(self, txt):
+        """Insurance completer."""
+        self.compldd(self.w.insDd, txt)
+
+    def compl_l(self, txt):
+        self.compldd(self.w.locDd, txt)
+
+    def compl_s(self, txt):
+        self.compldd(self.w.specDd, txt)
+        
     def db_state(self, db=None): # hierwei ck vs gaia from gnuv.py
         """Actions to be taken on db loss and gain."""
         errmsg = ''
