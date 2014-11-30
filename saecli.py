@@ -30,10 +30,10 @@ class Saecli(QMainWindow):
     db_err = changes = shutdown = False # self.adding?
     completed = ''
     curs  = None
+    gaia = None
     
     def __init__(self, parent=None, act='s', clis=None):
         super(Saecli, self).__init__(parent)
-        self.parent = parent
         self.clis = clis
         self.action = act
         self.w = Ui_Saecli()
@@ -103,19 +103,21 @@ class Saecli(QMainWindow):
         helpA.triggered.connect(self.help_self)
         closeA.triggered.connect(self.close)
         self.newcliA.triggered.connect(self.cli_add)
-        #    PARENT CONNECTIONS
-        if parent: # devel if
-            self.options = parent.options
-            self.staffid = parent.staffid
-            self.db = parent.db
-            self.dbA.triggered.connect(parent.db_connect)
-            aboutA.triggered.connect(parent.about)
-            self.db = parent.db
-            self.staffid = parent.staffid
-            parent.gvquit.connect(self.gv_quit)
-            parent.dbstate.connect(self.db_state)
-            self.helpsig.connect(parent.gv_help)
-            self.savestate.connect(parent.state_write)
+        #    GAIA CONNECTIONS
+        if parent.gaia == 'gaia':
+            self.gaia = parent
+        else:
+            self.gaia = parent.gaia
+        if self.gaia: # devel if
+            self.options = gaia.options
+            self.staffid = gaia.staffid
+            self.db = gaia.db
+            self.dbA.triggered.connect(gaia.db_connect)
+            aboutA.triggered.connect(gaia.about)
+            gaia.gvquit.connect(self.gv_quit)
+            gaia.dbstate.connect(self.db_state)
+            self.helpsig.connect(gaia.gv_help)
+            self.savestate.connect(gaia.state_write)
         else:
             from options import defaults as options
             self.options = options
@@ -329,6 +331,47 @@ class Saecli(QMainWindow):
     def cli_add(self): # adding args don't forget trg=False
         self.stage = 3
         # hierwei
+        tables = querydb( # well this should all be done on client creation
+            self,
+            "select tablename from pg_tables where tablename='acc{}'".format(
+                self.cid))
+        if tables == None:  return # db error
+        if not tables[0][0]:
+            suc = querydb(
+                self,
+                "insert into patients(p_name,p_cid,p_reg)values('nn',%s,%s) "
+                "returning p_id", (self.cid, self.today)) # implement today!
+            if suc is None:  return # db error
+            pid = suc[0][0]
+            try:
+                self.curs.execute(
+                    'create table e{}(id serial primary key'.format(pid))
+                self.curs.execute(
+                    'create table prod{0}(id serial primary key,consid integer '
+                    'not null references e{0},dt timestamp not null default '
+                    'now(),type integer not null references outputs,txt '
+                    'integer not null default 1,symp integer not null '
+                    'references symptoms default 1,staff integer not null '
+                    'references staff default 1,seq integer not null default '
+                    '3'.format(pid))
+                self.curs.execute(
+                    "create table ch{0}(id serial primary key,consid integer "
+                    "not null references e{0},dt timestamp not null default "
+                    "now(),text varchar(1024) not null default '',symp "
+                    "integer not null references symptoms default 1,staff "
+                    "integer not null references staff default 1,seq integer "
+                    "not null default 2)".format(pid))
+                self.curs.execute(
+                    'create table acc{}(acc_id serial primary key,acc_pid '
+                    'integer not null references patients,acc_prid integer not '
+                    'null references prod{},acc_npr numeric(9,2) not null,'
+                    'acc_vat integer not null references vats,acc_paid bool not'
+                    'null default false'.format(self.cid,self.pid))
+            except OperationalError as e:
+                self.db_state(e)
+                return
+            self.db.commit()
+            # hierwei end this shb done on add_client
         pass
 
     def cli_edit(self):
@@ -375,8 +418,8 @@ class Saecli(QMainWindow):
         if self.shutdown:
             if self.db_err:
                 self.state_write()
-        if hasattr(self.parent, 'xy_decr'):
-            self.parent.xy_decr()
+        if hasattr(self.gaia, 'xy_decr'):
+            self.gaia.xy_decr()
 
     def compl_city(self, txt=''):
         if self.db_err or not txt:
@@ -731,8 +774,8 @@ class Saecli(QMainWindow):
             self.close()
 
     def gv_quitconfirm(self):
-        if self.parent:
-            self.parent.gv_quitconfirm()
+        if self.gaia:
+            self.gaia.gv_quitconfirm()
         else:
             exit()
     
@@ -951,7 +994,7 @@ class Saecli(QMainWindow):
         pass
     
     def state_write(self):
-        """Signal unsaved changes to parent for filing for later retrieval."""
+        """Signal unsaved changes to gaia for filing for later retrieval."""
         pass
 
     def save_cli(self):
@@ -967,9 +1010,9 @@ class Saecli(QMainWindow):
     
     def w_cli(self): # hierwei: func name?
         """Signal client ID to whom it may concern."""
-        self.cidsig.connect(self.parent.opencli)
+        self.cidsig.connect(self.gaia.opencli)
         self.cidsig.emit(self.cid)
-        self.cidsig.disconnect(self.parent.opencli)
+        self.cidsig.disconnect(self.gaia.opencli)
         self.close()
 
     def develf(self):

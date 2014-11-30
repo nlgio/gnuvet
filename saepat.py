@@ -1,15 +1,16 @@
 """Search Add Edit patient interface."""
+# change self.action to self.act and use that insto self.stage
 # recheck all -- still functional, useful? connect.s? g|setattr(self, what)!!!
 #     avoid dependence on gnuv.py, should be ready for other modules as well
-# add search for breed, spec, col, loc, ins
-# re-implement statewrite and db_err and changes and suchlike
+# add search for breed, spec, col, loc, ins - done?
+# switch off completers when adding patient?
+# re-implement state_write and db_err and _changes_ and suchlike
 # test pat_add things with client list (clis)
 # edit -> name history!  check with self.today
 # error on closing when children around
 # TODO:
 # remove invisible columns, use cell.data for p_id
 # check all button connections
-# check all signals (bossquit(bool) -> bossquit.emit())
 #
 # pull out all connections related to other windows to those windows!
 
@@ -1446,6 +1447,8 @@ class Saepat(QMainWindow):
         ## for dd in (self.w.breedDd, self.w.specDd, self.w.colDd,
         ##            self.w.locDd, self.w.insDd):
         ##     self.complete_dd(dd)
+        ## ck update p set (col, col, ...) = (val, val, ...)
+        ## signal finish, like via addpat, chdpat or suchlike
         neut = neutdu = False
         if self.stage == 'a':
             query_s = (
@@ -1490,7 +1493,6 @@ class Saepat(QMainWindow):
                         self.w.insDd.currentIndex(), 32).toInt()[0],
                     ))
             if res is None:  return # db error
-            self.db.commit()
         elif self.stage == 'e':
             if (self.startv['pname'] != self.w.pnameLe.text().toLatin1() or
                 self.startv['breed'] != self.w.itemData(
@@ -1547,14 +1549,17 @@ class Saepat(QMainWindow):
                     self.w.insDd.itemData(self.w.insDd.currentIndex(), 32),
                     neut, self.pid))
             if res is None:  return # db error
-            self.db.commit()
+        self.db.commit()
         if self.w.neutduRb.isChecked():
             neut = neutdu = True
         if neut:
             self.ck_neutdate(self.pid, neutdu,
                              self.w.neutDe.date().toPyDate())
         print('pat_save done.')
-        #self.w_pat()
+        ## if self.act == 'a': # hierwei implement, in gnuv too
+        ##     self.newpat.emit(res[0][0])
+        ## elif self.act == 'e':
+        ##     self.chgpat.emit(res[0][0])
 
     def popul_breeds(self):
         """(Re-)Populate breed combo."""

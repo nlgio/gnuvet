@@ -150,7 +150,7 @@ class Client(QMainWindow):
             self.curs = self.db.cursor()
         except (OperationalError, AttributeError) as e: # no db connection
             self.db_state(e)
-            return # hierwei ck old files
+            return
         logname = 'no login' # neu
         lname = querydb(
             self,
@@ -164,8 +164,8 @@ class Client(QMainWindow):
     def addpat(self):
         print('client.addpat not yet implemented')
         self.origin.sae_pat(cid=self.cid, act='a')
-        ch_conn(self, 'newpat', self.origin.newpat, self.cli_data)
-        # hierwei
+        ch_conn(self, 'newpat', self.gaia.newpat, self.cli_data)
+        # hierwei: could be ready
         
     def cli_data(self):
         """Collect client data including associated patients."""
@@ -201,19 +201,7 @@ class Client(QMainWindow):
                 self.w.annotxtLb.setText(
                     'This is our first client, being the first sentient being '
                     'to have brought patients to our GnuVet practice.')
-        tables = querydb( # hierwei ck dependencies of tables for creation!
-            self,
-            "select tablename from pg_tables where tablename='acc{}'".format(
-                self.cid))
-        if tables == None:  return # db error
-        if not tables[0][0]:
-            suc = querydb(
-                self,
-                'create table acc{}(acc_id serial primary key,acc_pid integer '
-                'not null references patients,acc_prid integer not null '
-                'references prod{},acc_npr numeric(9,2) not null,acc_vat '
-                'integer not null references vats,acc_paid bool not null '
-                'default false'.format(self.cid,self.pid))
+        # hierwei here was table creation
         cbal = D('0.00')
         pats = querydb(
             self,
@@ -221,7 +209,8 @@ class Client(QMainWindow):
         if pats is None:  return # db error
         pats = [e[0] for e in pats]
         for p in pats:
-            ## hierwei: error if no accN table!
+            # hierwei: error if no accN table!
+            # hierwei: unsinn for balance don't need patients!
             addend = querydb(
                 self,
                 'select acc_npr,vat_rate,count from acc{0},prod{1},vats '
@@ -256,6 +245,8 @@ class Client(QMainWindow):
             self.warnw.closed.connect(self.show)
 
     def editc(self):
+        print('editc not yet implemented.')
+        self.gaia.saecli(self, act='e') # hierwei: to be implemented in saecli!
         pass
 
     def get_pats(self):
