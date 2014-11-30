@@ -32,6 +32,28 @@ class Saecli(QMainWindow):
     completed = ''
     curs  = None
     gaia = None
+
+    # queries for completers:
+    cityq = ("select distinct city from addresses where city ilike %s order by "
+             "city")
+    fnameq = ("select distinct c_fname from clients where c_fname ilike %s "
+              "order by c_fname")
+    housenq = ("select distinct housen from addresses where housen ilike %s "
+               "order by housen")
+    mnameq = ("select distinct c_mname from clients where c_mname ilike %s "
+              "order by c_mname")
+    pnameq = ("select distinct p_name from patients where p_name ilike %s "
+              "order by p_name")
+    postcq = ("select distinct postcode from addresses where postcode ilike %s "
+              "order by postcode")
+    regionq = ("select distinct region from addresses where region ilike %s "
+               "order by region")
+    snameq = ("select distinct c_sname from clients where client ilike %s "
+              "order by c_sname")
+    streetq = ("select distinct street from addresses where street ilike %s "
+               "order by street")
+    villageq = ("select distinct village from addresses where village ilike %s "
+                "order by village")
     
     def __init__(self, parent=None, clid=0, act='s', clis=None):
         super(Saecli, self).__init__(parent)
@@ -174,12 +196,15 @@ class Saecli(QMainWindow):
         for e in res:
             self.w.ctitleDd.addItem(e[1], e[0])
         #    COMPLETER HELPERS
-        self.les = (self.w.snameLe,self.w.fnameLe,self.w.mnameLe,
-                    self.w.housenLe,self.w.streetLe,self.w.villageLe,
-                    self.w.cityLe,self.w.regionLe,self.w.postcodeLe,
-                    self.w.pnameLe)
+        self.lenames = ('city', 'fname', 'housen', 'mname', 'pname', 'postcode',
+                        'region', 'sname', 'street', 'village')
+        self.les = (self.w.cityLe, self.w.fnameLe, self.w.housenLe,
+                    self.w.mnameLe, self.w.pnameLe, self.w.postcodeLe,
+                    self.w.regionLe, self.w.snameLe, self.w.streetLe,
+                    self.w.villageLe,)
         for le in self.les:
-            setattr(le, 'list', self.complist) # ? differs from saepat
+            setattr(le, 'name', self.lenames[self.les.index(le)])
+            setattr(le, 'query', le.name + 'q')
         #    COMPLETER
         ## self.qmodel = QStringListModel(self)
         ## self.completer = QCompleter(self)
@@ -192,13 +217,14 @@ class Saecli(QMainWindow):
         self.lcompl.setCaseSensitivity(0)
         self.lcompl.setCompletionMode(0)
         self.lcompl.setModel(self.lmodel)
-        
-        for le in (self.w.snameLe, self.w.mnameLe, self.w.fnameLe,
-                   self.w.housenLe, self.w.streetLe, self.w.villageLe,
-                   self.w.cityLe, self.w.regionLe, self.w.postcodeLe,
-                   self.w.telhomeLe, self.w.telworkLe, self.w.mobile1Le,
-                   self.w.mobile2Le, self.w.emailLe, self.w.pnameLe):
-            le.setCompleter(self.completer)
+        # hierwei ?
+        QApplication.instance().focusChanged.connect(self.focuschange)
+        ## for le in (self.w.snameLe, self.w.mnameLe, self.w.fnameLe,
+        ##            self.w.housenLe, self.w.streetLe, self.w.villageLe,
+        ##            self.w.cityLe, self.w.regionLe, self.w.postcodeLe,
+        ##            self.w.telhomeLe, self.w.telworkLe, self.w.mobile1Le,
+        ##            self.w.mobile2Le, self.w.emailLe, self.w.pnameLe):
+        ##     le.setCompleter(self.completer)
         #    COMPLETER CONNECTIONS
         self.w.snameLe.textEdited.connect(self.compl_sname)
         self.w.fnameLe.textEdited.connect(self.compl_fname)
@@ -833,6 +859,12 @@ class Saecli(QMainWindow):
             fixed.append(part)
         return ' '.join(fixed)
 
+    def focuschange(self, old, new):
+        if new:
+            self.updateclist(new)
+            if new in self.les:
+                self.setcompleter(new)
+                
     def gv_quit(self, quitnow=False):
         """Signal children if quitting GnuVet or not."""
         self.shutdown = quitnow
@@ -1096,6 +1128,17 @@ class Saecli(QMainWindow):
     def savedrestore(self, saved_things=[]):
         pass
 
+    def setcompleter(self, w):
+        """Called by focusChange to adapt completer."""
+        if w in self.les:
+            w.setCompleter(self.lcompl)
+            self.lmodel.setStringList(self.complist)
+            self.lcompl.setWidget(w)
+
+    ## def setlen(self, le): # hierwei nec?
+    ##     le.deselect()
+    ##     le.olen = len(le.text())
+        
     def setuple(self, le, n):
         """Called by __init__ to set Le vars for completer."""
         setattr(le, 'olen', 0)
