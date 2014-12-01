@@ -133,15 +133,15 @@ class Saecli(QMainWindow):
                 self.gaia = parent
             else:
                 self.gaia = parent.gaia
-            self.options = gaia.options
-            self.staffid = gaia.staffid
-            self.db = gaia.db
-            self.dbA.triggered.connect(gaia.db_connect)
-            aboutA.triggered.connect(gaia.about)
-            gaia.gvquit.connect(self.gv_quit)
-            gaia.dbstate.connect(self.db_state)
-            self.helpsig.connect(gaia.gv_help)
-            self.savestate.connect(gaia.state_write)
+            self.options = self.gaia.options
+            self.staffid = self.gaia.staffid
+            self.db = self.gaia.db
+            self.dbA.triggered.connect(self.gaia.db_connect)
+            aboutA.triggered.connect(self.gaia.about)
+            self.gaia.gvquit.connect(self.gv_quit)
+            self.gaia.dbstate.connect(self.db_state)
+            self.helpsig.connect(self.gaia.gv_help)
+            self.savestate.connect(self.gaia.state_write)
         else:
             from options import defaults as options
             self.options = options
@@ -225,22 +225,25 @@ class Saecli(QMainWindow):
         ##            self.w.telhomeLe, self.w.telworkLe, self.w.mobile1Le,
         ##            self.w.mobile2Le, self.w.emailLe, self.w.pnameLe):
         ##     le.setCompleter(self.completer)
+        ## #    COMPLETER CONNECTIONS
+        ## self.w.snameLe.textEdited.connect(self.compl_sname)
+        ## self.w.fnameLe.textEdited.connect(self.compl_fname)
+        ## self.w.mnameLe.textEdited.connect(self.compl_mname)
+        ## self.w.housenLe.textEdited.connect(self.compl_housen)
+        ## self.w.streetLe.textEdited.connect(self.compl_street)
+        ## self.w.villageLe.textEdited.connect(self.compl_village)
+        ## self.w.cityLe.textEdited.connect(self.compl_city)
+        ## self.w.postcodeLe.textEdited.connect(self.compl_postcode)
+        ## self.w.telhomeLe.textEdited.connect(self.compl_telh)
+        ## self.w.regionLe.textEdited.connect(self.compl_region)
+        ## self.w.telworkLe.textEdited.connect(self.compl_telw)
+        ## self.w.mobile1Le.textEdited.connect(self.compl_mob1)
+        ## self.w.mobile2Le.textEdited.connect(self.compl_mob2)
+        ## self.w.emailLe.textEdited.connect(self.compl_email)
+        ## self.w.pnameLe.textEdited.connect(self.compl_pname)
         #    COMPLETER CONNECTIONS
-        self.w.snameLe.textEdited.connect(self.compl_sname)
-        self.w.fnameLe.textEdited.connect(self.compl_fname)
-        self.w.mnameLe.textEdited.connect(self.compl_mname)
-        self.w.housenLe.textEdited.connect(self.compl_housen)
-        self.w.streetLe.textEdited.connect(self.compl_street)
-        self.w.villageLe.textEdited.connect(self.compl_village)
-        self.w.cityLe.textEdited.connect(self.compl_city)
-        self.w.postcodeLe.textEdited.connect(self.compl_postcode)
-        self.w.telhomeLe.textEdited.connect(self.compl_telh)
-        self.w.regionLe.textEdited.connect(self.compl_region)
-        self.w.telworkLe.textEdited.connect(self.compl_telw)
-        self.w.mobile1Le.textEdited.connect(self.compl_mob1)
-        self.w.mobile2Le.textEdited.connect(self.compl_mob2)
-        self.w.emailLe.textEdited.connect(self.compl_email)
-        self.w.pnameLe.textEdited.connect(self.compl_pname)
+        for le in self.les:
+            le.textEdited.connect(self.complle) # hierwei
         #    FINISH
         self.keycheck = Keycheck()
         self.installEventFilter(self.keycheck)
@@ -362,7 +365,7 @@ class Saecli(QMainWindow):
             return True
         return False
     
-    def cli_add(self): # adding args don't forget trg=False
+    def cli_add(self): # adding args don't forget triggered=False
         self.stage = 3
         # hierwei
         tables = querydb( # well this should all be done on client creation
@@ -455,21 +458,28 @@ class Saecli(QMainWindow):
         if self.gaia and hasattr(self.gaia, 'xy_decr'):
             self.gaia.xy_decr()
 
-    def complle(self, le, txt):
+    def complle(self, le):
         """Common actions on text input in Le."""
+        txt = str(le.text().toLatin1())
         if not txt:
             le.olen = 0
             return
-        if not le.completer():
-            self.setcompleter(le)
+        ## if not le.completer():
+        ##     self.setcompleter(le)
         if len(txt) <= le.olen: # bs, del or replace
-            res = le.query(txt)
-            while len(res) < 2 or len(txt) == le.olen:
-                txt = txt[:-1]
+            res = querydb(self, le.query, (txt+'%',))
+            if res is None:  return # db error
+            self.complist = [e[0] for e in res]
+            res = querydb(self, le.query, ('%'+txt+'%',))
+            if res is None:  return # db error
+            self.complist.extend(
+                [e[0] for e in res if e[0] not in self.complist])
+            while len(self.complist) < 2 or len(txt) == le.olen:
+                txt = txt[:-1] # hierwei ??
                 if not txt:
                     le.olen = 0
                     return
-                res = le.query(txt)
+                res = querydb(self, le.query, (txt+'%',)) # hierwei ???
             self.dmodel.setStringList(res)
         else: # text added
             self.dmodel.setStringList(le.query(txt))
@@ -860,10 +870,9 @@ class Saecli(QMainWindow):
         return ' '.join(fixed)
 
     def focuschange(self, old, new):
-        if new:
-            self.updateclist(new)
-            if new in self.les:
-                self.setcompleter(new)
+        if new and new in self.les:
+            self.complle(new)
+            self.setcompleter(new)
                 
     def gv_quit(self, quitnow=False):
         """Signal children if quitting GnuVet or not."""
@@ -1162,7 +1171,7 @@ class Saecli(QMainWindow):
     def this_enable(self):
         """(Re-)Enable things after re-obtaining db connection."""
         pass
-    
+        
     def w_cli(self): # hierwei: func name?
         """Signal client ID to whom it may concern."""
         self.cidsig.connect(self.gaia.opencli)
