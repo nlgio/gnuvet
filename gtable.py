@@ -32,7 +32,6 @@ class Gcell(QLabel):
     entry = False
     data = None
     children = 0
-    mdce = 0
     
     def __init__(self, parent=None, txt='', col=None, data=None):
         super(Gcell, self).__init__(parent)
@@ -120,7 +119,7 @@ class Gcell(QLabel):
         
     def setText(self, txt=''):
         super(Gcell, self).setText(txt)
-        if txt:
+        if txt: # entry still in use?
             self.entry = True
         else:
             self.entry = False
