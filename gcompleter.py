@@ -2,7 +2,7 @@
 only entries that start with txt, but also those that CONTAIN it."""
 
 from PyQt4.QtCore import pyqtSignal, QEvent, QString
-from PyQt4.QtGui import QFrame, QLabel, QScrollArea
+from PyQt4.QtGui import QComboBox, QFrame, QLabel, QLineEdit, QScrollArea
 from util import ch_conn
 
 class Gcompcell(QLabel):
@@ -34,7 +34,7 @@ border-radius: 3px;
 }}
 """
     
-    def __init__(self, parent=None, l=None, widget=None):
+    def __init__(self, parent=None, widget=None, l=None):
         super(Gcompleter, self).__init__(parent)
         self.conns = {} # pyqt bug disconnect
         self.sigs = {} # dto
@@ -43,31 +43,31 @@ border-radius: 3px;
         self.setFrameShape(0)
         self.clist = l or []
         if not self.clist:  return
-        self.resize(self.parent.size())
-        self.maxy = self.maxshow * self.height()
         self.fr = None
         if widget:
             self.setwidget(widget, l)
+        self.hide()
 
-    def delete(self):
+    def delcompl(self):
         if self.fr:
-            del(self.fr) # should delete all gcompcells as well            
+            del(self.fr) # should delete all gcompcells as well
+        self.hide()
         
     def listmatch(self, txt=''):
-        # first delete all existing gcompcells
+        # first delete all existing gcompcells?
         if not txt:  return
         txt = str(txt).lower()
         mlist = [e for e in self.clist if e.lower().startswith(txt)]
         mlist.extend([e for e in self.clist if e.lower().count(txt)
                       and e not in mlist])
         ipos = 0
+        self.move(self.widget.x(), self.widget.y()+self.widget.height())
         self.fr = QFrame(self)
         self.fr.setFrameShape(0) # ?
-        self.fr.resize(self.widget.size())
         for e in mlist:
             i = Gcompcell(self.fr, e)
             i.setGeometry(0, ipos, self.fr.width(), i.sizeHint().height()) # ?
-            i.setStyle(gccell)
+            i.setStyleSheet(self.gccellss)
             ipos += i.sizeHint().height()
             i.clicked.connect(self.select)
         self.fr.resize(self.fr.width(), ipos)
@@ -75,24 +75,31 @@ border-radius: 3px;
             self.resize(self.maxy)
         else:
             self.resize(self.fr.size())
+        self.show()
+        self.fr.show()
+        print('self.size: {}'.format(self.size()))
+        print('frame size: {}'.format(self.fr.size()))
 
     def select(self, txt):
         if self.wtype == 'le':
             self.widget.setText(txt)
         elif self.wtype == 'dd':
             self.widget.setCurrentIndex(self.widget.findText(txt))
-        self.delete()
+        self.delcompl()
 
     def setwidget(self, new=None, l=None):
         ch_conn(self, 'widget')
-        self.delete()
+        self.delcompl()
         self.clist = l or []
         self.widget = new
         if isinstance(new, QLineEdit):
-            ch_conn(self, 'widget', new.textEdited.connect, self.listmatch)
+            ch_conn(self, 'widget', new.textEdited, self.listmatch)
             self.wtype = 'le'
         elif isinstance(new, QComboBox):
             ch_conn(self, 'widget',
-                    new.lineEdit().textEdited.connect, self.listmatch)
+                    new.lineEdit().textEdited, self.listmatch)
             self.wtype = 'dd'
-        
+        self.resize(self.widget.size())
+        self.maxy = self.maxshow * self.height()
+        self.setGeometry(self.widget.x(), self.widget.y()+self.widget.height(),
+                         self.width(), self.height())
