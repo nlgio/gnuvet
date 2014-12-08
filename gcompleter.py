@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 """Try to replace QCompleter with something more to my liking, that offers not 
 only entries that start with txt, but also those that CONTAIN it."""
 
 from PyQt4.QtCore import pyqtSignal, QEvent, QString
-from PyQt4.QtGui import QComboBox, QFrame, QLabel, QLineEdit, QScrollArea
+from PyQt4.QtGui import (QComboBox, QFrame, QMouseEvent, QLabel, QLineEdit,
+                         QScrollArea)
 from util import ch_conn
 
 class Gcompcell(QLabel):
@@ -11,29 +13,38 @@ class Gcompcell(QLabel):
     __index = -1
     _index = -1
 
+    gccellss = """Gcompcell {{
+background: {};
+color: {};
+border: 1px solid lightgray;
+border-radius: 3px;
+}}
+"""
+
+    normal = ('white', 'black')
+    selection = ('darkblue', 'white')
+
     def __init__(self, parent=None, txt=''):
-        self.__class__.__index += 1
-        self._index = self.__class__.__index
         super(Gcompcell, self).__init__(parent)
         self.setAttribute(55) # Qt.WA_DeleteOnClose
+        self.setStyleSheet(self.gccellss.format(*self.normal))
+        self.setMouseTracking(True)
+        if txt:
+            self.setText(txt)
 
-    def index(self): # superfluous?  But nice :).
-        return self._index
-
+    def enterEvent(self, ev): # Cave this seems to differ from Qt's way
+        self.setStyleSheet(self.gccellss.format(*self.selection))
+        
+    def leaveEvent(self, ev):
+        self.setStyleSheet(self.gccellss.format(*self.normal))
+        
     def mousePressEvent(self, ev): # ev is QMouseEvent
         self.clicked.emit(self.text())
         
 class Gcompleter(QScrollArea):
     selected = pyqtSignal(QString)
     maxshow = 7
-    gccellss = """Gcompcell {{
-background: white;
-color: black;
-border: 0px;
-border-radius: 3px;
-}}
-"""
-    
+
     def __init__(self, parent=None, widget=None, l=None):
         super(Gcompleter, self).__init__(parent)
         self.conns = {} # pyqt bug disconnect
@@ -46,39 +57,48 @@ border-radius: 3px;
         self.fr = None
         if widget:
             self.setwidget(widget, l)
+            ## print('LineEdit size {}, sizeHint {}'.format(
+            ##     widget.size(), widget.sizeHint()))
         self.hide()
 
     def delcompl(self):
-        if self.fr:
+        if hasattr(self, 'fr'):
             del(self.fr) # should delete all gcompcells as well
         self.hide()
+
+    def keyPressEvent(self, ev):
+        # how tell between Le and Dd???
+        if ev.key() == Qt.Key_Down:
+            pass
+        elif ev.key() == Qt.Key_Up:
+            pass
+        elif ev.key() == Qt.Key_Right:
+            pass
         
     def listmatch(self, txt=''):
-        # first delete all existing gcompcells?
-        if not txt:  return
+        if not txt:
+            self.delcompl()
+            return
         txt = str(txt).lower()
         mlist = [e for e in self.clist if e.lower().startswith(txt)]
         mlist.extend([e for e in self.clist if e.lower().count(txt)
                       and e not in mlist])
+        self.resize(self.widget.width(), self.widget.height()*self.maxshow)
+        self.setFrameShape(1)
         ipos = 0
-        self.move(self.widget.x(), self.widget.y()+self.widget.height())
         self.fr = QFrame(self)
-        self.fr.setFrameShape(0) # ?
+        self.fr.resize(self.widget.width(), self.widget.height()*len(mlist))
         for e in mlist:
             i = Gcompcell(self.fr, e)
-            i.setGeometry(0, ipos, self.fr.width(), i.sizeHint().height()) # ?
-            i.setStyleSheet(self.gccellss)
-            ipos += i.sizeHint().height()
+            i.setGeometry(0, ipos, self.fr.width(), self.widget.height())
+            ## i.setStyleSheet(self.gccellss.format(*self.normal))
+            ipos += i.height()
             i.clicked.connect(self.select)
-        self.fr.resize(self.fr.width(), ipos)
-        if self.fr.height() > self.maxy:
-            self.resize(self.maxy)
-        else:
-            self.resize(self.fr.size())
+        self.setWidget(self.fr)
+        hcorr = 2
+        if self.fr.height()+hcorr < self.height():
+            self.resize(self.width(), self.fr.height()+hcorr)
         self.show()
-        self.fr.show()
-        print('self.size: {}'.format(self.size()))
-        print('frame size: {}'.format(self.fr.size()))
 
     def select(self, txt):
         if self.wtype == 'le':
@@ -91,7 +111,8 @@ border-radius: 3px;
         ch_conn(self, 'widget')
         self.delcompl()
         self.clist = l or []
-        self.widget = new
+        self.move(new.x(),
+                  new.y()+new.height())
         if isinstance(new, QLineEdit):
             ch_conn(self, 'widget', new.textEdited, self.listmatch)
             self.wtype = 'le'
@@ -99,7 +120,4 @@ border-radius: 3px;
             ch_conn(self, 'widget',
                     new.lineEdit().textEdited, self.listmatch)
             self.wtype = 'dd'
-        self.resize(self.widget.size())
-        self.maxy = self.maxshow * self.height()
-        self.setGeometry(self.widget.x(), self.widget.y()+self.widget.height(),
-                         self.width(), self.height())
+        self.widget = new
