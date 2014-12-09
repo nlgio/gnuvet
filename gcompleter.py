@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Try to replace QCompleter with something more to my liking, that offers not 
-only entries that start with txt, but also those that CONTAIN it."""
+only entries that start with txt, but also those that CONTAIN it, and doesn't
+cause as much unused overhead."""
 
 from PyQt4.QtCore import pyqtSignal, QEvent, QString
 from PyQt4.QtGui import (QComboBox, QFrame, QMouseEvent, QLabel, QLineEdit,
@@ -10,8 +11,6 @@ from util import ch_conn
 class Gcompcell(QLabel):
     """Single Completer Line."""
     clicked = pyqtSignal(QString)
-    __index = -1
-    _index = -1
 
     gccellss = """Gcompcell {{
 background: {};
@@ -42,7 +41,7 @@ border-radius: 3px;
         self.clicked.emit(self.text())
         
 class Gcompleter(QScrollArea):
-    selected = pyqtSignal(QString)
+    selected = None # was pyqtSignal(QString)
     maxshow = 7
 
     def __init__(self, parent=None, widget=None, l=None):
@@ -64,16 +63,39 @@ class Gcompleter(QScrollArea):
     def delcompl(self):
         if hasattr(self, 'fr'):
             del(self.fr) # should delete all gcompcells as well
+            self.gclist = []
         self.hide()
 
     def keyPressEvent(self, ev):
-        # how tell between Le and Dd???
+        # how tell between Le and Dd???  I start with Le. # hierwei
         if ev.key() == Qt.Key_Down:
-            pass
+            if self.widget.hasFocus():
+                self.fr.setFocus() # ?
+                self.setselection(self.gclist[0])
+            elif self.fr.hasFocus():
+                self.selected.setStyleSheet(self.gccellss.format(*self.normal))
+                new = (len(self.gclist) > self.gclist.index(e) and
+                       self.gclist[self.gclist.index(e)+1] or e)
+                new.setStyleSheet(self.gccellss.format(*self.selection))
         elif ev.key() == Qt.Key_Up:
-            pass
+            if not self.widget.hasFocus():
+                new = (self.gclist.index(self.selected) > 0 and
+                       self.gclist[self.gclist.index(self.selected)-1] or None)
+                if self.selected:
+                    self.selected.setStyleSheet(
+                        self.gccellss.format(*self.normal))
+                if new:
+                    new.setStyleSheet(
+                        self.gccellss.format(*self.selection))
+                else:
+                    self.widget.setFocus()
         elif ev.key() == Qt.Key_Right:
-            pass
+            if self.selected:
+                if self.wtype == 'le':
+                    self.widget.setText(self.selected.text())
+                elif self.wtype == 'dd':
+                    self.widget.setCurrentIndex(
+                        self.widget.findData(self.selected.text()))
         
     def listmatch(self, txt=''):
         if not txt:
@@ -91,7 +113,7 @@ class Gcompleter(QScrollArea):
         for e in mlist:
             i = Gcompcell(self.fr, e)
             i.setGeometry(0, ipos, self.fr.width(), self.widget.height())
-            ## i.setStyleSheet(self.gccellss.format(*self.normal))
+            self.gclist.append(i)
             ipos += i.height()
             i.clicked.connect(self.select)
         self.setWidget(self.fr)
@@ -107,6 +129,12 @@ class Gcompleter(QScrollArea):
             self.widget.setCurrentIndex(self.widget.findText(txt))
         self.delcompl()
 
+    def setselection(self, gc):
+        if self.selected:
+            self.selected.setStyleSheet(self.gccellss.format(*self.normal))
+        self.selected = gc
+        gc.setStyleSheet(self.gccellss.format(*self.selection))
+        
     def setwidget(self, new=None, l=None):
         ch_conn(self, 'widget')
         self.delcompl()
