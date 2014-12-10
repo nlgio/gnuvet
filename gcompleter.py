@@ -6,7 +6,7 @@ cause as much unused overhead."""
 # TODO:
 # 
 
-from PyQt4.QtCore import pyqtSignal, QString, Qt # try elim Qt
+from PyQt4.QtCore import pyqtSignal, QString
 from PyQt4.QtGui import (QComboBox, QFrame, QMouseEvent, QLabel, QLineEdit,
                          QScrollArea)
 from util import ch_conn
@@ -72,7 +72,7 @@ class Gcompleter(QScrollArea):
         # how tell between Le and Dd???  I start with Le. # hierwei
         if ev.type() != 6: # QEvent.KeyPress
             return False
-        if ev.key() == Qt.Key_Down: # 0x01000015
+        if ev.key() == 0x01000015: # Qt.Key_Down
             if self.widget.hasFocus():
                 self.fr.setFocus()
                 self.setselection(self.gclist[0])
@@ -83,7 +83,7 @@ class Gcompleter(QScrollArea):
                        self.selected)
                 self.setselection(new)
                 return True
-        elif ev.key() == Qt.Key_Up: # 0x01000013
+        elif ev.key() == 0x01000013: # Qt.Key_Up
             if not self.widget.hasFocus():
                 new = (self.gclist.index(self.selected) > 0 and
                        self.gclist[self.gclist.index(self.selected)-1] or None)
@@ -93,7 +93,7 @@ class Gcompleter(QScrollArea):
                     self.widget.setFocus()
                 return True
             return False # ?
-        elif ev.key() == Qt.Key_Right: # 0x01000014
+        elif ev.key() == 0x01000014: # Qt.Key_Right
             if self.selected:
                 if self.wtype == 'le':
                     self.widget.setText(self.selected.text())
