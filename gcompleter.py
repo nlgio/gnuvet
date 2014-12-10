@@ -62,6 +62,7 @@ class Gcompleter(QScrollArea):
         self.hide()
 
     def delcompl(self):
+        self.selected = None
         if hasattr(self, 'fr'):
             del(self.fr) # should delete all gcompcells as well
             self.gclist = []
@@ -69,45 +70,38 @@ class Gcompleter(QScrollArea):
 
     def eventFilter(self, ob, ev):
         # how tell between Le and Dd???  I start with Le. # hierwei
-        if ev.type() != 6: # QEvent.KeyPress: # 6
+        if ev.type() != 6: # QEvent.KeyPress
             return False
         if ev.key() == Qt.Key_Down: # 0x01000015
-            print('Qt.Key_Down')
             if self.widget.hasFocus():
-                self.fr.setFocus() # ?
+                self.fr.setFocus()
                 self.setselection(self.gclist[0])
                 return True
             elif self.fr.hasFocus():
-                #self.selected.setStyleSheet(self.gccellss.format(*self.normal))
-                self.selected.leaveEvent(None)
-                new = (len(self.gclist) > self.gclist.index(e) and
-                       self.gclist[self.gclist.index(e)+1] or e)
-                ##new.setStyleSheet(self.gccellss.format(*self.selection))
-                new.enterEvent(None)
+                new = (len(self.gclist) > self.gclist.index(self.selected) and
+                       self.gclist[self.gclist.index(self.selected)+1] or
+                       self.selected)
+                self.setselection(new)
                 return True
         elif ev.key() == Qt.Key_Up: # 0x01000013
             if not self.widget.hasFocus():
                 new = (self.gclist.index(self.selected) > 0 and
                        self.gclist[self.gclist.index(self.selected)-1] or None)
-                if self.selected:
-                    ## self.selected.setStyleSheet(
-                    ##     self.gccellss.format(*self.normal))
-                    self.selected.leaveEvent(None)
                 if new:
-                    ## new.setStyleSheet(
-                    ##     self.gccellss.format(*self.selection))
-                    new.enterEvent(None)
+                    self.setselection(new)
                 else:
                     self.widget.setFocus()
-            return True
+                return True
+            return False # ?
         elif ev.key() == Qt.Key_Right: # 0x01000014
             if self.selected:
                 if self.wtype == 'le':
                     self.widget.setText(self.selected.text())
                 elif self.wtype == 'dd':
                     self.widget.setCurrentIndex(
-                        self.widget.findData(self.selected.text()))
-            return True
+                        self.widget.findText(self.selected.text())) # flags?
+                self.delcompl()
+                return True
         return False ## ???
         
     def listmatch(self, txt=''):
@@ -145,10 +139,8 @@ class Gcompleter(QScrollArea):
 
     def setselection(self, gc):
         if self.selected:
-            ## self.selected.setStyleSheet(self.gccellss.format(*self.normal))
             self.selected.leaveEvent(None)
         self.selected = gc
-        ## gc.setStyleSheet(self.gccellss.format(*self.selection))
         gc.enterEvent(None)
         
     def setwidget(self, old=None, new=None, l=None):
