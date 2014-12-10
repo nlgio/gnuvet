@@ -3,7 +3,10 @@
 only entries that start with txt, but also those that CONTAIN it, and doesn't
 cause as much unused overhead."""
 
-from PyQt4.QtCore import pyqtSignal, QEvent, QString
+# TODO:
+# 
+
+from PyQt4.QtCore import pyqtSignal, QString, Qt # try elim Qt
 from PyQt4.QtGui import (QComboBox, QFrame, QMouseEvent, QLabel, QLineEdit,
                          QScrollArea)
 from util import ch_conn
@@ -55,9 +58,7 @@ class Gcompleter(QScrollArea):
         if not self.clist:  return
         self.fr = None
         if widget:
-            self.setwidget(widget, l)
-            ## print('LineEdit size {}, sizeHint {}'.format(
-            ##     widget.size(), widget.sizeHint()))
+            self.setwidget(new=widget, l=l)
         self.hide()
 
     def delcompl(self):
@@ -66,38 +67,51 @@ class Gcompleter(QScrollArea):
             self.gclist = []
         self.hide()
 
-    def keyPressEvent(self, ev):
+    def eventFilter(self, ob, ev):
         # how tell between Le and Dd???  I start with Le. # hierwei
-        if ev.key() == Qt.Key_Down:
+        if ev.type() != 6: # QEvent.KeyPress: # 6
+            return False
+        if ev.key() == Qt.Key_Down: # 0x01000015
+            print('Qt.Key_Down')
             if self.widget.hasFocus():
                 self.fr.setFocus() # ?
                 self.setselection(self.gclist[0])
+                return True
             elif self.fr.hasFocus():
-                self.selected.setStyleSheet(self.gccellss.format(*self.normal))
+                #self.selected.setStyleSheet(self.gccellss.format(*self.normal))
+                self.selected.leaveEvent(None)
                 new = (len(self.gclist) > self.gclist.index(e) and
                        self.gclist[self.gclist.index(e)+1] or e)
-                new.setStyleSheet(self.gccellss.format(*self.selection))
-        elif ev.key() == Qt.Key_Up:
+                ##new.setStyleSheet(self.gccellss.format(*self.selection))
+                new.enterEvent(None)
+                return True
+        elif ev.key() == Qt.Key_Up: # 0x01000013
             if not self.widget.hasFocus():
                 new = (self.gclist.index(self.selected) > 0 and
                        self.gclist[self.gclist.index(self.selected)-1] or None)
                 if self.selected:
-                    self.selected.setStyleSheet(
-                        self.gccellss.format(*self.normal))
+                    ## self.selected.setStyleSheet(
+                    ##     self.gccellss.format(*self.normal))
+                    self.selected.leaveEvent(None)
                 if new:
-                    new.setStyleSheet(
-                        self.gccellss.format(*self.selection))
+                    ## new.setStyleSheet(
+                    ##     self.gccellss.format(*self.selection))
+                    new.enterEvent(None)
                 else:
                     self.widget.setFocus()
-        elif ev.key() == Qt.Key_Right:
+            return True
+        elif ev.key() == Qt.Key_Right: # 0x01000014
             if self.selected:
                 if self.wtype == 'le':
                     self.widget.setText(self.selected.text())
                 elif self.wtype == 'dd':
                     self.widget.setCurrentIndex(
                         self.widget.findData(self.selected.text()))
+            return True
+        return False ## ???
         
     def listmatch(self, txt=''):
+        # use install|removeEventFilter on (parent) widget?  (QCompleter.cpp)
         if not txt:
             self.delcompl()
             return
@@ -131,12 +145,16 @@ class Gcompleter(QScrollArea):
 
     def setselection(self, gc):
         if self.selected:
-            self.selected.setStyleSheet(self.gccellss.format(*self.normal))
+            ## self.selected.setStyleSheet(self.gccellss.format(*self.normal))
+            self.selected.leaveEvent(None)
         self.selected = gc
-        gc.setStyleSheet(self.gccellss.format(*self.selection))
+        ## gc.setStyleSheet(self.gccellss.format(*self.selection))
+        gc.enterEvent(None)
         
-    def setwidget(self, new=None, l=None):
+    def setwidget(self, old=None, new=None, l=None):
         ch_conn(self, 'widget')
+        if old:
+            old.removeEventFilter(self)
         self.delcompl()
         self.clist = l or []
         self.move(new.x(),
@@ -148,4 +166,5 @@ class Gcompleter(QScrollArea):
             ch_conn(self, 'widget',
                     new.lineEdit().textEdited, self.listmatch)
             self.wtype = 'dd'
+        new.installEventFilter(self)
         self.widget = new
