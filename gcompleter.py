@@ -4,7 +4,16 @@ only entries that start with txt, but also those that CONTAIN it, and doesn't
 cause as much unused overhead."""
 
 # TODO:
-# 
+# oops, there's still problems with le:
+# on only one completion: eventFilter->setselection->enterEvent->
+# RuntimeError: wrapped C/C++ object of type Gcompcell has been deleted
+# and:
+##   File "/usr/local/enno/src/py/gnuvet/gcompleter.py", line 77, in eventFilter
+##     self.fr.setFocus()
+## AttributeError: 'Gcompleter' object has no attribute 'fr'
+
+#
+# ck gcompleter w/ dd
 
 from PyQt4.QtCore import pyqtSignal, QString
 from PyQt4.QtGui import (QComboBox, QFrame, QMouseEvent, QLabel, QLineEdit,
@@ -93,7 +102,7 @@ class Gcompleter(QScrollArea):
                     self.widget.setFocus()
                 return True
             return False # ?
-        elif ev.key() == 0x01000014: # Qt.Key_Right
+        elif ev.key() in (0x01000004, 0x01000005, 0x01000014: # Ret Enter Right
             if self.selected:
                 if self.wtype == 'le':
                     self.widget.setText(self.selected.text())
@@ -113,6 +122,17 @@ class Gcompleter(QScrollArea):
         mlist = [e for e in self.clist if e.lower().startswith(txt)]
         mlist.extend([e for e in self.clist if e.lower().count(txt)
                       and e not in mlist])
+        if len(mlist) == 1:
+            if self.wtype == 'le':
+                self.widget.setText(mlist[0])
+                # hierwei mark text s. saepat?
+            elif self.wtype == 'dd': # hierwei completiontext
+                self.widget.setCurrentIndex(self.widget.findText(mlist[0]))
+                if len(self.widget.currentText()) > len(txt):
+                    self.widget.lineEdit().setSelection(len(txt), 80)
+            self.delcompl()
+            # hierwei removeEventFilter?
+            return
         self.resize(self.widget.width(), self.widget.height()*self.maxshow)
         self.setFrameShape(1)
         ipos = 0
