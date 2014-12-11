@@ -11,6 +11,8 @@ cause as much unused overhead."""
 ##   File "/usr/local/enno/src/py/gnuvet/gcompleter.py", line 77, in eventFilter
 ##     self.fr.setFocus()
 ## AttributeError: 'Gcompleter' object has no attribute 'fr'
+## and:
+## on completion (Key_Right) in dd focus jumps to le
 
 #
 # ck gcompleter w/ dd
@@ -72,6 +74,8 @@ class Gcompleter(QScrollArea):
 
     def delcompl(self):
         self.selected = None
+        if hasattr(self, 'ewidget'):
+            self.ewidget.removeEventFilter(self)
         if hasattr(self, 'fr'):
             del(self.fr) # should delete all gcompcells as well
             self.gclist = []
@@ -82,7 +86,7 @@ class Gcompleter(QScrollArea):
         if ev.type() != 6: # QEvent.KeyPress
             return False
         if ev.key() == 0x01000015: # Qt.Key_Down
-            if self.widget.hasFocus():
+            if self.ewidget.hasFocus():
                 self.fr.setFocus()
                 self.setselection(self.gclist[0])
                 return True
@@ -93,22 +97,22 @@ class Gcompleter(QScrollArea):
                 self.setselection(new)
                 return True
         elif ev.key() == 0x01000013: # Qt.Key_Up
-            if not self.widget.hasFocus():
+            if not self.ewidget.hasFocus():
                 new = (self.gclist.index(self.selected) > 0 and
                        self.gclist[self.gclist.index(self.selected)-1] or None)
                 if new:
                     self.setselection(new)
                 else:
-                    self.widget.setFocus()
+                    self.ewidget.setFocus()
                 return True
             return False # ?
-        elif ev.key() in (0x01000004, 0x01000005, 0x01000014: # Ret Enter Right
+        elif ev.key() in (0x01000004, 0x01000005, 0x01000014): # Ret Enter Right
             if self.selected:
                 if self.wtype == 'le':
-                    self.widget.setText(self.selected.text())
+                    self.ewidget.setText(self.selected.text())
                 elif self.wtype == 'dd':
-                    self.widget.setCurrentIndex(
-                        self.widget.findText(self.selected.text())) # flags?
+                    self.ewidget.setCurrentIndex(
+                        self.ewidget.findText(self.selected.text())) # flags?
                 self.delcompl()
                 return True
         return False ## ???
@@ -124,23 +128,23 @@ class Gcompleter(QScrollArea):
                       and e not in mlist])
         if len(mlist) == 1:
             if self.wtype == 'le':
-                self.widget.setText(mlist[0])
+                self.ewidget.setText(mlist[0])
                 # hierwei mark text s. saepat?
             elif self.wtype == 'dd': # hierwei completiontext
-                self.widget.setCurrentIndex(self.widget.findText(mlist[0]))
-                if len(self.widget.currentText()) > len(txt):
-                    self.widget.lineEdit().setSelection(len(txt), 80)
+                self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))
+                if len(self.ewidget.currentText()) > len(txt):
+                    self.ewidget.lineEdit().setSelection(len(txt), 80)
             self.delcompl()
             # hierwei removeEventFilter?
             return
-        self.resize(self.widget.width(), self.widget.height()*self.maxshow)
+        self.resize(self.ewidget.width(), self.ewidget.height()*self.maxshow)
         self.setFrameShape(1)
         ipos = 0
         self.fr = QFrame(self)
-        self.fr.resize(self.widget.width(), self.widget.height()*len(mlist))
+        self.fr.resize(self.ewidget.width(), self.ewidget.height()*len(mlist))
         for e in mlist:
             i = Gcompcell(self.fr, e)
-            i.setGeometry(0, ipos, self.fr.width(), self.widget.height())
+            i.setGeometry(0, ipos, self.fr.width(), self.ewidget.height())
             self.gclist.append(i)
             ipos += i.height()
             i.clicked.connect(self.select)
@@ -152,9 +156,9 @@ class Gcompleter(QScrollArea):
 
     def select(self, txt):
         if self.wtype == 'le':
-            self.widget.setText(txt)
+            self.ewidget.setText(txt)
         elif self.wtype == 'dd':
-            self.widget.setCurrentIndex(self.widget.findText(txt))
+            self.ewidget.setCurrentIndex(self.ewidget.findText(txt))
         self.delcompl()
 
     def setselection(self, gc):
@@ -179,4 +183,4 @@ class Gcompleter(QScrollArea):
                     new.lineEdit().textEdited, self.listmatch)
             self.wtype = 'dd'
         new.installEventFilter(self)
-        self.widget = new
+        self.ewidget = new
