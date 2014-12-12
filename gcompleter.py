@@ -5,8 +5,9 @@ cause as much unused overhead."""
 
 # TODO:
 # oops, there's still problems with le:
-# on only one completion: eventFilter->setselection->enterEvent->
+# on only one completion: eventFilter->select_cell->enterEvent->
 # RuntimeError: wrapped C/C++ object of type Gcompcell has been deleted
+#  -> change eventFilter from le|dd to fr on moving via keys and vice versa!
 # and:
 ##   File "/usr/local/enno/src/py/gnuvet/gcompleter.py", line 77, in eventFilter
 ##     self.fr.setFocus()
@@ -45,10 +46,10 @@ border-radius: 3px;
         if txt:
             self.setText(txt)
 
-    def enterEvent(self, ev): # Cave this seems to differ from Qt's way
+    def enterEvent(self, ev=None): # Cave this seems to differ from Qt's way
         self.setStyleSheet(self.gccellss.format(*self.selection))
         
-    def leaveEvent(self, ev):
+    def leaveEvent(self, ev=None):
         self.setStyleSheet(self.gccellss.format(*self.normal))
         
     def mousePressEvent(self, ev): # ev is QMouseEvent
@@ -88,20 +89,20 @@ class Gcompleter(QScrollArea):
         if ev.key() == 0x01000015: # Qt.Key_Down
             if self.ewidget.hasFocus():
                 self.fr.setFocus()
-                self.setselection(self.gclist[0])
+                self.select_cell(self.gclist[0])
                 return True
             elif self.fr.hasFocus():
                 new = (len(self.gclist) > self.gclist.index(self.selected) and
                        self.gclist[self.gclist.index(self.selected)+1] or
                        self.selected)
-                self.setselection(new)
+                self.select_cell(new)
                 return True
         elif ev.key() == 0x01000013: # Qt.Key_Up
             if not self.ewidget.hasFocus():
                 new = (self.gclist.index(self.selected) > 0 and
                        self.gclist[self.gclist.index(self.selected)-1] or None)
                 if new:
-                    self.setselection(new)
+                    self.select_cell(new)
                 else:
                     self.ewidget.setFocus()
                 return True
@@ -161,11 +162,11 @@ class Gcompleter(QScrollArea):
             self.ewidget.setCurrentIndex(self.ewidget.findText(txt))
         self.delcompl()
 
-    def setselection(self, gc):
+    def select_cell(self, gc):
         if self.selected:
-            self.selected.leaveEvent(None)
+            self.selected.leaveEvent()
         self.selected = gc
-        gc.enterEvent(None)
+        gc.enterEvent()
         
     def setwidget(self, old=None, new=None, l=None):
         ch_conn(self, 'widget')
