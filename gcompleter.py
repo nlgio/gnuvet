@@ -53,11 +53,11 @@ border-radius: 3px;
 
     def enterEvent(self, ev=None): # Cave this seems to differ from Qt's way
         if self.parent.selected:
-            self.parent.selected.leaveEvent()
+            self.parent.selected.deselect()
         self.parent.selected = self
         self.setStyleSheet(self.gccellss.format(*self.selection))
         
-    def leaveEvent(self, ev=None):
+    def deselect(self):
         self.setStyleSheet(self.gccellss.format(*self.normal))
         
     def mousePressEvent(self, ev): # ev is QMouseEvent
@@ -124,7 +124,7 @@ class Gcompleter(QScrollArea):
                     self.fr.removeEventFilter(self)
                     self.ewidget.setFocus()
                     self.ewidget.installEventFilter(self)
-                    self.selected.leaveEvent()
+                    self.selected.deselect()
                     self.selected = None
                 return True
         elif ev.key() in (0x01000004, 0x01000005, 0x01000014): # Ret Enter Right
@@ -179,7 +179,7 @@ class Gcompleter(QScrollArea):
 
     def select_cell(self, gc):
         if self.selected:
-            self.selected.leaveEvent()
+            self.selected.deselect()
         self.selected = gc
         gc.enterEvent()
         
