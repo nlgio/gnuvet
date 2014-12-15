@@ -6,7 +6,8 @@ cause as much unused overhead."""
 # maybe if we optimise this, we can obsolete dropdowns on text input fields?
 
 # TODO:
-# backspace problem: use selection and txt[:n]
+# backspace problem: use selection and txt[:n] -- this interferes with
+#  connection on textEdited...
 # and:
 # on completion (Key_Right) in dd focus jumps to le, no idea why...
 
@@ -70,7 +71,6 @@ class Gcompleter(QScrollArea):
         self.hide()
 
     def delcompl(self):
-        print('delcompl')
         self.selected = None
         if hasattr(self, 'ewidget'):
             self.ewidget.removeEventFilter(self)
@@ -92,25 +92,20 @@ class Gcompleter(QScrollArea):
         if ev.type() != 6: # QEvent.KeyPress
             return False
         if ev.key() == 0x01000015: # Qt.Key_Down
-            print('evF Down'),
             if self.ewidget.hasFocus():
-                print(self.develf())
                 self.ewidget.removeEventFilter(self)
                 self.fr.setFocus()
                 self.fr.installEventFilter(self)
                 self.select_cell(self.gclist[0])
                 return True
             elif self.fr.hasFocus():
-                print('fr')
                 new = (len(self.gclist) > self.gclist.index(self.selected) and
                        self.gclist[self.gclist.index(self.selected)+1] or
                        self.selected)
                 self.select_cell(new)
                 return True
         elif ev.key() == 0x01000013: # Qt.Key_Up
-            print('evF Up'),
             if self.fr.hasFocus():
-                print('fr'),
                 new = (self.gclist.index(self.selected) > 0 and
                        self.gclist[self.gclist.index(self.selected)-1] or None)
                 if new:
@@ -122,34 +117,36 @@ class Gcompleter(QScrollArea):
                     self.selected.deselect()
                     self.selected = None
                 return True
-        elif ev.key() == 0x01000003: # backspace
-            if self.wtype == 'le': # ???
-                self.listmatch(self.ewidget.text())
-                # hierwei set selection on end of string
         elif ev.key() in (0x01000004, 0x01000005, 0x01000014): # Ret Enter Right
-            print('evF confirm'),
             if self.selected:
-                print('selected')
                 self.select(self.selected.text())
                 self.delcompl()
                 return True
-            print('not selected')
             self.delcompl()
         return False
         
     def listmatch(self, txt=''):
+        # schaut nicht so schlecht aus, etwas gewoehnungsbeduerftig allerdings
+        # test with dd
         self.delcompl()
         if not txt:
+            self.otxt = ''
             return
         txt = str(txt).lower()
+        if len(self.otxt) < len(txt):
+            self.otxt = txt
         mlist = [e for e in self.clist if e.lower().startswith(txt)]
         mlist.extend([e for e in self.clist if e.lower().count(txt)
                       and e not in mlist])
         if len(mlist) == 1:
-            print('listmatch one match')
+            print('listmatch one match "{}", otxt "{}"'.format(
+                txt, self.otxt))
             if self.wtype == 'le':
                 self.ewidget.setText(mlist[0])
-             elif self.wtype == 'dd': # hierwei completiontext?
+                if self.otxt.startswith(txt): # backspace or delete
+                    self.otxt = txt
+                    self.ewidget.setSelection(len(txt)-1, 80)
+            elif self.wtype == 'dd': # hierwei completiontext?
                 self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))
                 if len(self.ewidget.currentText()) > len(txt):
                     self.ewidget.lineEdit().setSelection(len(txt), 80)
@@ -173,13 +170,10 @@ class Gcompleter(QScrollArea):
         self.show()
 
     def select(self, txt):
-        print('select'),
         if self.wtype == 'le':
             self.ewidget.setText(txt)
-            print('text set')
         elif self.wtype == 'dd':
             self.ewidget.setCurrentIndex(self.ewidget.findText(txt))
-            print('index set')
 
     def select_cell(self, gc):
         if self.selected:
@@ -191,17 +185,28 @@ class Gcompleter(QScrollArea):
         if old == new:  return
         ch_conn(self, 'widget')
         if old: ## and old in self.wlist:
-            print(self.develf())
             old.removeEventFilter(self)
         self.clist = l or []
         self.move(new.x(),
                   new.y()+new.height())
         if isinstance(new, QLineEdit):
             ch_conn(self, 'widget', new.textEdited, self.listmatch)
+            self.otxt = str(new.text().toLatin1()).lower()
             self.wtype = 'le'
         elif isinstance(new, QComboBox):
             ch_conn(self, 'widget',
                     new.lineEdit().textEdited, self.listmatch)
+            self.otxt = str(new.currentText().toLatin1()).lower()
+            new.lineEdit().deselect() # "bug" when hitting enter on selected dd
+            # word marked, enter deletes word, and dd jumps to 1st item
             self.wtype = 'dd'
         self.ewidget = new
-        print(self.develf())
+
+## obsoleted?
+        ## elif ev.key() == 0x01000003: # backspace
+        ##     if self.wtype == 'le':
+        ##         mark = len(self.ewidget.selectedText())
+        ##         self.listmatch(self.ewidget.text())
+        ##         self.ewidget.setSelection(
+        ##             len(self.ewidget.text())-(mark+1), 80)
+        ##         # hierwei set selection on end of string, done?  Nope!
