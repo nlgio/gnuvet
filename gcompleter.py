@@ -41,20 +41,23 @@ border-radius: 3px;
             self.setText(txt)
 
     def enterEvent(self, ev=None): # Cave this seems to differ from Qt's way
+        """Select self when mouse hovers over self."""
         if self.parent.selected:
-            self.parent.selected.deselect()
+            self.parent.selected.unselect()
         self.parent.selected = self
         self.setStyleSheet(self.gccellss.format(*self.selection))
-        
-    def deselect(self):
-        self.setStyleSheet(self.gccellss.format(*self.normal))
         
     def mousePressEvent(self, ev): # ev is QMouseEvent
         self.clicked.emit(self.text())
         
+    def unselect(self):
+        """Was leaveEvent, unusable under these circumstances."""
+        self.setStyleSheet(self.gccellss.format(*self.normal))
+        
 class Gcompleter(QScrollArea):
-    selected = None
     maxshow = 7
+    selected = None
+    sellen = 0
 
     def __init__(self, parent=None, widget=None, l=None):
         super(Gcompleter, self).__init__(parent)
@@ -71,6 +74,7 @@ class Gcompleter(QScrollArea):
         self.hide()
 
     def delcompl(self):
+        """Kill the completer (fr w/ labels)."""
         self.selected = None
         if hasattr(self, 'ewidget'):
             self.ewidget.removeEventFilter(self)
@@ -114,7 +118,7 @@ class Gcompleter(QScrollArea):
                     self.fr.removeEventFilter(self)
                     self.ewidget.setFocus()
                     self.ewidget.installEventFilter(self)
-                    self.selected.deselect()
+                    self.selected.unselect()
                     self.selected = None
                 return True
         elif ev.key() in (0x01000004, 0x01000005, 0x01000014): # Ret Enter Right
@@ -126,7 +130,13 @@ class Gcompleter(QScrollArea):
         return False
         
     def listmatch(self, txt=''):
-        # schaut nicht so schlecht aus, etwas gewoehnungsbeduerftig allerdings
+        # schaut nicht so schlecht aus, aber:
+        # le und dd: Markierung (selection) ist immer um eins mehr als der
+        # veraenderte Text, als ob der backspace erst beim 2. Mal durchkomme
+        #
+        # naah, don't work this way, have to do something w/ selectionChanged
+        # signal from le...
+        # naah, won't work this way either...
         # test with dd
         self.delcompl()
         if not txt:
@@ -138,19 +148,39 @@ class Gcompleter(QScrollArea):
         mlist = [e for e in self.clist if e.lower().startswith(txt)]
         mlist.extend([e for e in self.clist if e.lower().count(txt)
                       and e not in mlist])
+        
+        ########################
         if len(mlist) == 1:
-            print('listmatch one match "{}", otxt "{}"'.format(
+            print('txt "{}", otxt "{}"'.format(
                 txt, self.otxt))
-            if self.wtype == 'le':
-                self.ewidget.setText(mlist[0])
-                if self.otxt.startswith(txt): # backspace or delete
-                    self.otxt = txt
-                    self.ewidget.setSelection(len(txt)-1, 80)
-            elif self.wtype == 'dd': # hierwei completiontext?
+            if self.wtype == 'le': # LINEEDIT
+                wid = self.ewidget
+                
+                wid.setText(mlist[0])
+                self.otxt = mlist[0].lower()
+                self.delcompl()
+                print('otxt.startswith(txt) and otxt != txt: {}'.format(
+                    self.otxt.startswith(txt) and self.otxt != txt))
+                if self.otxt.startswith(txt) and self.otxt != txt:
+                    # backspace or delete
+                    wid.setSelection(
+                        len(self.otxt)-self.sellen, 80)
+                    self.sellen += 1
+                else:
+                    self.sellen = 0
+            elif self.wtype == 'dd': # DROPDOWN
                 self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))
-                if len(self.ewidget.currentText()) > len(txt):
-                    self.ewidget.lineEdit().setSelection(len(txt), 80)
+                if self.otxt.startswith(txt): # backspace or delete
+                    print('len(curText) {}, sellen {}'.format(
+                        len(self.ewidget.currentText()), self.sellen))
+                    self.ewidget.lineEdit().setSelection(
+                        len(self.ewidget.currentText())-self.sellen, 80)
+                    self.sellen += 1
+                else:
+                    self.sellen = 0
             return
+        #########################
+        self.sellen = 0
         self.resize(self.ewidget.width(), self.ewidget.height()*self.maxshow)
         self.setFrameShape(1)
         ipos = 0
@@ -169,7 +199,11 @@ class Gcompleter(QScrollArea):
             self.resize(self.width(), self.fr.height()+hcorr)
         self.show()
 
+    def selchd(self):
+        print('selchd')
+    
     def select(self, txt):
+        """Put selected text into active widget."""
         if self.wtype == 'le':
             self.ewidget.setText(txt)
         elif self.wtype == 'dd':
@@ -177,11 +211,12 @@ class Gcompleter(QScrollArea):
 
     def select_cell(self, gc):
         if self.selected:
-            self.selected.deselect()
+            self.selected.unselect()
         self.selected = gc
         gc.enterEvent()
         
     def setwidget(self, old=None, new=None, l=None):
+        """Bind Gcompleter to a (new) widget with a completion list."""
         if old == new:  return
         ch_conn(self, 'widget')
         if old: ## and old in self.wlist:
@@ -190,16 +225,14 @@ class Gcompleter(QScrollArea):
         self.move(new.x(),
                   new.y()+new.height())
         if isinstance(new, QLineEdit):
-            ch_conn(self, 'widget', new.textEdited, self.listmatch)
-            self.otxt = str(new.text().toLatin1()).lower()
+            wid = new
             self.wtype = 'le'
         elif isinstance(new, QComboBox):
-            ch_conn(self, 'widget',
-                    new.lineEdit().textEdited, self.listmatch)
-            self.otxt = str(new.currentText().toLatin1()).lower()
-            new.lineEdit().deselect() # "bug" when hitting enter on selected dd
-            # word marked, enter deletes word, and dd jumps to 1st item
+            wid = new.lineEdit()
             self.wtype = 'dd'
+        ch_conn(self, 'widget', wid.textEdited, self.listmatch)
+        ch_conn(self, 'selchd', wid.selectionChanged, self.selchd)
+        self.otxt = str(wid.text().toLatin1()).lower()
         self.ewidget = new
 
 ## obsoleted?
