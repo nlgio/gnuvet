@@ -57,7 +57,6 @@ border-radius: 3px;
 class Gcompleter(QScrollArea):
     maxshow = 7
     selected = None
-    sellen = 0
 
     def __init__(self, parent=None, widget=None, l=None):
         super(Gcompleter, self).__init__(parent)
@@ -130,14 +129,7 @@ class Gcompleter(QScrollArea):
         return False
         
     def listmatch(self, txt=''):
-        # schaut nicht so schlecht aus, aber:
-        # le und dd: Markierung (selection) ist immer um eins mehr als der
-        # veraenderte Text, als ob der backspace erst beim 2. Mal durchkomme
-        #
-        # naah, don't work this way, have to do something w/ selectionChanged
-        # signal from le...
-        # naah, won't work this way either...
-        # test with dd
+        """Set up the proper completer."""
         self.delcompl()
         if not txt:
             self.otxt = ''
@@ -145,42 +137,47 @@ class Gcompleter(QScrollArea):
         txt = str(txt).lower()
         if len(self.otxt) < len(txt):
             self.otxt = txt
-        mlist = [e for e in self.clist if e.lower().startswith(txt)]
-        mlist.extend([e for e in self.clist if e.lower().count(txt)
-                      and e not in mlist])
+        mlist = self.mklist(txt)
         
         ########################
         if len(mlist) == 1:
-            print('txt "{}", otxt "{}"'.format(
-                txt, self.otxt))
-            if self.wtype == 'le': # LINEEDIT
+            ## if self.wtype == 'le': # LINEEDIT
+            ##     self.ewidget.setText(mlist[0]) ########
+            ##     self.otxt = mlist[0].lower()
+            ##     self.delcompl()
+            ##     if self.otxt.startswith(txt) and self.otxt != txt:
+            ##         # backspace or delete
+            ##         while len(mlist) == 1:
+            ##             txt = txt[:-1]
+            ##             mlist = self.mklist(txt)
+            ##         markstart = len(txt)
+            ##         self.ewidget.setSelection(markstart, 80)
+            ## elif self.wtype == 'dd': # DROPDOWN
+            ##     self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))###
+            ##     self.otxt = mlist[0].lower()
+            ##     if self.otxt.startswith(txt) and self.otxt != txt:
+            ##         # backspace or delete
+            ##         while len(mlist) == 1:
+            ##             txt = txt[:-1]
+            ##             mlist = self.mklist(txt)
+            ##         markstart = len(txt)
+            ##         self.ewidget.lineEdit().setSelection(markstart, 80)
+            if self.wtype == 'le':
                 wid = self.ewidget
-                
                 wid.setText(mlist[0])
-                self.otxt = mlist[0].lower()
-                self.delcompl()
-                print('otxt.startswith(txt) and otxt != txt: {}'.format(
-                    self.otxt.startswith(txt) and self.otxt != txt))
-                if self.otxt.startswith(txt) and self.otxt != txt:
-                    # backspace or delete
-                    wid.setSelection(
-                        len(self.otxt)-self.sellen, 80)
-                    self.sellen += 1
-                else:
-                    self.sellen = 0
-            elif self.wtype == 'dd': # DROPDOWN
+            elif self.wtype == 'dd':
+                wid = self.ewidget.lineEdit()
                 self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))
-                if self.otxt.startswith(txt): # backspace or delete
-                    print('len(curText) {}, sellen {}'.format(
-                        len(self.ewidget.currentText()), self.sellen))
-                    self.ewidget.lineEdit().setSelection(
-                        len(self.ewidget.currentText())-self.sellen, 80)
-                    self.sellen += 1
-                else:
-                    self.sellen = 0
+            self.otxt = mlist[0].lower()
+            self.delcompl()
+            if self.otxt.startswith(txt) and self.otxt != txt: # backspace etc.
+                while len(mlist) == 1:
+                    txt = txt[:-1]
+                    mlist = self.mklist(txt)
+                markstart = len(txt)
+                wid.setSelection(markstart, 80)
             return
         #########################
-        self.sellen = 0
         self.resize(self.ewidget.width(), self.ewidget.height()*self.maxshow)
         self.setFrameShape(1)
         ipos = 0
@@ -198,6 +195,12 @@ class Gcompleter(QScrollArea):
         if self.fr.height()+hcorr < self.height():
             self.resize(self.width(), self.fr.height()+hcorr)
         self.show()
+
+    def mklist(self, txt=''):
+        mlist = [e for e in self.clist if e.lower().startswith(txt)]
+        mlist.extend([e for e in self.clist if e.lower().count(txt)
+                      and e not in mlist])
+        return mlist
 
     def selchd(self):
         print('selchd')
@@ -231,11 +234,10 @@ class Gcompleter(QScrollArea):
             wid = new.lineEdit()
             self.wtype = 'dd'
         ch_conn(self, 'widget', wid.textEdited, self.listmatch)
-        ch_conn(self, 'selchd', wid.selectionChanged, self.selchd)
         self.otxt = str(wid.text().toLatin1()).lower()
         self.ewidget = new
 
-## obsoleted?
+## obsoleted?  from eventFilter
         ## elif ev.key() == 0x01000003: # backspace
         ##     if self.wtype == 'le':
         ##         mark = len(self.ewidget.selectedText())
