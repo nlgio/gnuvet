@@ -131,12 +131,13 @@ class Gcompleter(QScrollArea):
                 self.select_cell(self.gclist[-1])
                 return True
             return False
-        elif ev.key() == 0x01000016: # Key_PageUp # this and next dont work clean: effin fr is moved left for whatever reason!
+        elif ev.key() == 0x01000016: # Key_PageUp
             if hasattr(self, 'fr') and self.fr.hasFocus():
                 self.select_cell(self.gclist[
                     self.gclist.index(self.selected)-7 > 0 and
                     self.gclist.index(self.selected)-7 or 0])
-                self.ensureWidgetVisible(self.selected, 10, 0)
+                self.ensureWidgetVisible(self.selected, 0, 0)
+                self.fr.move(0, self.fr.y()) # (py?)qt bug
                 return True
             return False
         elif ev.key() == 0x01000017: # Key_PageDown
@@ -144,7 +145,8 @@ class Gcompleter(QScrollArea):
                 self.select_cell(self.gclist[
                     self.gclist.index(self.selected)+7 < len(self.gclist) and
                     self.gclist.index(self.selected)+7 or -1])
-                self.ensureWidgetVisible(self.selected, 10, 0)
+                self.ensureWidgetVisible(self.selected, 0, 0)
+                self.fr.move(0, self.fr.y())
                 return True
             return False
         elif ev.key() in (0x01000004, 0x01000005, 0x01000014): # Ret Enter Right
