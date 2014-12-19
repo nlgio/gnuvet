@@ -105,9 +105,8 @@ class Gcompleter(QScrollArea):
                     if self.selected:
                         self.selected.unselect()
                         self.selected = None
-                    else: # this should never happen
-                        print('evF Key_Up not selected')
                 return True
+            return True
         elif ev.key() in (0x01000004, 0x01000005, 0x01000014): # Ret Enter Right
             if self.selected:
                 self.select(self.selected.text())
