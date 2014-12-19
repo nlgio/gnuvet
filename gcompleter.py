@@ -1,7 +1,21 @@
 # -*- coding: utf-8 -*-
 """Replace QCompleter with something more to my liking, that offers not only 
 entries that start with txt, but also those that CONTAIN it, and doesn't 
-cause as much unused overhead."""
+cause as much unused overhead.
+
+Use: create a completer object like so
+> self.gc = Gcompleter(self, self.widget, self.list)
+If more than one widget shall use the completer, create a list of widgets
+to use the completer, prepare a list or method to get a list for each widget,
+then add a
+> QApplication.instance().focusChanged.connect(self.focuschange)
+focuschange can of course be any name you like if appropriate.
+And add the function:
+> def focuschange(self, old, new):
+>     if new in self.widgetlist:
+>         self.gc.setwidget(old=old, new=new, l=new.list)
+That should suffice.
+"""
 
 from PyQt4.QtCore import pyqtSignal, QString
 from PyQt4.QtGui import (QComboBox, QFrame, QMouseEvent, QLabel,
@@ -106,7 +120,33 @@ class Gcompleter(QScrollArea):
                         self.selected.unselect()
                         self.selected = None
                 return True
-            return True
+            return True # yes, this stops dd from walking through its entries
+        elif ev.key() == 0x01000010: # Key_Home
+            if hasattr(self, 'fr') and self.fr.hasFocus():
+                self.select_cell(self.gclist[0])
+                return True
+            return False
+        elif ev.key() == 0x01000011: # Key_End
+            if hasattr(self, 'fr') and self.fr.hasFocus():
+                self.select_cell(self.gclist[-1])
+                return True
+            return False
+        elif ev.key() == 0x01000016: # Key_PageUp # this and next dont work clean: effin fr is moved left for whatever reason!
+            if hasattr(self, 'fr') and self.fr.hasFocus():
+                self.select_cell(self.gclist[
+                    self.gclist.index(self.selected)-7 > 0 and
+                    self.gclist.index(self.selected)-7 or 0])
+                self.ensureWidgetVisible(self.selected, 10, 0)
+                return True
+            return False
+        elif ev.key() == 0x01000017: # Key_PageDown
+            if hasattr(self, 'fr') and self.fr.hasFocus():
+                self.select_cell(self.gclist[
+                    self.gclist.index(self.selected)+7 < len(self.gclist) and
+                    self.gclist.index(self.selected)+7 or -1])
+                self.ensureWidgetVisible(self.selected, 10, 0)
+                return True
+            return False
         elif ev.key() in (0x01000004, 0x01000005, 0x01000014): # Ret Enter Right
             if self.selected:
                 self.select(self.selected.text())
