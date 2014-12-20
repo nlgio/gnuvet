@@ -3,17 +3,23 @@
 entries that start with txt, but also those that CONTAIN it, and doesn't 
 cause as much unused overhead.
 
-Use: create a completer object like so
-> self.gc = Gcompleter(self, self.widget, self.list)
+Use: create a completer object, taking care to use the parent of the widgets
+
+> self.gc = Gcompleter(self.widgetparent, self.widget, self.list)
+
 If more than one widget shall use the completer, create a list of widgets
 to use the completer, prepare a list or method to get a list for each widget,
 then add a
+
 > QApplication.instance().focusChanged.connect(self.focuschange)
+
 focuschange can of course be any name you like if appropriate.
 And add the function:
+
 > def focuschange(self, old, new):
 >     if new in self.widgetlist:
 >         self.gc.setwidget(old=old, new=new, l=new.list)
+
 That should suffice.
 """
 
@@ -93,6 +99,9 @@ class Gcompleter(QScrollArea):
     def eventFilter(self, ob, ev):
         if ev.type() != 6: # QEvent.KeyPress
             return False
+        if ev.key() == 0x01000000: # Qt.Key_Escape
+            self.delcompl()
+            return True
         if ev.key() == 0x01000015: # Qt.Key_Down
             if hasattr(self, 'fr'):
                 if self.ewidget.hasFocus():
