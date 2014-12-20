@@ -22,15 +22,14 @@ class Saecli(QMainWindow):
     cidsig   = pyqtSignal(int)
     dbstate   = pyqtSignal(bool)
     helpsig   = pyqtSignal(str)
-    savestate = pyqtSignal(tuple)
+    savestate = pyqtSignal(tuple) # currently unused
 
     # vars:
     db_err = changes = shutdown = False # self.adding?
-    completed = ''
     curs  = None
     gaia = None
 
-    # queries for completers:
+    # queries for completer:
     cityq = ("select distinct city from addresses order by city")
     fnameq = ("select distinct c_fname from clients order by c_fname")
     housenq = ("select distinct housen from addresses order by housen")
@@ -51,7 +50,6 @@ class Saecli(QMainWindow):
         self.w.setupUi(self)
         #    instance vars
         self.cids = []
-        self.complist = []
         self.conns = {} # pyqt bug: segfaults on disconnect() w/o arg
         self.sigs  = {}
         #    ACTIONS
@@ -139,14 +137,13 @@ class Saecli(QMainWindow):
             self.dbA.setEnabled(False)
             aboutA.setEnabled(False)
         #    WIDGET CONNECTIONS
-        ## ch_conn(self,'dclick',self.w.clist.cellDoubleClicked,self.cli_signal)
         ch_conn(self, 'dclick', self.w.clist.doubleclicked, self.w_cli)
         #    BUTTON CONNECTIONS
         self.w.errOk.clicked.connect(self.err_ok)
         self.w.sbynameRb.setChecked(1)
         self.w.sbydateRb.toggled.connect(self.list_clis)
         self.w.cancelPb.clicked.connect(self.close)
-        #    INIT
+        #    INIT # hierwei durchchecken
         self.clistheader = [
             '', # for baddebt icon
             self.tr('Client'),
@@ -185,10 +182,6 @@ class Saecli(QMainWindow):
         #    COMPLETER HELPERS
         self.lenames = ('city', 'fname', 'housen', 'mname', 'pname', 'postcode',
                         'region', 'sname', 'street', 'village')
-        ## self.les = (self.w.cityLe, self.w.fnameLe, self.w.housenLe,
-        ##             self.w.mnameLe, self.w.pnameLe, self.w.postcodeLe,
-        ##             self.w.regionLe, self.w.snameLe, self.w.streetLe,
-        ##             self.w.villageLe,)
         les = []
         for e in self.lenames:
             les.append(getattr(self.w, e + 'Le'))
@@ -219,7 +212,7 @@ class Saecli(QMainWindow):
         elif act == 'e': # edit client
             pass
 
-    def changed(self, change=0):
+    def changed(self, change=0): # currently unused
         """Note if changes have been made for poss emerg save."""
         if change:
             self.changes = True
