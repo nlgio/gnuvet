@@ -2,20 +2,17 @@
 # TODO:
 # should hide mobile2, patient, somehow col_hide don't seem to work
 # adapt to saepat.py
-# completer tun nicht wie sollen?
-# completer ausschalten on edit?
-# jetzt kommt der glyph bug auch bei ToolTips! # obsolete?
-# add: lLb.setText(self.user)
 # check query_string (insb f qstring)
 # action: a add  e edit  s search  c select
 
 from datetime import date
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import (QAction, QCompleter, QMainWindow,
+from PyQt4.QtGui import (QAction, QMainWindow,
                          QMenu, QPixmap, QStringListModel,)
 import gv_qrc
 from saecli_ui import Ui_Saecli
+from gcompleter import Gcompleter
 from keycheck import Keycheck
 from util import ch_conn, querydb
 
@@ -34,26 +31,16 @@ class Saecli(QMainWindow):
     gaia = None
 
     # queries for completers:
-    cityq = ("select distinct city from addresses where city ilike %s order by "
-             "city")
-    fnameq = ("select distinct c_fname from clients where c_fname ilike %s "
-              "order by c_fname")
-    housenq = ("select distinct housen from addresses where housen ilike %s "
-               "order by housen")
-    mnameq = ("select distinct c_mname from clients where c_mname ilike %s "
-              "order by c_mname")
-    pnameq = ("select distinct p_name from patients where p_name ilike %s "
-              "order by p_name")
-    postcq = ("select distinct postcode from addresses where postcode ilike %s "
-              "order by postcode")
-    regionq = ("select distinct region from addresses where region ilike %s "
-               "order by region")
-    snameq = ("select distinct c_sname from clients where client ilike %s "
-              "order by c_sname")
-    streetq = ("select distinct street from addresses where street ilike %s "
-               "order by street")
-    villageq = ("select distinct village from addresses where village ilike %s "
-                "order by village")
+    cityq = ("select distinct city from addresses order by city")
+    fnameq = ("select distinct c_fname from clients order by c_fname")
+    housenq = ("select distinct housen from addresses order by housen")
+    mnameq = ("select distinct c_mname from clients order by c_mname")
+    pnameq = ("select distinct p_name from patients order by p_name")
+    postcodeq = ("select distinct postcode from addresses order by postcode")
+    regionq = ("select distinct region from addresses order by region")
+    snameq = ("select distinct c_sname from clients order by c_sname")
+    streetq = ("select distinct street from addresses order by street")
+    villageq = ("select distinct village from addresses order by village")
     
     def __init__(self, parent=None, clid=0, act='s', clis=None):
         super(Saecli, self).__init__(parent)
@@ -198,52 +185,20 @@ class Saecli(QMainWindow):
         #    COMPLETER HELPERS
         self.lenames = ('city', 'fname', 'housen', 'mname', 'pname', 'postcode',
                         'region', 'sname', 'street', 'village')
-        self.les = (self.w.cityLe, self.w.fnameLe, self.w.housenLe,
-                    self.w.mnameLe, self.w.pnameLe, self.w.postcodeLe,
-                    self.w.regionLe, self.w.snameLe, self.w.streetLe,
-                    self.w.villageLe,)
+        ## self.les = (self.w.cityLe, self.w.fnameLe, self.w.housenLe,
+        ##             self.w.mnameLe, self.w.pnameLe, self.w.postcodeLe,
+        ##             self.w.regionLe, self.w.snameLe, self.w.streetLe,
+        ##             self.w.villageLe,)
+        les = []
+        for e in self.lenames:
+            les.append(getattr(self.w, e + 'Le'))
+        self.les = tuple(les)
         for le in self.les:
             setattr(le, 'name', self.lenames[self.les.index(le)])
-            setattr(le, 'query', le.name + 'q')
-        #    COMPLETER
-        ## self.qmodel = QStringListModel(self)
-        ## self.completer = QCompleter(self)
-        ## self.completer.setCaseSensitivity(0)
-        ## self.completer.setModelSorting(1)
-        ## self.completer.setModel(self.qmodel)
-        ## self.completer.setCompletionMode(0) # was 1
-        self.lmodel = QStringListModel(self)
-        self.lcompl = QCompleter(self)
-        self.lcompl.setCaseSensitivity(0)
-        self.lcompl.setCompletionMode(0)
-        self.lcompl.setModel(self.lmodel)
-        # hierwei ?
+            setattr(le, 'query', getattr(self, le.name + 'q'))
+            setattr(le, 'list', [])
+        self.gc = Gcompleter(self.w.saeFr)
         QApplication.instance().focusChanged.connect(self.focuschange)
-        ## for le in (self.w.snameLe, self.w.mnameLe, self.w.fnameLe,
-        ##            self.w.housenLe, self.w.streetLe, self.w.villageLe,
-        ##            self.w.cityLe, self.w.regionLe, self.w.postcodeLe,
-        ##            self.w.telhomeLe, self.w.telworkLe, self.w.mobile1Le,
-        ##            self.w.mobile2Le, self.w.emailLe, self.w.pnameLe):
-        ##     le.setCompleter(self.completer)
-        ## #    COMPLETER CONNECTIONS
-        ## self.w.snameLe.textEdited.connect(self.compl_sname)
-        ## self.w.fnameLe.textEdited.connect(self.compl_fname)
-        ## self.w.mnameLe.textEdited.connect(self.compl_mname)
-        ## self.w.housenLe.textEdited.connect(self.compl_housen)
-        ## self.w.streetLe.textEdited.connect(self.compl_street)
-        ## self.w.villageLe.textEdited.connect(self.compl_village)
-        ## self.w.cityLe.textEdited.connect(self.compl_city)
-        ## self.w.postcodeLe.textEdited.connect(self.compl_postcode)
-        ## self.w.telhomeLe.textEdited.connect(self.compl_telh)
-        ## self.w.regionLe.textEdited.connect(self.compl_region)
-        ## self.w.telworkLe.textEdited.connect(self.compl_telw)
-        ## self.w.mobile1Le.textEdited.connect(self.compl_mob1)
-        ## self.w.mobile2Le.textEdited.connect(self.compl_mob2)
-        ## self.w.emailLe.textEdited.connect(self.compl_email)
-        ## self.w.pnameLe.textEdited.connect(self.compl_pname)
-        #    COMPLETER CONNECTIONS
-        for le in self.les:
-            le.textEdited.connect(self.complle) # hierwei
         #    FINISH
         self.keycheck = Keycheck()
         self.installEventFilter(self.keycheck)
@@ -263,29 +218,6 @@ class Saecli(QMainWindow):
             pass
         elif act == 'e': # edit client
             pass
-
-    # devel func:
-    ## def develf(self):
-    ##     if self.w.saeFr.isVisible():
-    ##         self.w.saeFr.hide()
-    ##         self.w.errFr.show()
-    ##         self.w.matchFr.hide()
-    ##         self.w.noMFr.hide()
-    ##     elif self.w.errFr.isVisible():
-    ##         self.w.saeFr.hide()
-    ##         self.w.errFr.hide()
-    ##         self.w.matchFr.show()
-    ##         self.w.noMFr.hide()
-    ##     elif self.w.matchFr.isVisible():
-    ##         self.w.saeFr.hide()
-    ##         self.w.errFr.hide()
-    ##         self.w.matchFr.hide()
-    ##         self.w.noMFr.show()
-    ##     elif self.w.noMFr.isVisible():
-    ##         self.w.saeFr.show()
-    ##         self.w.errFr.hide()
-    ##         self.w.matchFr.hide()
-    ##         self.w.noMFr.hide()
 
     def changed(self, change=0):
         """Note if changes have been made for poss emerg save."""
@@ -430,7 +362,6 @@ class Saecli(QMainWindow):
             self.setWindowTitle(self.tr('Search Client'))
         if self.act == 'c':
             self.setWindowTitle(self.tr('Select Client'))
-        # 
         self.w.backPb.setDefault(0)
         self.w.backPb.setAutoDefault(0)
         self.w.backPb.hide()
@@ -457,306 +388,7 @@ class Saecli(QMainWindow):
         ##         self.state_write()
         if self.gaia and hasattr(self.gaia, 'xy_decr'):
             self.gaia.xy_decr()
-
-    def complle(self, le):
-        """Common actions on text input in Le."""
-        txt = str(le.text().toLatin1())
-        if not txt:
-            le.olen = 0
-            return
-        ## if not le.completer():
-        ##     self.setcompleter(le)
-        if len(txt) <= le.olen: # bs, del or replace
-            res = querydb(self, le.query, (txt+'%',))
-            if res is None:  return # db error
-            self.complist = [e[0] for e in res]
-            res = querydb(self, le.query, ('%'+txt+'%',))
-            if res is None:  return # db error
-            self.complist.extend(
-                [e[0] for e in res if e[0] not in self.complist])
-            while len(self.complist) < 2 or len(txt) == le.olen:
-                txt = txt[:-1] # hierwei ??
-                if not txt:
-                    le.olen = 0
-                    return
-                res = querydb(self, le.query, (txt+'%',)) # hierwei ???
-            self.dmodel.setStringList(res)
-        else: # text added
-            self.dmodel.setStringList(le.query(txt))
-        self.complete_le(le, txt)
-
-    def complete_le(self, le, txt):
-        """Complete partly entered data in Le."""
-        if len(self.dmodel.stringList()) == 1: # one match
-            le.completer().setWidget(None)
-            le.setCompleter(None)
-            le.olen = len(le.currentText())
-            return
-        ## elif len(self.dmodel.stringList()): # several
-        ##     dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
-        else: # None
-            idx = 0
-            if type(txt) is not str:
-                txt = str(txt)
-            print('c_le: {} is {}'.format(txt, type(txt)))
-            txt = txt[:-1].lower()
-            while txt:
-                l = [e for e in le.list if e.lower().startswith(txt)]
-                l.extend([e for e in le.list
-                          if e.lower().count(txt) and e not in l])
-                if l:
-                    idx = le.list.index(l[0])
-                    break
-                else:
-                    txt = txt[:-1]
-        le.olen = len(txt)
-        ## ch_conn(self, 'activated', self.dcompl.activated, le.setlen) # ???
-        self.dcompl.setCompletionPrefix(txt)
-        self.dcompl.complete()
-        if len(le.currentText()) > le.olen:
-            le.lineEdit().setSelection(le.olen, 80)
         
-    # hierwei: these following compl_ funcs obsoletable?
-    def compl_city(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 80:
-            self.w.cityLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct city from addresses where city ilike %s order by '
-            'city', (txt,))
-        if result is None:  return # db error
-        for e in result:
-            self.complist.append(e[0])
-        self.qmodel.setStringList(self.complist)
-
-    def compl_email(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 80:
-            self.w.emailLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct c_email from clients where c_email ilike %s order '
-            'by c_email', (txt,))
-        if result is None:  return # db error
-        for e in result:
-            self.complist.append(e[0])
-        self.qmodel.setStringList(self.complist)
-            
-    def compl_fname(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 80:
-            self.w.fnameLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct c_fname from clients where c_fname ilike %s order '
-            'by c_fname', (txt,))
-        if result is None:  return # db error
-        for e in result:
-            self.complist.append(e[0])
-        self.qmodel.setStringList(self.complist)
-
-    def compl_housen(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 80:
-            self.w.housenLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct housen from addresses where housen ilike %s order '
-            'by housen', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-            
-    def compl_mname(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 25:
-            self.w.mnameLe.setText(txt[:25])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct c_mname from clients where c_mname ilike %s order '
-            'by c_mname', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-
-    def compl_mob1(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 30:
-            self.w.mobile1Le.setText(txt[:30])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct c_mobile1 from clients where c_mobile1 ilike %s '
-            'order by c_mobile1', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-            
-    def compl_mob2(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 30:
-            self.w.mobile2Le.setText(txt[:30])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct c_mobile2 from clients where c_mobile2 ilike %s '
-            'order by c_mobile2', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-            
-    def compl_pname(self, txt): # txt=''
-        if self.db_err or not txt:
-            return
-        if len(txt) > 80:
-            self.w.pnameLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt.toLatin1()) + '%'
-        result = querydb(
-            self,
-            'select distinct p_name from patients where p_name ilike %s order '
-            'by p_name', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-            
-    def compl_postcode(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 10:
-            self.w.postcodeLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct postcode from addresses where postcode ilike %s '
-            'order by postcode', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-            
-    def compl_region(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 80:
-            self.w.regionLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct region from addresses where region ilike %s order '
-            'by region', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-            
-    def compl_sname(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 80:
-            self.w.snameLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct c_sname from clients where c_sname ilike %s order '
-            'by c_sname', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-
-    def compl_street(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 80:
-            self.w.streetLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct street from addresses where street ilike %s order '
-            'by street', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-
-    def compl_telh(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 30:
-            self.w.telhomeLe.setText(txt[:30])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct c_telhome from clients where c_telhome ilike %s '
-            'order by c_telhome', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-        
-    def compl_telw(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 30:
-            self.w.telworkLe.setText(txt[:30])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct c_telwork from clients where c_telwork ilike %s '
-            'order by c_telwork', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-            
-    def compl_village(self, txt=''):
-        if self.db_err or not txt:
-            return
-        if len(txt) > 80:
-            self.w.villageLe.setText(txt[:80])
-        self.complist = []
-        txt = str(txt) + '%'
-        result = querydb(
-            self,
-            'select distinct village from addresses where village ilike %s '
-            'order by village', (txt,))
-        if result is None:  return # db error
-        for res in result:
-            self.complist.append(res[0])
-        self.qmodel.setStringList(self.complist)
-                
     def dbdep_enable(self, yes=True):
         """En|Disable actions in case of db loss or gain."""
         #self.a_disabled = True
@@ -777,7 +409,7 @@ class Saecli(QMainWindow):
         ch_conn(self, 'enter', self.keycheck.enter, self.w.mainPb.click)
         self.w.errFr.hide()
 
-    def error_msg(self, err_msg=''):
+    def error_msg(self, err_msg=''): # currently unused?
         """Display error message in errFr when: db-error or client exists."""
         self.w.saeFr.setEnabled(0)
         self.w.errLb.setText(self.tr(err_msg))
@@ -871,8 +503,13 @@ class Saecli(QMainWindow):
 
     def focuschange(self, old, new):
         if new and new in self.les:
-            self.complle(new)
-            self.setcompleter(new)
+            if not new.list:
+                ## print('query: "{}"'.format(new.query))
+                l = querydb(self, new.query)
+                if l is None:  return # db error
+                if l:
+                    new.list = [e[0] for e in l]
+            self.gc.setwidget(old=old, new=new, l=new.list)
                 
     def gv_quit(self, quitnow=False):
         """Signal children if quitting GnuVet or not."""
@@ -972,44 +609,6 @@ class Saecli(QMainWindow):
         ch_conn(self, 'backPb', self.w.backPb.clicked, self.cli_search)
         ch_conn(self, 'mainPb', self.w.mainPb.clicked, self.cli_add)
         self.w.noMFr.show()
-        
-    def querycomp(self, le, txt):
-        """Get list for le completers."""
-        txt = str(txt.toLatin1()).lower()
-        l = [e for e in le.list if e.lower().startswith(txt)]
-        l.extend([e for e in le.list if e.lower().count(txt) and e not in l])
-        return l
-
-    def query_city(self, txt=''):
-        """These query functions are called as le.query."""
-        return self.querycomp(self.w.cityLe, txt)
-        
-    def query_fname(self, txt=''):
-        return self.querycomp(self.w.fnameLe, txt)
-
-    def query_housen(self, txt=''):
-        return self.querycomp(self.w.housenLe, txt)
-
-    def query_mname(self, txt=''):
-        return self.querycomp(self.w.mnameLe, txt)
-
-    def query_pname(self, txt=''):
-        return self.querycomp(self.w.pnameLe, txt)
-
-    def query_postcode(self, txt=''):
-        return self.querycomp(self.w.postcodeLe, txt)
-
-    def query_region(self, txt=''):
-        return self.querycomp(self.w.regionLe, txt)
-
-    def query_sname(self, txt=''):
-        return self.querycomp(self.w.snameLe, txt)
-
-    def query_street(self, txt=''):
-        return self.querycomp(self.w.streetLe, txt)
-
-    def query_village(self, txt=''):
-        return self.querycomp(self.w.villageLe, txt)
 
     def query_string(self, s_byname):
         """Construct query string from user input."""
@@ -1136,26 +735,6 @@ class Saecli(QMainWindow):
     
     def savedrestore(self, saved_things=[]):
         pass
-
-    def setcompleter(self, w):
-        """Called by focusChange to adapt completer."""
-        if w in self.les:
-            w.setCompleter(self.lcompl)
-            self.lmodel.setStringList(self.complist)
-            self.lcompl.setWidget(w)
-
-    ## def setlen(self, le): # hierwei nec?
-    ##     le.deselect()
-    ##     le.olen = len(le.text())
-        
-    def setuple(self, le, n):
-        """Called by __init__ to set Le vars for completer."""
-        setattr(le, 'olen', 0)
-        ## setattr(le, 'setlen', getattr(self, 'setlen'+n)) dd-specific
-        setattr(le, 'list', self.complist) # hierwei ck differs from saepat
-        ## setattr(le, 'lname', 'complist') # unused 'lname'
-        setattr(le, 'query', getattr(self, 'query_'+n))
-        le.textEdited.connect(getattr(self, 'compl_'+n)) # ???
         
     def state_write(self):
         """Signal unsaved changes to gaia for filing for later retrieval."""
