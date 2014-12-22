@@ -21,8 +21,7 @@ Powered by Python, (Py)Qt4 and PostGreSQL.
 
 Copyright 2012 Enno Deimel.
 """,
-    de = """
-GnuVet ist Freie und Quelloffene Software und steht unter der GNU Public License (GPL), und es gibt keinerlei Garantie irgendwölcher Art, nicht einmal die Garantie der BRAUCHBARKEIT für IRGENDETWAS Besonderes.
+    de = """GnuVet ist Freie und Quelloffene Software und steht unter der GNU Public License (GPL), und es gibt keinerlei Garantie irgendwölcher Art, nicht einmal die Garantie der BRAUCHBARKEIT für IRGENDETWAS Besonderes.
 
 Realisiert mit Python, (Py)Qt4 und PostGreSQL.
 

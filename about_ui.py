@@ -7,7 +7,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4.QtCore import Qt
+## from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QApplication, QLabel, QFont, QPushButton
 
 class Ui_About(object):
@@ -23,9 +23,9 @@ class Ui_About(object):
         font = QFont()
         font.setBold(True)
         self.vLb.setFont(font)
-        self.vLb.setAlignment(Qt.AlignCenter)
+        ## self.vLb.setAlignment(Qt.AlignCenter)
         self.aboutLb = QLabel(About)
-        self.aboutLb.setGeometry(35,60,288,141)
+        self.aboutLb.setGeometry(25,50,298,160)
         self.aboutLb.setWordWrap(True)
         self.okPb = QPushButton(About)
         self.okPb.setGeometry(137,223,84,30)
