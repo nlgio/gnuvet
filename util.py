@@ -61,10 +61,7 @@ def querydb(caller, query, qtuple=None, debug=False):
             caller.curs.execute(query)
         return caller.curs.fetchall()
     except OperationalError as e:
-        if caller.gaia == 'gaia': # new 141120 test for gaia i.e. is gnuv.py
-            caller.db_state(e)
-        else:
-            caller.gaia.db_state(e)
+        caller.db_state(e)
 
 def sysinfo():
     """Return sys-dependent syspath userpath and options_filename."""

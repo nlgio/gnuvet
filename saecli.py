@@ -128,6 +128,7 @@ class Saecli(QMainWindow):
             self.helpsig.connect(self.gaia.gv_help)
             self.savestate.connect(self.gaia.state_write)
         else:
+            self.gaia = self # test
             from options import defaults as options
             self.options = options
             import dbmod
@@ -143,29 +144,13 @@ class Saecli(QMainWindow):
         self.w.sbynameRb.setChecked(1)
         self.w.sbydateRb.toggled.connect(self.list_clis)
         self.w.cancelPb.clicked.connect(self.close)
-        #    INIT # hierwei durchchecken
-        self.clistheader = [
-            '', # for baddebt icon
-            self.tr('Client'),
-            self.tr('Address'),
-            self.tr('Tel Home'),
-            self.tr('Tel Work'),
-            self.tr('Mobile 1'),
-            self.tr('Mobile 2'),
-            self.tr('email'),
-            self.tr('Last Seen'),
-            self.tr('Registered'),
-            self.tr('Annotation'),
-            ##self.tr('Balance'),
-            self.tr('Patient')
-            ]
+        #    INIT
         try:
             self.curs = self.db.cursor()
         except (OperationalError, AttributeError) as e: # no db connection
             self.db_state(e)
         if self.curs:
-            self.dbA.setVisible(0)
-            self.dbA.setEnabled(0)
+            self.dbdep_enable()
             logname = querydb(
                 self, 'select stf_logname from staff where stf_id=%s',
                 (self.staffid,))
@@ -179,7 +164,7 @@ class Saecli(QMainWindow):
         if res is None:  return # db error
         for e in res:
             self.w.ctitleDd.addItem(e[1], e[0])
-        #    COMPLETER HELPERS
+        #    GCOMPLETER
         self.lenames = ('city', 'fname', 'housen', 'mname', 'pname', 'postcode',
                         'region', 'sname', 'street', 'village')
         les = []
@@ -193,6 +178,7 @@ class Saecli(QMainWindow):
         self.gc = Gcompleter(self.w.saeFr)
         QApplication.instance().focusChanged.connect(self.focuschange)
         #    FINISH
+        self.clistheader = []
         self.keycheck = Keycheck()
         self.installEventFilter(self.keycheck)
         if type(self.options['currency']) is int:
@@ -220,80 +206,123 @@ class Saecli(QMainWindow):
     def ck_email(self):
         if not self.w.emailLe.text():
             return True
-        import re
+        if not 'rematch' in locals:
+            from re import match as rematch, compile as recompile
         if not 'emailre' in locals():
-            emailre = re.compile(
+            emailre = recompile(
                 r'([A-Z]|[a-z]|[0-9]){1,}([A-Z]|[a-z]|[0-9]|[\.])*([A-'
                 'Z]|[a-z]|[0-9]){1,}@{1}([A-Z]|[a-z]|[0-9]){1,}([A-Z]|['
                 'a-z]|[0-9]|[\.])*([A-Z]|[a-z]|[0-9]){1,}$')
-        if not re.match(emailre, str(self.w.emailLe.text().toLatin1())):
+        if not rematch(emailre, str(self.w.emailLe.text().toLatin1())):
             return False
         return True
 
-    def ck_entries(self):
-        import re
+    def ck_entries(self): # hierwei untested
+        if not 'rematch' in locals:
+            from re import match as rematch, compile as recompile
         # for non-english languages these have to be adapted:
         if not 'namere' in locals():
-            namere = re.compile(r"[A-Z][a-z']*([-\ ]?[A-Z][a-z']*)*$")
+            namere = recompile(r"[A-Z][a-z']*([-\ ]?[A-Z][a-z']*)*$")
         if not 'mnamere' in locals():
-            mnamere = re.compiler(r"([A-Z][a-z']*([-\ ]?[A-Z][a-z']*)*)|([A-"
+            mnamere = recompile(r"([A-Z][a-z']*([-\ ]?[A-Z][a-z']*)*)|([A-"
                                   "Z][\.\ ]?)*$")
         if not 'housenre' in locals():
-            housenre = re.compile(r"(\d*[-]?(\d*|[\ ]?[A-Za-z]+))|([A-Z]["
+            housenre = recompile(r"(\d*[-]?(\d*|[\ ]?[A-Za-z]+))|([A-Z]["
                                   "a-z]*\b([-\ ]?\b[A-Z][a-z]*)*)$")
         errors = []
         txt = self.w.mnameLe.text().toLatin1()
         if txt:
-            if not re.match(mnamere, txt):
+            if not rematch(mnamere, txt):
                 txt = fix_mname(txt)
-                if re.match(mnamere, txt):
+                if rematch(mnamere, txt):
                     self.w.mnameLe.setText(txt)
                 else:
-                    errors.append[5]
-        # iter something here?  use list?
-        i = 0
+                    errors.append('mname')
         for le in (self.w.snameLe, self.w.fnameLe, self.w.housenLe,
                    self.w.streetLe, self.w.villageLe, self.w.cityLe,
                    self.w.regionLe):
             txt = le.text().toLatin1()
             if txt:
-                if not re.match(namere, txt):
+                if not rematch(namere, txt):
                     txt = fix_name(txt)
-                    if re.match(namere, txt):
+                    if rematch(namere, txt):
                         le.setText(txt)
                     else:
-                        errors.append[i]
-            i += 1
+                        errors.append(le.name)
         if not ck_postcode():
-            errors.append[11]
+            errors.append('postcode')
         if not ck_email():
-            errors.append[12]
-        if errors:
+            errors.append('email')
+        if errors: # hierwei this is still very devel
             print('AE Errors: {}'.format(errors))
+            return 1
 
     def ck_postcode(self):
         if not self.w.postcodeLe.text():
             return
         if not 'cpostre' in locals():
             if self.options['ccode'] == 'uk':
-                cpostre = re.compile(
+                cpostre = recompile(
                     r"(GIR 0AA)|((([A-PR-UWYZ][0-9][0-9]?)|(([A-PR-"
                     "UWYZ][A-HK-Y][0-9][0-9]?)|(([A-PR-UWYZ][0-9][A"
                     "-HJKSTUW])|([A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRV"
                     "WXY])))) [0-9][ABD-HJLNP-UW-Z]{2})$")
             elif self.options['ccode'] == 'de':
-                cpostre = re.compile(r'\d{5}$')
+                cpostre = recompile(r'\d{5}$')
             elif self.options['ccode'] == 'at':
-                cpostre = re.compile(r'\d{4}$')
-        if re.match(cpostre, ' '.join(
+                cpostre = recompile(r'\d{4}$')
+        if rematch(cpostre, ' '.join(
             str(self.w.postcodeLe.text().toLatin1().toUpper()).split())):
             return True
         return False
     
-    def cli_add(self): # adding args don't forget triggered=False
+    def cli_add(self):
+        test = self.ck_entries()
+        if test:  return # errors on entry check
+        adr = []
+        for le in (self.w.housenLe, self.w.streetLe, self.w.villageLe,
+                   self.w.cityLe, self.w.regionLe, self.w.postcodeLe):
+            adr.append(le.text().toLatin1())
+        adr = tuple(adr)
+        suc = querydb(self,
+                      'select addr_id from addresses where housen=%s and '
+                      'street=%s and village=%s and city=%s and region=%s and '
+                      'postcode=%s', adr)
+        if suc is None:  return # db error
+        if suc[0][0]:
+            adr = suc
+        else:
+            suc = querydb(
+                self,
+                'insert into addresses(housen,street,village,city,region,'
+                'postcode)values(%s,%s,%s,%s,%s,%s) returning addr_id', adr)
+            if suc is None:  return # db error
+            if suc[0][0]:
+                adr = suc
+        cli = [self.w.ctitleDd.itemData(
+            self.w.ctitleDd.currentIndex(), 32).toInt()[0]]
+        for le in (self.w.snameLe, self.w.mnameLe, self.w.fnamele,
+                   self.w.telhomeLe, self.w.telworkLe, self.w.mobile1Le,
+                   self.w.mobile2Le, self.w.emailLe):
+            cli.append(le.text().toLatin1())
+        cli.insert(4, adr)
+        cli.append(date.today())
+        cli.append(self.w.annoTe.toPlainText().toLatin1())
+        cli = tuple(cli)
+        suc = querydb( # leave out baddebt on new client?
+            self,
+            'insert into clients(c_title,c_sname,c_mname,c_fname,c_address,'
+            'c_telhome,c_telwork,c_mobile1,c_mobile2,c_email,c_reg,c_anno)'
+            'values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) returning c_id', cli)
+        if suc is None:  return # db error
+        self.cid = suc[0][0]
+        self.db.commit()
+        self.create_tables()
+    
+    def create_tables(self):
+        """Create accounting tables for new client and nn patient."""
         self.stage = 3
-        # hierwei
-        tables = querydb( # well this should all be done on client creation
+        tables = querydb(
             self,
             "select tablename from pg_tables where tablename='acc{}'".format(
                 self.cid))
@@ -302,7 +331,7 @@ class Saecli(QMainWindow):
             suc = querydb(
                 self,
                 "insert into patients(p_name,p_cid,p_reg)values('nn',%s,%s) "
-                "returning p_id", (self.cid, self.today)) # implement today!
+                "returning p_id", (self.cid, date.today()))
             if suc is None:  return # db error
             pid = suc[0][0]
             try:
@@ -333,8 +362,6 @@ class Saecli(QMainWindow):
                 self.db_state(e)
                 return
             self.db.commit()
-            # hierwei end this shb done on add_client
-        pass
 
     def cli_edit(self):
         self.stage = 4
@@ -397,6 +424,8 @@ class Saecli(QMainWindow):
         self.w.no_dbconn.setVisible(self.db_err)
         self.dbstate.emit(not self.db_err) # hierwei
         self.dbdep_enable(not self.db_err)
+        # devel
+        print('db error: {}'.format(msg))
 
     def err_ok(self): # hierwei mainPb.click?
         ch_conn(self, 'enter', self.keycheck.enter, self.w.mainPb.click)
@@ -462,9 +491,11 @@ class Saecli(QMainWindow):
         for k in tooltips:
             self.w.clist.lrows[0][k].setToolTip(tooltips[k])
         
-    def fix_housen(self, name):
+    def fix_housen(self, name): # currently unused
         """Try to avoid common typos in housen."""
-        if re.match(r'.*\d', name):
+        if not 'rematch' in locals:
+            from re import match as rematch, compile as recompile
+        if rematch(r'.*\d', name):
             name = ' '.join(name.split())
             if name.count('- ') or name.count(' -'):
                 name = name.replace(' -', '-').replace('- ', '-')
@@ -531,6 +562,22 @@ class Saecli(QMainWindow):
             s_byname = False
         ch_conn(self, 'selch')
         self.w.clist.clear()
+        if not self.clistheader:
+            self.clistheader = [
+                '', # for baddebt icon
+                self.tr('Client'),
+                self.tr('Address'),
+                self.tr('Tel Home'),
+                self.tr('Tel Work'),
+                self.tr('Mobile 1'),
+                self.tr('Mobile 2'),
+                self.tr('email'),
+                self.tr('Last Seen'),
+                self.tr('Registered'),
+                self.tr('Annotation'),
+                ##self.tr('Balance'),
+                self.tr('Patient') # can search for p_name here as well
+                ]
         if not self.w.clist.headers:
             self.w.clist.set_headers(self.clistheader)
         result = querydb(self, self.query_string(s_byname))
@@ -703,9 +750,9 @@ class Saecli(QMainWindow):
         self.w.pnameLe.clear()
         self.w.annoTe.clear()
         self.w.regspecDd.setCurrentIndex(0)
-        self.w.regDe.clear() #?
+        ##self.w.regDe.clear() #?
         self.w.lastspecDd.setCurrentIndex(0)
-        self.w.lastDe.clear() #?
+        ##self.w.lastDe.clear() #?
         self.w.balspecDd.setCurrentIndex(0)
         self.w.balSb.clear() #?
         self.w.snameLe.setFocus()
@@ -769,3 +816,11 @@ if __name__ == '__main__':
     ding = Saecli(None)
     ding.show()
     exit(a.exec_())
+
+## db error: 'str' object has no attribute 'cursor'
+## Traceback (most recent call last):
+##   File "saecli.py", line 816, in <module>
+##     ding = Saecli(None)
+##   File "saecli.py", line 159, in __init__
+##     self.w.lLb.setText(logname)
+## UnboundLocalError: local variable 'logname' referenced before assignment
