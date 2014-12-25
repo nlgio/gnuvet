@@ -27,7 +27,11 @@ class Ui_Appointer(object):
         self.no_dbconn.hide()
         self.lLb = QLabel(Appointer)
         self.lLb.setGeometry(Appointer.width()-90, 1, 85, 19)
-        self.lLb.setAlignment(Qt.AlignRight|Qt.AlignBottom)
+        self.lLb.setAlignment(Qt.AlignRight|Qt.AlignBottom) # tryin 2 elim Qt
+        ## self.lLb.setAlignment(0x0002|0x0040) # dont work
+        ## self.lLb.setAlignment(0x0042) # dont work
+        ## self.lLb.setStyleSheet( # dont work either
+        ##     """QLabel { text-align: right; vertical-align: bottom; }""")
         self.monthRb = QRadioButton(Appointer)
         self.monthRb.setGeometry(10, 35, 50, 22)
         self.weekRb = QRadioButton(Appointer)

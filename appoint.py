@@ -592,7 +592,7 @@ border-radius: 3px;
                 else:
                     c.setStyleSheet(self.othermonth)
                     othermonth.append(self.w.calendar.lrows[-1].index(c))
-                c.setAlignment(Qt.AlignCenter)
+                c.setAlignment(Qt.AlignCenter) # sole use of Qt.!
                 c.selectable = False
             self.w.calendar.append_row(len(dates[0]) * [''])
             for c in self.w.calendar.lrows[-1]:
