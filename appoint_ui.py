@@ -66,8 +66,8 @@ class Ui_Appointer(object):
         self.confirm = QFrame(Appointer)
         # hierwei
         self.confirm.setAutoFillBackground(True)
-        self.confirm.setFrameShape(QFrame.StyledPanel)
-        self.confirm.setFrameShadow(QFrame.Raised)
+        self.confirm.setFrameShape(6)#QFrame.StyledPanel)
+        self.confirm.setFrameShadow(20)#QFrame.Raised)
         self.confirm.setGeometry(300, 200, 350, 200)
         self.confirm.warnPix = QLabel(self.confirm)
         self.confirm.warnPix.setGeometry(15, 60, 40, 39)

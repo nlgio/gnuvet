@@ -5,136 +5,186 @@
 # Created: Mon Dec 22 21:53:13 2014
 #      by: PyQt4 UI code generator 4.11.2
 #
-# WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
-
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
-
-class Ui_AeBasecol(object):
-    def setupUi(self, AeBasecol):
-        AeBasecol.resize(400, 469)
-        AeBasecol.setMinimumSize(400, 469)
-        AeBasecol.setMaximumSize(400, 469)
-        self.centralwidget = QtGui.QWidget(AeBasecol)
-        self.errFr = QtGui.QFrame(self.centralwidget)
-        self.errFr.setGeometry(10, 10, 380, 340)
-        self.errFr.setMinimumSize(0, 0)
-        self.errFr.setAutoFillBackground(True)
-        self.errFr.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.errFr.setFrameShadow(QtGui.QFrame.Raised)
-        self.warningPix = QtGui.QLabel(self.errFr)
-        self.warningPix.setGeometry(10, 81, 40, 39)
-        self.warningPix.setPixmap(QtGui.QPixmap(_fromUtf8(":/images/warning.png")))
-        self.errMsgLb = QtGui.QLabel(self.errFr)
-        self.errMsgLb.setGeometry(70, 20, 210, 175)
-        self.errMsgLb.setWordWrap(True)
-        self.errMsgLb.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
-        self.okPb = QtGui.QPushButton(self.centralwidget)
-        self.okPb.setGeometry(70, 358, 80, 30)
-        self.backPb = QtGui.QPushButton(self.centralwidget)
-        self.backPb.setGeometry(160, 358, 80, 30)
-        self.cancelPb = QtGui.QPushButton(self.centralwidget)
-        self.cancelPb.setGeometry(250, 358, 80, 30)
-        self.cancelPb.setAutoDefault(True)
-        self.confFr = QtGui.QFrame(self.centralwidget)
-        self.confFr.setGeometry(10, 10, 380, 340)
-        self.confFr.setMinimumSize(0, 0)
-        self.confFr.setAutoFillBackground(True)
-        self.confFr.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.confFr.setFrameShadow(QtGui.QFrame.Raised)
-        self.qPix = QtGui.QLabel(self.confFr)
-        self.qPix.setGeometry(20, 148, 32, 32)
-        self.qPix.setPixmap(QtGui.QPixmap(_fromUtf8(":/images/question.png")))
-        self.confMsgLb = QtGui.QLabel(self.confFr)
-        self.confMsgLb.setGeometry(79, 24, 261, 281)
-        self.addFr = QtGui.QFrame(self.centralwidget)
-        self.addFr.setGeometry(10, 10, 380, 340)
-        self.addFr.setMinimumSize(0, 0)
-        self.addFr.setAutoFillBackground(True)
-        self.addFr.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.addFr.setFrameShadow(QtGui.QFrame.Raised)
-        self.bcName = QtGui.QLineEdit(self.addFr)
-        self.bcName.setGeometry(30, 17, 231, 27)
-        self.bcName.setMaxLength(25)
-        self.bcnameLb = QtGui.QLabel(self.addFr)
-        self.bcnameLb.setGeometry(30, 50, 116, 19)
-        self.groupBox = QtGui.QGroupBox(self.addFr)
-        self.groupBox.setGeometry(30, 90, 231, 111)
-        self.oblRb = QtGui.QRadioButton(self.groupBox)
-        self.oblRb.setGeometry(25, 50, 91, 23)
-        self.noRb = QtGui.QRadioButton(self.groupBox)
-        self.noRb.setGeometry(25, 77, 58, 23)
-        self.possRb = QtGui.QRadioButton(self.groupBox)
-        self.possRb.setGeometry(25, 23, 78, 23)
-        self.possRb.setChecked(True)
-        self.addMsgLb = QtGui.QLabel(self.addFr)
-        self.addMsgLb.setGeometry(30, 8, 231, 37)
-        self.addMsgLb.setWordWrap(True)
-        self.togglePb = QtGui.QPushButton(self.addFr)
-        self.togglePb.setGeometry(250, 200, 80, 30)
-        self.sAllPb = QtGui.QPushButton(self.addFr)
-        self.sAllPb.setGeometry(250, 160, 80, 30)
-        AeBasecol.setCentralWidget(self.centralwidget)
-        self.menubar = QtGui.QMenuBar(AeBasecol)
-        self.menubar.setGeometry(0, 0, 400, 28)
-        AeBasecol.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(AeBasecol)
-        self.statusbar.setSizeGripEnabled(False)
-        AeBasecol.setStatusBar(self.statusbar)
-        self.bcnameLb.setBuddy(self.bcName)
-
-        self.retranslateUi(AeBasecol)
-        QtCore.QMetaObject.connectSlotsByName(AeBasecol)
-        AeBasecol.setTabOrder(self.bcName, self.possRb)
-        AeBasecol.setTabOrder(self.possRb, self.oblRb)
-        AeBasecol.setTabOrder(self.oblRb, self.noRb)
-        AeBasecol.setTabOrder(self.noRb, self.togglePb)
-        AeBasecol.setTabOrder(self.togglePb, self.okPb)
-        AeBasecol.setTabOrder(self.okPb, self.backPb)
-        AeBasecol.setTabOrder(self.backPb, self.cancelPb)
-
-    def retranslateUi(self, AeBasecol):
-        AeBasecol.setWindowTitle(_translate("AeBasecol", "GnuVet: Add Basecolour", None))
-        self.okPb.setText(_translate("AeBasecol", "OK", None))
-        self.backPb.setText(_translate("AeBasecol", "Bac&k", None))
-        self.cancelPb.setText(_translate("AeBasecol", "Cancel", None))
-        self.cancelPb.setShortcut(_translate("AeBasecol", "Esc", None))
-        self.bcnameLb.setText(_translate("AeBasecol", "BaseC&olour Name", None))
-        self.groupBox.setTitle(_translate("AeBasecol", "Combinations of this Basecolour", None))
-        self.oblRb.setToolTip(_translate("AeBasecol", "This Basecolour has to be combined with another", None))
-        self.oblRb.setStatusTip(_translate("AeBasecol", "Combination required", None))
-        self.oblRb.setText(_translate("AeBasecol", "n&ecessary", None))
-        self.noRb.setToolTip(_translate("AeBasecol", "This Basecolour can not be combined with others", None))
-        self.noRb.setStatusTip(_translate("AeBasecol", "No combination possible", None))
-        self.noRb.setText(_translate("AeBasecol", "&none", None))
-        self.possRb.setToolTip(_translate("AeBasecol", "This Basecolour can be combined with others", None))
-        self.possRb.setStatusTip(_translate("AeBasecol", "Combination possible", None))
-        self.possRb.setText(_translate("AeBasecol", "&possible", None))
-        self.togglePb.setText(_translate("AeBasecol", "Toggle &All", None))
-        self.sAllPb.setText(_translate("AeBasecol", "&Select All", None))
+from PyQt4.QtGui import (QApplication, QCheckBox, QFont, QFrame, QLabel,
+                         QLineEdit, QPixmap, QPushButton, QRadioButton,
+                         QScrollArea)
 
 import gv_qrc
 
+class Ui_Aebasecol(object):
+    devels = 0
+    
+    def setupUi(self, Aebasecol):
+        Aebasecol.resize(400, 469)
+        Aebasecol.setMinimumSize(400, 469)
+        Aebasecol.setMaximumSize(400, 470)
+        ## self.centralwidget = QtGui.QWidget(Aebasecol) # elim centralwidget?
+        self.menubar = Aebasecol.menuBar()
+        self.statusbar = Aebasecol.statusBar()
+        self.statusbar.setSizeGripEnabled(False)
+        self.no_dbconn = QLabel(self.statusbar)
+        font = QFont()
+        font.setBold(True)
+        self.no_dbconn.setFont(font)
+        self.statusbar.addPermanentWidget(self.no_dbconn, 0)
+        self.no_dbconn.hide()
+        self.aeFr = QFrame(Aebasecol)
+        self.aeFr.setGeometry(10, 10, 380, 340)
+        self.aeFr.setAutoFillBackground(True)
+        self.aeFr.setFrameShape(6) # StyledPanel
+        self.aeFr.setFrameShadow(20) # Raised
+        self.bcnameLb = QLabel(self.aeFr)
+        self.bcnameLb.setGeometry(31, 10, 115, 19)
+        self.bcnameLe = QLineEdit(self.aeFr)
+        self.bcnameLe.setGeometry(30, 30, 231, 27)
+        self.bcnameLe.setMaxLength(25)
+        self.combLb = QLabel(self.aeFr)
+        self.combLb.setGeometry(31, 70, 240, 24)
+        self.possRb = QRadioButton(self.aeFr)
+        self.possRb.setGeometry(30, 95, 78, 23)
+        self.possRb.setChecked(True)
+        self.oblRb = QRadioButton(self.aeFr)
+        self.oblRb.setGeometry(30, 115, 91, 23)
+        self.noRb = QRadioButton(self.aeFr)
+        self.noRb.setGeometry(30, 135, 58, 23)
+        self.specLb = QLabel(self.aeFr)
+        self.specLb.setGeometry(31, 170, 231, 37)
+        ## self.specLb.setFrameShape(1)
+        self.specLb.setWordWrap(True)
+        self.scrollA = QScrollArea(self.aeFr)
+        self.scrollA.setGeometry(30, 220, 231, 101)
+        ## self.scrollA.setFrameShape(1)
+        self.specFr = QFrame(self.scrollA) # aeFr?
+        self.specFr.setGeometry(0, 0, 230, 110)
+        self.specFr.setFrameShape(6)
+        self.specFr.setFrameShadow(30)
+        self.allCb = QCheckBox(
+            QApplication.translate("Aebasecol", "Select All", None, 1),
+            self.specFr)
+        self.allCb.setGeometry(20, 10, 200, 21)
+        self.line = QFrame(self.specFr)
+        self.line.setGeometry(20, 36, 180, 2)
+        self.line.setFrameShape(6)
+        self.togglePb = QPushButton(self.aeFr)
+        self.togglePb.setGeometry(280, 255, 80, 30)
+        self.errFr = QFrame(Aebasecol)
+        self.errFr.setGeometry(10, 10, 380, 340)
+        self.errFr.setAutoFillBackground(True)
+        self.errFr.setFrameShape(6)
+        self.errFr.setFrameShadow(20)
+        self.warnLb = QLabel(self.errFr)
+        self.warnLb.setGeometry(10, 130, 40, 39)
+        self.warnLb.setPixmap(QPixmap(":/images/warning.png"))
+        self.errmsgLb = QLabel(self.errFr)
+        self.errmsgLb.setGeometry(70, 69, 210, 175)
+        self.errmsgLb.setWordWrap(True)
+        self.confFr = QFrame(Aebasecol)
+        self.confFr.setGeometry(10, 10, 380, 340)
+        self.confFr.setAutoFillBackground(True)
+        self.confFr.setFrameShape(6)
+        self.confFr.setFrameShadow(20)
+        self.qLb = QLabel(self.confFr)
+        self.qLb.setGeometry(20, 148, 32, 32)
+        self.qLb.setPixmap(QPixmap(":/images/question.png"))
+        self.confmsgLb = QLabel(self.confFr)
+        self.confmsgLb.setGeometry(79, 24, 261, 281)
+        self.okPb = QPushButton(Aebasecol)
+        self.okPb.setGeometry(70, 358, 80, 30)
+        self.backPb = QPushButton(Aebasecol)
+        self.backPb.setGeometry(160, 358, 80, 30)
+        self.cancelPb = QPushButton(Aebasecol)
+        self.cancelPb.setGeometry(250, 358, 80, 30)
+        self.cancelPb.setAutoDefault(True)
+        self.bcnameLb.setBuddy(self.bcnameLe)
+
+        self.retranslateUi(Aebasecol)
+
+    def retranslateUi(self, Aebasecol):
+        Aebasecol.setWindowTitle(
+            QApplication.translate(
+                "Aebasecol", "GnuVet: Add Basecolour", None, 1))
+        self.no_dbconn.setText(
+            QApplication.translate("Aebasecol", "No db connection...", None, 1))
+        self.bcnameLb.setText(
+            QApplication.translate("Aebasecol", "BaseC&olour Name:", None, 1))
+        self.okPb.setText(
+            QApplication.translate("Aebasecol", "OK", None, 1))
+        self.backPb.setText(
+            QApplication.translate("Aebasecol", "Bac&k", None, 1))
+        self.cancelPb.setText(
+            QApplication.translate("Aebasecol", "Cancel", None, 1))
+        self.cancelPb.setShortcut(
+            QApplication.translate("Aebasecol", "Esc", None, 1))
+        ## self.groupBox.setTitle(
+        ##    _translate("Aebasecol", "Combinations with other 
+        ## Basecolours", None))
+        self.combLb.setText(
+            QApplication.translate(
+                "Aebasecol", "Combinations with other Basecolours:", None, 1))
+        self.possRb.setText(
+            QApplication.translate("Aebasecol", "&possible", None, 1))
+        self.possRb.setToolTip(
+            QApplication.translate(
+                "Aebasecol", "This Basecolour can be combined with others",
+                None, 1))
+        self.possRb.setStatusTip(
+            QApplication.translate(
+                "Aebasecol", "Combination possible", None, 1))
+        self.oblRb.setText(
+            QApplication.translate("Aebasecol", "n&ecessary", None, 1))
+        self.oblRb.setToolTip(
+            QApplication.translate(
+                "Aebasecol", "This Basecolour has to be combined with another",
+                None, 1))
+        self.oblRb.setStatusTip(
+            QApplication.translate(
+                "Aebasecol", "Combination required", None, 1))
+        self.noRb.setText(
+            QApplication.translate("Aebasecol", "&none", None, 1))
+        self.noRb.setToolTip(
+            QApplication.translate(
+                "Aebasecol", "This Basecolour can not be combined with others",
+                None, 1))
+        self.noRb.setStatusTip(
+            QApplication.translate("Aebasecol", "No combination possible",
+                                   None, 1))
+        self.specLb.setText(
+            QApplication.translate(
+                "Aebasecol",
+                "Please select species for which new basecolour applies:",
+                None, 1))
+        self.togglePb.setText(
+            QApplication.translate("Aebasecol", "Toggle &All", None, 1))
+
+    def develf(self):
+        if self.devels == 0:
+            self.aeFr.hide()
+            self.confFr.hide()
+            self.errFr.show()
+            self.devels = 1
+        elif self.devels == 1:
+            self.confFr.hide()
+            self.errFr.hide()
+            self.aeFr.show()
+            self.devels = 2
+        elif self.devels == 2:
+            self.aeFr.hide()
+            self.errFr.hide()
+            self.confFr.show()
+            self.devels = 0
+
 if __name__ == '__main__':
-    from PyQt4.QtGui import QApplication, QMainWindow, QShortcut
+    from PyQt4.QtGui import QAction, QApplication, QMainWindow, QShortcut
     a = QApplication([])
     a.setStyle('plastique')
-    b = Ui_AeBasecol()
+    b = Ui_Aebasecol()
     w = QMainWindow()
     b.setupUi(w)
+    develA = QAction(w)
+    develA.setShortcut('Ctrl+D')
+    develA.triggered.connect(b.develf)
+    w.addAction(develA)
     QShortcut('Ctrl+Q', w, quit)
     b.cancelPb.clicked.connect(quit)
     w.show()
