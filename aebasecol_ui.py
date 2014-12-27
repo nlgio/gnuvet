@@ -19,7 +19,6 @@ class Ui_Aebasecol(object):
         Aebasecol.resize(400, 469)
         Aebasecol.setMinimumSize(400, 469)
         Aebasecol.setMaximumSize(400, 470)
-        ## self.centralwidget = QtGui.QWidget(Aebasecol) # elim centralwidget?
         self.menubar = Aebasecol.menuBar()
         self.statusbar = Aebasecol.statusBar()
         self.statusbar.setSizeGripEnabled(False)
@@ -30,7 +29,7 @@ class Ui_Aebasecol(object):
         self.statusbar.addPermanentWidget(self.no_dbconn, 0)
         self.no_dbconn.hide()
         self.aeFr = QFrame(Aebasecol)
-        self.aeFr.setGeometry(10, 10, 380, 340)
+        self.aeFr.setGeometry(10, 40, 380, 340)
         self.aeFr.setAutoFillBackground(True)
         self.aeFr.setFrameShape(6) # StyledPanel
         self.aeFr.setFrameShadow(20) # Raised
@@ -72,7 +71,7 @@ class Ui_Aebasecol(object):
         self.togglePb = QPushButton(self.aeFr)
         self.togglePb.setGeometry(280, 255, 80, 30)
         self.errFr = QFrame(Aebasecol)
-        self.errFr.setGeometry(10, 10, 380, 340)
+        self.errFr.setGeometry(10, 40, 380, 340)
         self.errFr.setAutoFillBackground(True)
         self.errFr.setFrameShape(6)
         self.errFr.setFrameShadow(20)
@@ -83,7 +82,7 @@ class Ui_Aebasecol(object):
         self.errmsgLb.setGeometry(70, 69, 210, 175)
         self.errmsgLb.setWordWrap(True)
         self.confFr = QFrame(Aebasecol)
-        self.confFr.setGeometry(10, 10, 380, 340)
+        self.confFr.setGeometry(10, 40, 380, 340)
         self.confFr.setAutoFillBackground(True)
         self.confFr.setFrameShape(6)
         self.confFr.setFrameShadow(20)
@@ -98,11 +97,11 @@ class Ui_Aebasecol(object):
         self.confmsgLb.setGeometry(0, 0, 261, 277)
         self.cscrollA.setWidget(self.confmsgLb)
         self.okPb = QPushButton(Aebasecol)
-        self.okPb.setGeometry(70, 358, 80, 30)
+        self.okPb.setGeometry(70, 408, 80, 30)
         self.backPb = QPushButton(Aebasecol)
-        self.backPb.setGeometry(160, 358, 80, 30)
+        self.backPb.setGeometry(160, 408, 80, 30)
         self.closePb = QPushButton(Aebasecol)
-        self.closePb.setGeometry(250, 358, 80, 30)
+        self.closePb.setGeometry(250, 408, 80, 30)
         self.closePb.setAutoDefault(True)
         self.bcnameLb.setBuddy(self.bcnameLe)
 
@@ -124,9 +123,6 @@ class Ui_Aebasecol(object):
             QApplication.translate("Aebasecol", "Cancel", None, 1))
         self.closePb.setShortcut(
             QApplication.translate("Aebasecol", "Esc", None, 1))
-        ## self.groupBox.setTitle(
-        ##    _translate("Aebasecol", "Combinations with other 
-        ## Basecolours", None))
         self.combLb.setText(
             QApplication.translate(
                 "Aebasecol", "Combinations with other Basecolours:", None, 1))
