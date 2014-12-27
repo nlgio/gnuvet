@@ -101,9 +101,9 @@ class Ui_Aebasecol(object):
         self.okPb.setGeometry(70, 358, 80, 30)
         self.backPb = QPushButton(Aebasecol)
         self.backPb.setGeometry(160, 358, 80, 30)
-        self.cancelPb = QPushButton(Aebasecol)
-        self.cancelPb.setGeometry(250, 358, 80, 30)
-        self.cancelPb.setAutoDefault(True)
+        self.closePb = QPushButton(Aebasecol)
+        self.closePb.setGeometry(250, 358, 80, 30)
+        self.closePb.setAutoDefault(True)
         self.bcnameLb.setBuddy(self.bcnameLe)
 
         self.retranslateUi(Aebasecol)
@@ -120,9 +120,9 @@ class Ui_Aebasecol(object):
             QApplication.translate("Aebasecol", "OK", None, 1))
         self.backPb.setText(
             QApplication.translate("Aebasecol", "Bac&k", None, 1))
-        self.cancelPb.setText(
+        self.closePb.setText(
             QApplication.translate("Aebasecol", "Cancel", None, 1))
-        self.cancelPb.setShortcut(
+        self.closePb.setShortcut(
             QApplication.translate("Aebasecol", "Esc", None, 1))
         ## self.groupBox.setTitle(
         ##    _translate("Aebasecol", "Combinations with other 
@@ -194,6 +194,6 @@ if __name__ == '__main__':
     develA.triggered.connect(b.develf)
     w.addAction(develA)
     QShortcut('Ctrl+Q', w, quit)
-    b.cancelPb.clicked.connect(quit)
+    b.closePb.clicked.connect(quit)
     w.show()
     exit(a.exec_())
