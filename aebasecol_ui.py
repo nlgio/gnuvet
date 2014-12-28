@@ -97,11 +97,9 @@ class Ui_Aebasecol(object):
         self.confmsgLb.setGeometry(0, 0, 261, 277)
         self.cscrollA.setWidget(self.confmsgLb)
         self.okPb = QPushButton(Aebasecol)
-        self.okPb.setGeometry(70, 408, 80, 30)
-        self.backPb = QPushButton(Aebasecol)
-        self.backPb.setGeometry(160, 408, 80, 30)
+        self.okPb.setGeometry(110, 408, 80, 30)
         self.closePb = QPushButton(Aebasecol)
-        self.closePb.setGeometry(250, 408, 80, 30)
+        self.closePb.setGeometry(210, 408, 80, 30)
         self.closePb.setAutoDefault(True)
         self.bcnameLb.setBuddy(self.bcnameLe)
 
@@ -117,8 +115,6 @@ class Ui_Aebasecol(object):
             QApplication.translate("Aebasecol", "BaseC&olour Name:", None, 1))
         self.okPb.setText(
             QApplication.translate("Aebasecol", "OK", None, 1))
-        self.backPb.setText(
-            QApplication.translate("Aebasecol", "Bac&k", None, 1))
         self.closePb.setText(
             QApplication.translate("Aebasecol", "Cancel", None, 1))
         self.closePb.setShortcut(
