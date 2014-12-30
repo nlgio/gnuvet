@@ -321,33 +321,36 @@ class Saepat(QMainWindow):
         """Adapt breed/spec combos to selection [idx] in colours.
         Triggered by colDd.currentIndexChanged."""
         self.w.mixedcolCb.setEnabled(idx > 1)
-        if self.w.specDd.currentIndex() > 0:
-            return
-        if self.w.breedDd.currentIndex() > 0:
+        if self.w.specDd.currentIndex()>0 or self.w.breedDd.currentIndex()>0:
             return
         if idx > 0:
-            spec_code = querydb(
+            scode = querydb(
                 self,
                 'select c_speccode from colours where col_id=%s',
                 (self.w.colDd.itemData(idx, 32).toInt()[0],))
-            if spec_code is None:  return # db error
-            spec_code = spec_code[0][0]
+            if scode is None:  return # db error
+            scode = scode[0][0] # e.g.1048543
         else:
-            spec_code = 'a'
+            scode = 'a'
+            # new: scode = 0 # all
         self.breed2spec = {}
         self.w.breedDd.currentIndexChanged.disconnect(self.adapt_colours)
         self.w.breedDd.clear()
         self.w.breedDd.addItem('', 0)
         self.w.breedDd.currentIndexChanged.connect(self.adapt_colours)
         codestring = ''
-        if spec_code != 'a':
+        if scode != 'a':
             codestring += self.curs.mogrify(
-                ' and spec_code in %s', (tuple('a' + spec_code),))
+                ' and spec_code in %s', (tuple('a' + scode),))
         self.blist = []
         res = querydb( # not even at gunpoint?  Ha!
             self,
             'select distinct breed_id,breed_name,b_spec from breeds,species '
             'where spec_id=b_spec{} order by breed_name'.format(codestring))
+        # new:
+        #    'select distinct breed_id,breed_name,b_spec from breeds '
+        #    'where spec_id=b_spec and %s|(1<<b_spec-1)=%s',
+        #    (spcode,spcode)
         if res is None:  return # db error
         for e in res:
             self.w.breedDd.addItem(e[1], e[0])
@@ -1588,25 +1591,36 @@ class Saepat(QMainWindow):
         ch_conn(self, 'coldd')#, self.w.colDd.currentIndexChanged)
         self.w.colDd.clear()
         self.w.colDd.addItem('', 0)
-        spec_code = ''
+        scode = ''
+        # neu: scode = 0
         if self.w.specDd.currentIndex() > 0:
-            spec_code = self.spec2code[
+            scode = self.spec2code[
                 self.w.specDd.itemData(
                     self.w.specDd.currentIndex(), 32).toInt()[0]]
+            # neu: scode = 1<<self.w.specDd.itemData(
+            ##         self.w.specDd.currentIndex(), 32).toInt()[0]-1
         elif self.currentspec:
-            spec_code = self.spec2code[self.currentspec]
-        if spec_code == 'a':
-            spec_code = " and c_speccode='a'"
+            scode = self.spec2code[self.currentspec]
+            # neu: scode = 1<<self.currentspec-1
+        if scode == 'a':
+            scode = " and c_speccode='a'"
+            # neu:
+            # if scode == 0:
+            #     scode = 'and c_speccode=0'
         else:
-            spec_code = (" and ((c_speccode='a') or " +
-                         "(c_speccode like '%" + spec_code + "%'))")
-        result = querydb(
+            scode = (" and ((c_speccode='a') or " +
+                         "(c_speccode like '%" + scode + "%'))")
+            # neu:
+            # scode = (' and (
+            #             (c_speccode=0) or c_speccode|(%s)=c_speccode).format(
+            #             scode)) # do i need =0 at all?
+        result = querydb( # hierwei
             self,
             'select col_id,b1.bcol,b2.bcol,b3.bcol from basecolours b1,'
             'basecolours b2,basecolours b3,colours where b1.bcol_id=col1 '
             'and b2.bcol_id=col2 and b3.bcol_id=col3{} order by b1.bcol '
             'nulls first, b2.bcol nulls first, b3.bcol nulls first'.format(
-                spec_code))
+                scode))
         if result is None:  return # db error
         for res in result:
             tmp = '-'.join([col for col in res[1:] if col])
@@ -1668,13 +1682,13 @@ class Saepat(QMainWindow):
             self, 'select spec_id,spec_name,spec_code from species order by '
             'spec_name')
         if result is None:  return # db error
-        self.spec2code = {}
+        self.spec2code = {} # obsolete
         self.slist = []
         self.w.specDd.clear()
         self.w.specDd.addItem('', 0)
         for res in result:
             self.w.specDd.addItem(res[1], res[0])
-            self.spec2code[res[0]] = res[2]
+            self.spec2code[res[0]] = res[2] # obsolete
             self.slist.append(res[1])
     
     def prep_ae(self):
