@@ -1604,16 +1604,14 @@ class Saepat(QMainWindow):
             # neu: scode = 1<<self.currentspec-1
         if scode == 'a':
             scode = " and c_speccode='a'"
-            # neu:
-            # if scode == 0:
-            #     scode = 'and c_speccode=0'
         else:
             scode = (" and ((c_speccode='a') or " +
                          "(c_speccode like '%" + scode + "%'))")
-            # neu:
-            # scode = (' and (
-            #             (c_speccode=0) or c_speccode|(%s)=c_speccode).format(
-            #             scode)) # do i need =0 at all?
+        # neu:
+        # if scode:
+        #     scode = ' and (c_speccode|{}=c_speccode)'.format(scode)
+        # else:
+        #     scode = ''
         result = querydb( # hierwei
             self,
             'select col_id,b1.bcol,b2.bcol,b3.bcol from basecolours b1,'
