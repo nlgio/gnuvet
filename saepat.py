@@ -1,4 +1,5 @@
 """Search Add Edit patient interface."""
+# replace QCompleter w/ Gcompleter
 # change self.action to self.act and use that insto self.stage
 # recheck all -- still functional, useful? connect.s? g|setattr(self, what)!!!
 #     avoid dependence on gnuv.py, should be ready for other modules as well
@@ -329,28 +330,28 @@ class Saepat(QMainWindow):
                 'select c_speccode from colours where col_id=%s',
                 (self.w.colDd.itemData(idx, 32).toInt()[0],))
             if scode is None:  return # db error
-            scode = scode[0][0] # e.g.1048543
+            scode = scode[0][0] # e.g.1048543, or 0
         else:
-            scode = 'a'
-            # new: scode = 0 # all
+            ## scode = 'a'
+            scode = ''
         self.breed2spec = {}
         self.w.breedDd.currentIndexChanged.disconnect(self.adapt_colours)
         self.w.breedDd.clear()
         self.w.breedDd.addItem('', 0)
         self.w.breedDd.currentIndexChanged.connect(self.adapt_colours)
-        codestring = ''
-        if scode != 'a':
-            codestring += self.curs.mogrify(
-                ' and spec_code in %s', (tuple('a' + scode),))
+        ## codestring = ''
+        ## if scode != 'a':
+        ##     codestring += self.curs.mogrify(
+        ##         ' and spec_code in %s', (tuple('a' + scode),))
+        if scode:
+            scode = ' and bool({}|(1<<b_spec-1))'.format(scode)
         self.blist = []
         res = querydb( # not even at gunpoint?  Ha!
             self,
-            'select distinct breed_id,breed_name,b_spec from breeds,species '
-            'where spec_id=b_spec{} order by breed_name'.format(codestring))
-        # new:
-        #    'select distinct breed_id,breed_name,b_spec from breeds '
-        #    'where spec_id=b_spec and %s|(1<<b_spec-1)=%s',
-        #    (spcode,spcode)
+            ## 'select distinct breed_id,breed_name,b_spec from breeds,species '
+            ## 'where spec_id=b_spec{} order by breed_name'.format(codestring))
+            'select distinct breed_id,breed_name,b_spec from breeds '
+            'where spec_id=b_spec{} order by breed_name'.format(scode))
         if res is None:  return # db error
         for e in res:
             self.w.breedDd.addItem(e[1], e[0])
@@ -601,6 +602,7 @@ class Saepat(QMainWindow):
         if self.gaia and hasattr(self.gaia, 'xy_decr'):
             self.gaia.xy_decr()
 
+    # hierwei completers
     def compldd(self, dd, txt):
         """Common actions on text input in Dd."""
         if not txt:
@@ -673,6 +675,7 @@ class Saepat(QMainWindow):
 
     def compl_s(self, txt):
         self.compldd(self.w.specDd, txt)
+    # completers finished?
         
     def db_state(self, db=None): # hierwei ck vs gaia from gnuv.py
         """Actions to be taken on db loss and gain."""
@@ -774,7 +777,7 @@ class Saepat(QMainWindow):
     def err_ok(self):
         self.w.errFr.hide()
 
-    def error_msg(self, err_msg=''):
+    def error_msg(self, err_msg=''): # obsolete? ck gaia re dberror
         """Display error message in errFr when: db-error or pat_exists."""
         self.w.saeFr.setEnabled(0)
         self.w.errLb.setText(self.tr(err_msg))
@@ -1591,30 +1594,28 @@ class Saepat(QMainWindow):
         ch_conn(self, 'coldd')#, self.w.colDd.currentIndexChanged)
         self.w.colDd.clear()
         self.w.colDd.addItem('', 0)
-        scode = ''
-        # neu: scode = 0
+        ## scode = ''
+        scode = 0 # hierwei
         if self.w.specDd.currentIndex() > 0:
-            scode = self.spec2code[
-                self.w.specDd.itemData(
-                    self.w.specDd.currentIndex(), 32).toInt()[0]]
-            # neu: scode = 1<<self.w.specDd.itemData(
-            ##         self.w.specDd.currentIndex(), 32).toInt()[0]-1
+            ## scode = self.spec2code[
+            ##     self.w.specDd.itemData(
+            ##         self.w.specDd.currentIndex(), 32).toInt()[0]]
+            scode = 1<<self.w.specDd.itemData(
+                self.w.specDd.currentIndex(), 32).toInt()[0]-1
+            # e.g. 1, 2, 4, 8, 16, 32, 64, ...
         elif self.currentspec:
-            scode = self.spec2code[self.currentspec]
-            # neu: scode = 1<<self.currentspec-1
-        if scode == 'a':
-            scode = " and c_speccode='a'"
-            # neu:
-            # if scode == 0:
-            #     scode = 'and c_speccode=0'
+            ## scode = self.spec2code[self.currentspec]
+            scode = 1<<self.currentspec-1
+        ## if scode == 'a':
+        ##     scode = " and c_speccode='a'"
+        ## else:
+        ##     scode = (" and ((c_speccode='a') or " +
+        ##                  "(c_speccode like '%" + scode + "%'))")
+        if scode == 0:
+            scode = ''
         else:
-            scode = (" and ((c_speccode='a') or " +
-                         "(c_speccode like '%" + scode + "%'))")
-            # neu:
-            # scode = (' and (
-            #             (c_speccode=0) or c_speccode|(%s)=c_speccode).format(
-            #             scode)) # do i need =0 at all?
-        result = querydb( # hierwei
+            scode = ' and ((c_speccode=0) or bool(c_speccode&' + scode + '))'
+        result = querydb(
             self,
             'select col_id,b1.bcol,b2.bcol,b3.bcol from basecolours b1,'
             'basecolours b2,basecolours b3,colours where b1.bcol_id=col1 '
@@ -1676,20 +1677,22 @@ class Saepat(QMainWindow):
 
     def popul_species(self):
         """(Re-)Populate 'species' combo and spec2code dict{id: code}."""
+        # neu: spec2code obsolete!
         if self.db_err:
             return
         result = querydb(
             self, 'select spec_id,spec_name,spec_code from species order by '
             'spec_name')
+        # neu: ohne spec_code
         if result is None:  return # db error
         self.spec2code = {} # obsolete
-        self.slist = []
+        self.slist = [] # obsolete
         self.w.specDd.clear()
         self.w.specDd.addItem('', 0)
         for res in result:
             self.w.specDd.addItem(res[1], res[0])
             self.spec2code[res[0]] = res[2] # obsolete
-            self.slist.append(res[1])
+            self.slist.append(res[1]) # obsolete
     
     def prep_ae(self):
         """Prepare A&E (add/edit) stage of search-add-edit patient window."""
