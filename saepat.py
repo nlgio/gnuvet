@@ -625,78 +625,78 @@ class Saepat(QMainWindow):
             self.gaia.xy_decr()
 
     # hierwei completers
-    def compldd(self, dd, txt):
-        """Common actions on text input in Dd."""
-        if not txt:
-            dd.olen = 0
-            dd.setCurrentIndex(0)
-            return
-        if not dd.completer():
-            self.setcompleter(dd)
-        if len(txt) <= dd.olen: # bs, del or replace
-            result = dd.query(txt)
-            while len(result) < 2 or len(txt) == dd.olen:
-                txt = txt[:-1]
-                if not txt:
-                    dd.olen = 0
-                    dd.setCurrentIndex(0)
-                    return
-                result = dd.query(txt)
-            self.dmodel.setStringList(result)
-        else: # text added
-            self.dmodel.setStringList(dd.query(txt))
-        self.complete_dd(dd, txt)
+    ## def compldd(self, dd, txt):
+    ##     """Common actions on text input in Dd."""
+    ##     if not txt:
+    ##         dd.olen = 0
+    ##         dd.setCurrentIndex(0)
+    ##         return
+    ##     if not dd.completer():
+    ##         self.setcompleter(dd)
+    ##     if len(txt) <= dd.olen: # bs, del or replace
+    ##         result = dd.query(txt)
+    ##         while len(result) < 2 or len(txt) == dd.olen:
+    ##             txt = txt[:-1]
+    ##             if not txt:
+    ##                 dd.olen = 0
+    ##                 dd.setCurrentIndex(0)
+    ##                 return
+    ##             result = dd.query(txt)
+    ##         self.dmodel.setStringList(result)
+    ##     else: # text added
+    ##         self.dmodel.setStringList(dd.query(txt))
+    ##     self.complete_dd(dd, txt)
     
-    def complete_dd(self, dd, txt):
-        """Complete partly entered data in dropdown (QComboBox)."""
-        if len(self.dmodel.stringList()) == 1: # one match
-            dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
-            dd.completer().setWidget(None)
-            dd.setCompleter(None)
-            dd.olen = len(dd.currentText())
-            return
-        elif len(self.dmodel.stringList()): # several
-            dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
-        else: # None
-            idx = 0
-            if type(txt) is not str:
-                txt = str(txt)
-            print('c_dd: {} is {}'.format(txt, type(txt)))
-            txt = txt[:-1].lower()
-            while txt:
-                l = [e for e in dd.list if e.lower().startswith(txt)]
-                l.extend([e for e in dd.list
-                          if e.lower().count(txt) and e not in l])
-                if l:
-                    idx = dd.list.index(l[0])
-                    break
-                else:
-                    txt = txt[:-1]
-            dd.setCurrentIndex(idx)
-        dd.olen = len(txt)
-        ch_conn(self, 'activated', self.dcompl.activated, dd.setlen)
-        self.dcompl.setCompletionPrefix(txt)
-        self.dcompl.complete()
-        if len(dd.currentText()) > dd.olen:
-            dd.lineEdit().setSelection(dd.olen, 80)
+    ## def complete_dd(self, dd, txt):
+    ##     """Complete partly entered data in dropdown (QComboBox)."""
+    ##     if len(self.dmodel.stringList()) == 1: # one match
+    ##         dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
+    ##         dd.completer().setWidget(None)
+    ##         dd.setCompleter(None)
+    ##         dd.olen = len(dd.currentText())
+    ##         return
+    ##     elif len(self.dmodel.stringList()): # several
+    ##         dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
+    ##     else: # None
+    ##         idx = 0
+    ##         if type(txt) is not str:
+    ##             txt = str(txt)
+    ##         print('c_dd: {} is {}'.format(txt, type(txt)))
+    ##         txt = txt[:-1].lower()
+    ##         while txt:
+    ##             l = [e for e in dd.list if e.lower().startswith(txt)]
+    ##             l.extend([e for e in dd.list
+    ##                       if e.lower().count(txt) and e not in l])
+    ##             if l:
+    ##                 idx = dd.list.index(l[0])
+    ##                 break
+    ##             else:
+    ##                 txt = txt[:-1]
+    ##         dd.setCurrentIndex(idx)
+    ##     dd.olen = len(txt)
+    ##     ch_conn(self, 'activated', self.dcompl.activated, dd.setlen)
+    ##     self.dcompl.setCompletionPrefix(txt)
+    ##     self.dcompl.complete()
+    ##     if len(dd.currentText()) > dd.olen:
+    ##         dd.lineEdit().setSelection(dd.olen, 80)
     
-    def compl_b(self, txt):
-        """Breed completer."""
-        self.compldd(self.w.breedDd, txt)
+    ## def compl_b(self, txt):
+    ##     """Breed completer."""
+    ##     self.compldd(self.w.breedDd, txt)
 
-    def compl_c(self, txt):
-        """Colour completer."""
-        self.compldd(self.w.colDd, txt)
+    ## def compl_c(self, txt):
+    ##     """Colour completer."""
+    ##     self.compldd(self.w.colDd, txt)
 
-    def compl_i(self, txt):
-        """Insurance completer."""
-        self.compldd(self.w.insDd, txt)
+    ## def compl_i(self, txt):
+    ##     """Insurance completer."""
+    ##     self.compldd(self.w.insDd, txt)
 
-    def compl_l(self, txt):
-        self.compldd(self.w.locDd, txt)
+    ## def compl_l(self, txt):
+    ##     self.compldd(self.w.locDd, txt)
 
-    def compl_s(self, txt):
-        self.compldd(self.w.specDd, txt)
+    ## def compl_s(self, txt):
+    ##     self.compldd(self.w.specDd, txt)
     # completers finished?
         
     def db_state(self, db=None): # hierwei ck vs gaia from gnuv.py
