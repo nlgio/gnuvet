@@ -6,17 +6,6 @@
  * This file is part of gnuvet, published under the GNU General Public License
  * (GPL in short).  See the file GPL for more Information.
  *
- * ERROR: bc_combine bit but expression integer colours
-    Going to roll in sample-entries.psql: FEHLER:  Einfügen oder Aktualisieren in Tabelle „patients“ verletzt Fremdschlüssel-Constraint „patients_colour_fkey“
-FEHLER:  Einfügen oder Aktualisieren in Tabelle „neuts“ verletzt Fremdschlüssel-Constraint „neuts_neut_id_fkey“
-FEHLER:  Einfügen oder Aktualisieren in Tabelle „seen“ verletzt Fremdschlüssel-Constraint „seen_seen_pid_fkey“
-FEHLER:  Einfügen oder Aktualisieren in Tabelle „rips“ verletzt Fremdschlüssel-Constraint „rips_rip_id_fkey“
-FEHLER:  Einfügen oder Aktualisieren in Tabelle „vdues“ verletzt Fremdschlüssel-Constraint „vdues_vd_pid_fkey“
-FEHLER:  Einfügen oder Aktualisieren in Tabelle „vdues“ verletzt Fremdschlüssel-Constraint „vdues_vd_pid_fkey“
-FEHLER:  Einfügen oder Aktualisieren in Tabelle „vdues“ verletzt Fremdschlüssel-Constraint „vdues_vd_pid_fkey“
-FEHLER:  Einfügen oder Aktualisieren in Tabelle „acc2“ verletzt Fremdschlüssel-Constraint „acc2_acc_pid_fkey“
-FEHLER:  Einfügen oder Aktualisieren in Tabelle „appointments“ verletzt Fremdschlüssel-Constraint „appointments_app_pid_fkey“
-
  */
 
 -- implement mustelid vaccination
@@ -93,7 +82,7 @@ insert into species values
 -- Colours:
 insert into basecolours values
  (1, null,'0', 0), (2, 'according to breed','0', 0), (3, 'albino','0', 0),
- (4, 'bay','0', 6), (5, 'black','0', 0), (6, 'blue','0', 1048543),
+ (4, 'bay','0', 32), (5, 'black','0', 0), (6, 'blue','0', 1048543),
  (7, 'bluebrindle','0', 1), (8, 'brindle','0', 658531), (9, 'brown','0', 0),
  (10, 'buckskin','0', 32), (11, 'chestnut','0', 32), (12, 'colourpoint','0', 2),
  (13, 'cream','0', 1048543), (14, 'dapple', null, 32),
@@ -101,8 +90,8 @@ insert into basecolours values
  (18, 'fleabitten grey', null, 32), (19, 'ginger','0', 2), (20, 'golden','0',0),
  (21, 'green','0', 1032192), (22, 'grey','0', 0), (23, 'overo', null, 32),
  (24, 'palomino', null, 32), (25, 'piebald', null, 32),
- (26, 'polecat', null, 5), (27, 'red','0', 1040335), (28, 'roan','0', 32),
- (29, 'rose','0', 32), (30, 'skewbald', null, 32), (31, 'spotted','1', 0),
+ (26, 'polecat', null, 16), (27, 'red','0', 1040335), (28, 'roan','0', 32),
+ (29, 'rose','0', 0), (30, 'skewbald', null, 32), (31, 'spotted','1', 0),
  (32, 'tabby','0', 2), (33, 'tan','0', 1), (34, 'tobiano', null, 32),
  (35, 'tortoise','0', 2), (36, 'white','0', 0), (37, 'dark','1', 0),
  (38, 'light','1', 0), (39, 'chocolate','0', 11);
