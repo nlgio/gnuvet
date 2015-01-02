@@ -1,5 +1,4 @@
 """Search Add Edit patient interface."""
-# replace QCompleter w/ Gcompleter, hopefully done
 # change self.action to self.act and use that insto self.stage
 # recheck all -- still functional, useful? connect.s? g|setattr(self, what)!!!
 #     avoid dependence on gnuv.py, should be ready for other modules as well
@@ -302,6 +301,11 @@ class Saepat(QMainWindow):
         self.get_pnames()
         self.get_cfnames()
         self.get_csnames()
+        ## try 1
+        self.gc = Gcompleter(parent=self.w.saeFr)
+        ## try 2:
+        ## self.gc = Gcompleter(
+        ##     self.w.centralwidget,self.w.pnameLe,self.w.pnameLe.list) # nodiff
         QApplication.instance().focusChanged.connect(self.focuschange)
         #    FURTHER WIDGET CONNECTIONS
         self.w.ageSb.valueChanged.connect(self.adapt_dob)
@@ -366,14 +370,15 @@ class Saepat(QMainWindow):
             self,
             ## 'select distinct breed_id,breed_name,b_spec from breeds,species '
             ## 'where spec_id=b_spec{} order by breed_name'.format(codestring))
-            'select distinct breed_id,breed_name,b_spec from breeds '
+            # hierwei: do we need species and spec_id here?
+            'select distinct breed_id,breed_name,b_spec from breeds,species '
             'where spec_id=b_spec{} order by breed_name'.format(scode))
         if res is None:  return # db error
         for e in res:
             self.w.breedDd.addItem(e[1], e[0])
             blist.append(e[1])
             self.breed2spec[e[0]] = e[2]
-        self.w.breedDe.list = blist
+        self.w.breedDd.list = blist
 
     def adapt_age(self):
         """Adapt age combo to changes in dobDe."""
@@ -852,7 +857,7 @@ class Saepat(QMainWindow):
         if new:
             ## if new in self.dds or new in self.les:
             if new in self.cwidgets:
-                self.setcompleter(new)
+                self.gc.setwidget(old=old, new=new, l=new.list)
     
     def get_cfnames(self):
         res = querydb(self,
@@ -1633,7 +1638,7 @@ class Saepat(QMainWindow):
         if scode == 0:
             scode = ''
         else:
-            scode = ' and ((c_speccode=0) or bool(c_speccode&' + scode + '))'
+            scode = ' and ((c_speccode=0) or bool(c_speccode&'+str(scode)+'))'
         result = querydb(
             self,
             'select col_id,b1.bcol,b2.bcol,b3.bcol from basecolours b1,'
@@ -1702,7 +1707,7 @@ class Saepat(QMainWindow):
         if self.db_err:
             return
         result = querydb(
-            self, 'select spec_id,spec_name,spec_code from species order by '
+            self, 'select spec_id,spec_name from species order by '
             'spec_name')
         # neu: ohne spec_code
         if result is None:  return # db error
@@ -2137,7 +2142,7 @@ class Saepat(QMainWindow):
         self.w.clientLb.setText(tmp)
         return True    
     
-    def setcompleter(self, w):
+    def setcompleter(self, w): # obsolete?
         """Called by focusChange to adapt completer."""
         if w in self.dds:
             w.setCompleter(self.dcompl)
