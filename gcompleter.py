@@ -3,7 +3,7 @@
 entries that start with txt, but also those that CONTAIN it, and doesn't 
 cause as much unused overhead.
 
-Use: create a completer object, taking care to use the parent of the widgets
+Use: create a completer object, taking care to use the parent of the widgets for correct placement of completer.
 
 > self.gc = Gcompleter(self.widgetparent, self.widget, self.list)
 
