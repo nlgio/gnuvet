@@ -58,6 +58,8 @@ def querydb(caller, query, qtuple=None, debug=False):
                 print(caller.curs.mogrify(query, qtuple))
             caller.curs.execute(query, qtuple)
         else:
+            if debug:
+                print(caller.curs.mogrify(query))
             caller.curs.execute(query)
         return caller.curs.fetchall()
     except OperationalError as e:
