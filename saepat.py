@@ -15,10 +15,7 @@
 
 from datetime import date, timedelta
 from psycopg2 import OperationalError
-# eliminated: Qt # effin Qt for ItemFlags
 from PyQt4.QtCore import pyqtSignal
-# eliminated:
-# QCheckBox,QComboBox,QCompleter,QDateEdit,QLineEdit,QRadioButton,QSpinBox, 
 from PyQt4.QtGui import (QAction, QApplication, QMainWindow,
                          QMenu, QStringListModel)
 import gv_qrc
@@ -296,7 +293,7 @@ class Saepat(QMainWindow):
         #self.w.mainPb.setDefault(yes)
     
     def adapt2colours(self, idx):
-        """Adapt breed/spec combos to selection [idx] in colours.
+        """Adapt breed/spec Dds to selection [idx] in colours.
         Triggered by colDd.currentIndexChanged."""
         self.w.mixedcolCb.setEnabled(idx > 1)
         if self.w.specDd.currentIndex()>0 or self.w.breedDd.currentIndex()>0:
@@ -340,7 +337,7 @@ class Saepat(QMainWindow):
         self.w.breedDd.list = blist
 
     def adapt_age(self):
-        """Adapt age combo to changes in dobDe."""
+        """Adapt ageDd to changes in dobDe."""
         if self.w.ageSb.hasFocus() or self.w.ageuDd.hasFocus():
             return
         age = self.w.dobDe.date().daysTo(self.today)
@@ -360,7 +357,7 @@ class Saepat(QMainWindow):
             self.w.ageSb.setValue(age)
     
     def adapt_breeds(self, idx):
-        """Adapt breed combo to spec change/breed addition.
+        """Adapt breedDd to spec change/breed addition.
         Triggered by specDd.activated, called by set_addedspec."""
         bdx = 0
         self.w.breedDd.currentIndexChanged.disconnect(self.adapt_colours)
@@ -1471,7 +1468,7 @@ class Saepat(QMainWindow):
         ##     self.chgpat.emit(res[0][0])
 
     def popul_breeds(self):
-        """(Re-)Populate breed combo."""
+        """(Re-)Populate breed Dd."""
         if self.db_err:
             return
         result = querydb(
@@ -1489,7 +1486,7 @@ class Saepat(QMainWindow):
         self.w.breedDd.list = blist
 
     def popul_colours(self):
-        """(Re-)Populate colour combo."""
+        """(Re-)Populate colour Dd."""
         if self.db_err:
             return
         idx = 0
@@ -1539,7 +1536,7 @@ class Saepat(QMainWindow):
         self.w.colDd.list = clist
         
     def popul_ins(self):
-        """(Re-)Populate insurance combo."""
+        """(Re-)Populate insurance Dd."""
         if self.db_err:
             return
         result = querydb(self,
@@ -1557,10 +1554,10 @@ class Saepat(QMainWindow):
         else:
             self.w.insDd.setEnabled(1)
             self.w.insLb.setEnabled(1)
-            self.w.insLb.list = ilist
+        self.w.insLb.list = ilist
 
     def popul_locs(self):
-        """(Re-)Populate location combo."""
+        """(Re-)Populate location Dd."""
         if self.db_err:
             return
         result = querydb(
@@ -1580,26 +1577,21 @@ class Saepat(QMainWindow):
         else:
             self.w.locDd.setEnabled(1)
             self.w.locLb.setEnabled(1)
-            self.w.locLb.list = llist
+        self.w.locLb.list = llist
 
     def popul_species(self):
-        """(Re-)Populate 'species' combo and spec2code dict{id: code}."""
-        # neu: spec2code obsolete!
+        """(Re-)Populate 'species' Dd."""
         if self.db_err:
             return
         result = querydb(
             self, 'select spec_id,spec_name from species order by '
             'spec_name')
-        # neu: ohne spec_code
         if result is None:  return # db error
-        ## self.spec2code = {} # obsolete
-        ## self.slist = [] # obsolete
         slist = []
         self.w.specDd.clear()
         self.w.specDd.addItem('', 0)
         for res in result:
             self.w.specDd.addItem(res[1], res[0])
-            ## self.spec2code[res[0]] = res[2] # obsolete
             slist.append(res[1])
         self.w.specDd.list = slist
     
