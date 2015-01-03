@@ -1,8 +1,7 @@
 """Search Add Edit patient interface."""
+# Add completer for petpassLe and idLe
 # change self.action to self.act and use that insto self.stage
 # recheck all -- still functional, useful? connect.s? g|setattr(self, what)!!!
-#     avoid dependence on gnuv.py, should be ready for other modules as well
-# add search for breed, spec, col, loc, ins - done?
 # switch off completers when adding patient?
 # re-implement state_write and db_err and _changes_ and suchlike
 # test pat_add things with client list (clis)
@@ -253,59 +252,17 @@ class Saepat(QMainWindow):
         self.w.detailedCb.stateChanged.connect(self.details_toggle)
         if not pid:
             self.w.regDe.setEnabled(False)
-        #    COMPLETER LISTS
-        # try 1:
-        ## self.clists = ('blist', 'cflist', 'clist', 'cslist', 'ilist',
-        ##                'llist', 'plist', 'slist')
-        ## for e in self.clists:
-        ##     setattr(self, e, [])
-        # diff in llist?
-        #    COMPLETER HELPERS
-        # old:
-        ## self.dds = (self.w.breedDd, self.w.colDd, self.w.insDd, self.w.locDd,
-        ##            self.w.specDd)
-        ## self.les = (self.w.pnameLe, self.w.csnameLe, self.w.cfnameLe)
+        #    COMPLETERS
         self.cwidgets = []
         for w in ('breedDd', 'cfnameLe', 'colDd', 'csnameLe', 'insDd', 'locDd',
                   'pnameLe', 'specDd'):
             self.cwidgets.append(getattr(self.w, w))
-        # try 1:
-        ## for w in self.cwidgets:
-        ##     setattr(w, 'list', self.clists[self.cwidgets.index(w)])
-        for w in self.cwidgets:
-            setattr(w, 'list', [])
-        # old:
-        ## self.setupdd(self.w.breedDd, 'b')
-        ## self.setupdd(self.w.colDd, 'c')
-        ## self.setupdd(self.w.insDd, 'i')
-        ## self.setupdd(self.w.locDd, 'l')
-        ## self.setupdd(self.w.specDd, 's')
-        ## setattr(self.w.csnameLe, 'list', self.cslist)
-        ## setattr(self.w.cfnameLe, 'list', self.cflist)
-        ## setattr(self.w.pnameLe, 'list', self.plist)
-        #    COMPLETERs: d Dd, l Le
-        ## self.dmodel = QStringListModel(self)
-        ## self.dcompl = QCompleter(self)
-        ## self.dcompl.setCaseSensitivity(0)
-        ## self.dcompl.setModelSorting(1)
-        ## self.dcompl.setCompletionMode(1)
-        ## self.dcompl.setModel(self.dmodel)
-        ## self.lmodel = QStringListModel(self)
-        ## self.lcompl = QCompleter(self)
-        ## self.lcompl.setCaseSensitivity(0)
-        ## self.lcompl.setModelSorting(1)
-        ## self.lcompl.setCompletionMode(0)
-        ## self.lcompl.setModel(self.lmodel)
         #    LISTFILL lEs:
         ## if not self.db_err:
         self.get_pnames()
         self.get_cfnames()
         self.get_csnames()
-        ## try 1
         self.gc = Gcompleter(parent=self.w.saeFr)
-        ## try 2:
-        ## self.gc = Gcompleter(
-        ##     self.w.centralwidget,self.w.pnameLe,self.w.pnameLe.list) # nodiff
         QApplication.instance().focusChanged.connect(self.focuschange)
         #    FURTHER WIDGET CONNECTIONS
         self.w.ageSb.valueChanged.connect(self.adapt_dob)
@@ -364,7 +321,9 @@ class Saepat(QMainWindow):
         ##     codestring += self.curs.mogrify(
         ##         ' and spec_code in %s', (tuple('a' + scode),))
         if scode:
-            scode = ' and bool({}|(1<<b_spec-1))'.format(scode)
+            scode = ' and bool({}&(1<<b_spec-1))'.format(scode)
+        else:
+            scode = ''
         blist = []
         res = querydb( # not even at gunpoint?  Ha!
             self,
@@ -433,7 +392,7 @@ class Saepat(QMainWindow):
 
     def adapt_colours(self, idx=0):
         """Adapt colours to species chosen by selecting breed.  Triggered by
-        breedDd.cIC [compl_b, pat_edit]. Called by set_addedbreed."""
+        breedDd.cIC [pat_edit]. Called by set_addedbreed."""
         if idx == -1:  return
         if idx:
             self.currentspec = self.breed2spec[
@@ -623,81 +582,6 @@ class Saepat(QMainWindow):
         ##     self.state_write()
         if self.gaia and hasattr(self.gaia, 'xy_decr'):
             self.gaia.xy_decr()
-
-    # hierwei completers
-    ## def compldd(self, dd, txt):
-    ##     """Common actions on text input in Dd."""
-    ##     if not txt:
-    ##         dd.olen = 0
-    ##         dd.setCurrentIndex(0)
-    ##         return
-    ##     if not dd.completer():
-    ##         self.setcompleter(dd)
-    ##     if len(txt) <= dd.olen: # bs, del or replace
-    ##         result = dd.query(txt)
-    ##         while len(result) < 2 or len(txt) == dd.olen:
-    ##             txt = txt[:-1]
-    ##             if not txt:
-    ##                 dd.olen = 0
-    ##                 dd.setCurrentIndex(0)
-    ##                 return
-    ##             result = dd.query(txt)
-    ##         self.dmodel.setStringList(result)
-    ##     else: # text added
-    ##         self.dmodel.setStringList(dd.query(txt))
-    ##     self.complete_dd(dd, txt)
-    
-    ## def complete_dd(self, dd, txt):
-    ##     """Complete partly entered data in dropdown (QComboBox)."""
-    ##     if len(self.dmodel.stringList()) == 1: # one match
-    ##         dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
-    ##         dd.completer().setWidget(None)
-    ##         dd.setCompleter(None)
-    ##         dd.olen = len(dd.currentText())
-    ##         return
-    ##     elif len(self.dmodel.stringList()): # several
-    ##         dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
-    ##     else: # None
-    ##         idx = 0
-    ##         if type(txt) is not str:
-    ##             txt = str(txt)
-    ##         print('c_dd: {} is {}'.format(txt, type(txt)))
-    ##         txt = txt[:-1].lower()
-    ##         while txt:
-    ##             l = [e for e in dd.list if e.lower().startswith(txt)]
-    ##             l.extend([e for e in dd.list
-    ##                       if e.lower().count(txt) and e not in l])
-    ##             if l:
-    ##                 idx = dd.list.index(l[0])
-    ##                 break
-    ##             else:
-    ##                 txt = txt[:-1]
-    ##         dd.setCurrentIndex(idx)
-    ##     dd.olen = len(txt)
-    ##     ch_conn(self, 'activated', self.dcompl.activated, dd.setlen)
-    ##     self.dcompl.setCompletionPrefix(txt)
-    ##     self.dcompl.complete()
-    ##     if len(dd.currentText()) > dd.olen:
-    ##         dd.lineEdit().setSelection(dd.olen, 80)
-    
-    ## def compl_b(self, txt):
-    ##     """Breed completer."""
-    ##     self.compldd(self.w.breedDd, txt)
-
-    ## def compl_c(self, txt):
-    ##     """Colour completer."""
-    ##     self.compldd(self.w.colDd, txt)
-
-    ## def compl_i(self, txt):
-    ##     """Insurance completer."""
-    ##     self.compldd(self.w.insDd, txt)
-
-    ## def compl_l(self, txt):
-    ##     self.compldd(self.w.locDd, txt)
-
-    ## def compl_s(self, txt):
-    ##     self.compldd(self.w.specDd, txt)
-    # completers finished?
         
     def db_state(self, db=None): # hierwei ck vs gaia from gnuv.py
         """Actions to be taken on db loss and gain."""
@@ -858,6 +742,7 @@ class Saepat(QMainWindow):
             ## if new in self.dds or new in self.les:
             if new in self.cwidgets:
                 self.gc.setwidget(old=old, new=new, l=new.list)
+                ##print(new.list)
     
     def get_cfnames(self):
         res = querydb(self,
@@ -1203,7 +1088,7 @@ class Saepat(QMainWindow):
         print('double name check')
         if not self.nameok:
             print('not nameok')
-
+            # hierwei
             if self.stage == 'e':
                 res = querydb(
                     self,
@@ -1471,10 +1356,6 @@ class Saepat(QMainWindow):
 
     def pat_save(self):
         """Insert/Update changes to db."""
-        ## # Check Dds for validity -- shouldn't be nec anymore
-        ## for dd in (self.w.breedDd, self.w.specDd, self.w.colDd,
-        ##            self.w.locDd, self.w.insDd):
-        ##     self.complete_dd(dd)
         ## ck update p set (col, col, ...) = (val, val, ...)
         ## signal finish, like via addpat, chdpat or suchlike
         neut = neutdu = False
@@ -1624,12 +1505,12 @@ class Saepat(QMainWindow):
             ## scode = self.spec2code[
             ##     self.w.specDd.itemData(
             ##         self.w.specDd.currentIndex(), 32).toInt()[0]]
-            scode = 1<<self.w.specDd.itemData(
-                self.w.specDd.currentIndex(), 32).toInt()[0]-1
+            scode = 1<<(self.w.specDd.itemData(
+                self.w.specDd.currentIndex(), 32).toInt()[0]-1)
             # e.g. 1, 2, 4, 8, 16, 32, 64, ...
         elif self.currentspec:
             ## scode = self.spec2code[self.currentspec]
-            scode = 1<<self.currentspec-1
+            scode = 1<<(self.currentspec-1)
         ## if scode == 'a':
         ##     scode = " and c_speccode='a'"
         ## else:
@@ -1829,32 +1710,6 @@ class Saepat(QMainWindow):
         self.w.detailedCb.setChecked(self.options['srchdetails'])
         self.details_toggle(self.w.detailedCb.isChecked())
         self.w.pnameLe.setFocus()
-
-    def query_b(self, txt=''):
-        """These query_ functions are called as dd.query."""
-        return self.querycompl(self.w.breedDd, txt)
-
-    def query_c(self, txt=''): # hierwei test
-        dlist = []
-        for i in xrange(1, self.w.colDd.count()+1):
-            dlist.append(str(self.w.colDd.itemText(i).toLatin1()))
-        txt = str(txt.toLatin1()).lower()
-        l = [e for e in dlist if e.lower().startswith(txt)]
-        l.extend([e for e in dlist if len(e.split('-')) > 1 and
-                  e.split('-')[1].lower().startswith(txt) and e not in l])
-        l.extend([e for e in dlist if len(e.split('-')) > 2 and
-                  e.split('-')[2].lower().startswith(txt) and e not in l])
-        l.extend([e for e in dlist if e.lower().count(txt) and e not in l])
-        return l
-
-    def query_i(self, txt=''):
-        return self.querycompl(self.w.insDd, txt)
-
-    def query_l(self, txt=''):
-        return self.querycompl(self.w.locDd, txt)
-
-    def query_s(self, txt=''):
-        return self.querycompl(self.w.specDd, txt)
     
     def query_string(self, s_byname):
         """Construct query string from user input."""
@@ -2025,13 +1880,6 @@ class Saepat(QMainWindow):
         return  ('select ' + query_sel + ' from ' + query_from +
                  ' where ' + query_where + ' order by ' + query_order)
 
-    def querycompl(self, dd, txt):
-        """Get list for diff Dds."""
-        txt = str(txt.toLatin1()).lower()
-        l = [e for e in dd.list if e.lower().startswith(txt)]
-        l.extend([e for e in dd.list if e.lower().count(txt) and e not in l])
-        return l
-
     def regde_toggle(self, state):
         self.w.regDe.setEnabled(state)
 
@@ -2141,52 +1989,6 @@ class Saepat(QMainWindow):
         tmp = ' '.join([e for e in tmp if e])
         self.w.clientLb.setText(tmp)
         return True    
-    
-    def setcompleter(self, w): # obsolete?
-        """Called by focusChange to adapt completer."""
-        if w in self.dds:
-            w.setCompleter(self.dcompl)
-            self.dcompl.setWidget(w)
-        elif w in self.les:
-            w.setCompleter(self.lcompl)
-            self.lmodel.setStringList(w.list)
-            self.lcompl.setWidget(w) # dont seem nec here test hierwei
-        
-    def setlen(self, dd, arg):
-        """Triggered via activated signals to set index and dd.olen."""
-        if isinstance(arg, int): # dd.activated(int)
-            dd.setCurrentIndex(arg)
-        else: # compl.activated(str)
-            if not arg in dd.list:
-                print('"{}" not in {}'.format(arg, dd.list))
-            dd.setCurrentIndex(dd.list.index(arg))
-        dd.lineEdit().deselect()
-        dd.olen = len(dd.currentText())
-        
-    def setlenb(self, arg):
-        self.setlen(self.w.breedDd, arg)
-
-    def setlenc(self, arg):
-        self.setlen(self.w.colDd, arg)
-
-    def setleni(self, arg):
-        self.setlen(self.w.insDd, arg)
-        
-    def setlenl(self, arg):
-        self.setlen(self.w.locDd, arg)
-
-    def setlens(self, arg):
-        self.setlen(self.w.specDd, arg)
-
-    ## def setupdd(self, dd, n):
-    ##     """Called by __init__ to set Dd vars for completer."""
-    ##     setattr(dd, 'olen', 0)
-    ##     setattr(dd, 'setlen', getattr(self, 'setlen'+n))
-    ##     setattr(dd, 'list', getattr(self, n+'list'))
-    ##     setattr(dd, 'lname', n+'list') # unused 'lname'
-    ##     setattr(dd, 'query', getattr(self, 'query_'+n))
-    ##     dd.lineEdit().textEdited.connect(getattr(self, 'compl_'+n))
-    ##     dd.activated.connect(dd.setlen)
         
     def state_write(self):
         """Signal unsaved changes to parent for filing for later restoration."""
