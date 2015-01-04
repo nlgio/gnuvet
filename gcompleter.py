@@ -1,24 +1,29 @@
 # -*- coding: utf-8 -*-
+# TODO:
+# Key_Down: IndexError: list index out of range
+# check if completer fits into parent, else place above widget?
+#  no rather ck height and reduce self.height accordingly...
+# delete completer on click somewhere else in parent, but how?
 """Replace QCompleter with something more to my liking, that offers not only 
 entries that start with txt, but also those that CONTAIN it, and doesn't 
 cause as much unused overhead.
 
 Use: create a completer object, taking care to use the parent of the widgets for correct placement of completer.
 
-> self.gc = Gcompleter(self.widgetparent, self.widget, self.list)
+ self.gc = Gcompleter(self.widgetparent, self.widget, self.list)
 
 If more than one widget shall use the completer, create a list of widgets
 to use the completer, prepare a list or method to get a list for each widget,
 then add a
 
-> QApplication.instance().focusChanged.connect(self.focuschange)
+ QApplication.instance().focusChanged.connect(self.focuschange)
 
 focuschange can of course be any name you like if appropriate.
 And add the function:
 
-> def focuschange(self, old, new):
->     if new in self.widgetlist:
->         self.gc.setwidget(old=old, new=new, l=new.list)
+ def focuschange(self, old, new):
+     if new in self.widgetlist:
+         self.gc.setwidget(old=old, new=new, l=new.list)
 
 That should suffice.
 """
@@ -101,6 +106,7 @@ class Gcompleter(QScrollArea):
             return False
         if ev.key() == 0x01000000: # Qt.Key_Escape
             self.delcompl()
+            print('gcompleter esc')
             return True
         if ev.key() == 0x01000015: # Qt.Key_Down
             if hasattr(self, 'fr'):
@@ -114,6 +120,7 @@ class Gcompleter(QScrollArea):
                            self.gclist[self.gclist.index(self.selected)+1] or
                            self.selected)
                     self.select_cell(new)
+                    self.ensureWidgetVisible(new, 0, 0)
                 return True
         elif ev.key() == 0x01000013: # Qt.Key_Up
             if hasattr(self, 'fr') and self.fr.hasFocus():
@@ -121,6 +128,7 @@ class Gcompleter(QScrollArea):
                        self.gclist[self.gclist.index(self.selected)-1] or None)
                 if new:
                     self.select_cell(new)
+                    self.ensureWidgetVisible(new, 0, 0)
                 else:
                     self.fr.removeEventFilter(self)
                     self.ewidget.setFocus()
@@ -133,11 +141,13 @@ class Gcompleter(QScrollArea):
         elif ev.key() == 0x01000010: # Key_Home
             if hasattr(self, 'fr') and self.fr.hasFocus():
                 self.select_cell(self.gclist[0])
+                self.ensureWidgetVisible(self.selected, 0, 0)
                 return True
             return False
         elif ev.key() == 0x01000011: # Key_End
             if hasattr(self, 'fr') and self.fr.hasFocus():
                 self.select_cell(self.gclist[-1])
+                self.ensureWidgetVisible(self.selected, 0, 0)
                 return True
             return False
         elif ev.key() == 0x01000016: # Key_PageUp
@@ -206,12 +216,19 @@ class Gcompleter(QScrollArea):
         hcorr = 2
         if self.fr.height()+hcorr < self.height():
             self.resize(self.width(), self.fr.height()+hcorr)
+        if (self.ewidget.y()+self.ewidget.height()+self.height() >
+            self.parent().height()):
+            y = self.ewidget.y() - self.height()
+        else:
+            y = self.ewidget.y() + self.ewidget.height()
+        self.move(self.ewidget.x(), y)
         self.show()
 
-    def mklist(self, txt=''):
+    def mklist(self, txt='', within=True):
         mlist = [e for e in self.clist if e.lower().startswith(txt)]
-        mlist.extend([e for e in self.clist if e.lower().count(txt)
-                      and e not in mlist])
+        if within:
+            mlist.extend([e for e in self.clist if e.lower().count(txt)
+                          and e not in mlist])
         return mlist
     
     def select(self, txt):
@@ -234,8 +251,6 @@ class Gcompleter(QScrollArea):
         if old:
             old.removeEventFilter(self)
         self.clist = l or []
-        self.move(new.x(),
-                  new.y()+new.height())
         if isinstance(new, QLineEdit):
             wid = new
             self.wtype = 'le'
