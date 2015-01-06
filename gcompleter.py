@@ -82,6 +82,7 @@ border-radius: 3px;
         self.setStyleSheet(self.gccellss.format(*self.normal))
         
 class Gcompleter(QScrollArea):
+    markadd = 0
     maxshow = 7
     selected = None
 
@@ -177,6 +178,9 @@ class Gcompleter(QScrollArea):
                 self.select(self.selected.text())
                 self.delcompl()
                 return True
+        ## elif ev.key() in (0x01000003, 0x01000007): # Backspace, Delete
+        ##     self.markadd += 1
+        ##     return True # ?
         return False
         
     def listmatch(self, txt=''):
@@ -197,11 +201,12 @@ class Gcompleter(QScrollArea):
                 wid = self.ewidget.lineEdit()
                 self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))
             self.otxt = mlist[0].lower()
-            if self.otxt.startswith(txt) and self.otxt != txt: # backspace etc.
+            if self.otxt.startswith(txt) and self.otxt != txt:
+                print('startswith "{}"'.format(txt))
+                markstart = len(txt)
                 while len(mlist) == 1:
                     txt = txt[:-1]
                     mlist = self.mklist(txt)
-                markstart = len(txt)
                 wid.setSelection(markstart, 80)
             return
         self.resize(self.ewidget.width(), self.ewidget.height()*self.maxshow)

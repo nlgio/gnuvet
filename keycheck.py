@@ -14,6 +14,7 @@ class Keycheck(QObject):
                 self.enter.emit()
                 return True
             if ev.key() == Qt.Key_Escape:
+                print('keycheck esc')
                 self.esc.emit()
                 return True
             return False
