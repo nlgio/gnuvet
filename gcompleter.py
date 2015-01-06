@@ -1,42 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Replacement for QCompleter with something more to my liking, that offers
-not only entries that start with txt, but also those that CONTAIN it, and
-doesn't cause as much unused overhead.
-
-USE
-Create a completer object, taking care to use the parent of the widget(s)
-for correct placement of completer.  Prepare a list -- or method to produce
-a list -- for the widget.  Then add
-    self.gc = Gcompleter(self.widgetparent, self.widget, self.list)
-to your __init__ or whatever sets the completer.
-
-If more than one widget shall use the completer, create a list of the widgets
-to use the completer, prepare a list -- or method to produce a list -- for
-each widget.  I recommend to
-    setattr(widget, 'list', wlist)
-for each widget involved.
-
-Then add
-    self.gc = Gcompleter(self.widgetparent)
-    QApplication.instance().focusChanged.connect(self.focuschange)
-to your __init__ or whatever sets the completer.
-
-focuschange can of course be any name you like if appropriate.
-And add the function:
-    wef focuschange(self, old, new):
-        if new in self.widgetlist:
-            self.gc.setwidget(old=old, new=new, l=new.list)
-    
-That should suffice.
-"""
-
 # TODO:
 # Key_Up on top Gcompcell kills completer:  Why?  This is Nonsense!
 # check if completer fits into parent, else place above widget?
 #  no rather ck height and reduce self.height accordingly... done, test
-# text completion highlighting in Le suboptimal, irritating, inconsistent
+# key_esc also kills parent!
 # delete completer on click somewhere else in parent, but how?
-# change wef for def in docstring above!  That was nec to trick emacs!
 
 from PyQt4.QtCore import pyqtSignal, QString
 from PyQt4.QtGui import (QComboBox, QFrame, QMouseEvent, QLabel,
@@ -82,7 +50,38 @@ border-radius: 3px;
         self.setStyleSheet(self.gccellss.format(*self.normal))
         
 class Gcompleter(QScrollArea):
-    markadd = 0
+    """Replacement for QCompleter with something more to my liking, that offers
+not only entries that start with txt, but also those that CONTAIN it, and
+doesn't cause as much unused overhead.
+
+USE
+Create a completer object, taking care to use the parent of the widget(s)
+for correct placement of completer.  Prepare a list -- or method to produce
+a list -- for the widget.  Then add
+    self.gc = Gcompleter(self.widgetparent, self.widget, self.list)
+to your __init__ or whatever sets the completer.
+
+If more than one widget shall use the completer, create a list of the widgets
+to use the completer, prepare a list -- or method to produce a list -- for
+each widget.  I recommend to
+    setattr(widget, 'list', wlist)
+for each widget involved.
+
+Then add
+    self.gc = Gcompleter(self.widgetparent)
+    QApplication.instance().focusChanged.connect(self.focuschange)
+to your __init__ or whatever sets the completer.
+
+focuschange can of course be any name you like if appropriate.
+And add the function:
+    def focuschange(self, old, new):
+        if new in self.widgetlist:
+            self.gc.setwidget(old=old, new=new, l=new.list)
+    
+That should suffice.
+"""
+
+    mtxt    = ''
     maxshow = 7
     selected = None
 
@@ -176,11 +175,7 @@ class Gcompleter(QScrollArea):
         elif ev.key() in (0x01000004, 0x01000005, 0x01000014): # Ret Enter Right
             if self.selected:
                 self.select(self.selected.text())
-                self.delcompl()
                 return True
-        ## elif ev.key() in (0x01000003, 0x01000007): # Backspace, Delete
-        ##     self.markadd += 1
-        ##     return True # ?
         return False
         
     def listmatch(self, txt=''):
@@ -188,6 +183,7 @@ class Gcompleter(QScrollArea):
         self.delcompl()
         if not txt:
             self.otxt = ''
+            self.mtxt = ''
             return
         txt = str(txt).lower()
         if len(self.otxt) < len(txt):
@@ -202,35 +198,42 @@ class Gcompleter(QScrollArea):
                 self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))
             self.otxt = mlist[0].lower()
             if self.otxt.startswith(txt) and self.otxt != txt:
-                print('startswith "{}"'.format(txt))
                 markstart = len(txt)
                 while len(mlist) == 1:
                     txt = txt[:-1]
                     mlist = self.mklist(txt)
+                if self.mtxt == txt:
+                    markstart -= 1
                 wid.setSelection(markstart, 80)
+                self.mtxt = txt
             return
-        self.resize(self.ewidget.width(), self.ewidget.height()*self.maxshow)
+        y = self.ewidget.y() + self.ewidget.height()
+        vplace = self.parent().height() - y
+        if vplace < self.ewidget.height()*self.maxshow:
+            selfh = self.ewidget.height() * self.maxshow
+        else:
+            selfh = vplace
         self.setFrameShape(1)
         ipos = 0
-        hcorr = 2
+        scorr = 2
         self.fr = QFrame(self)
-        self.fr.resize(self.width(), self.ewidget.height()*len(mlist))
+        frh = self.ewidget.height()*len(mlist)
         for e in mlist:
             i = Gcompcell(self.fr, e)
-            i.setGeometry(0, ipos, self.fr.width(), self.ewidget.height())
+            i.setGeometry(0, ipos, self.ewidget.width(), self.ewidget.height())
             self.gclist.append(i)
             ipos += i.height()
             i.clicked.connect(self.select)
-        self.setWidget(self.fr)
         self.ewidget.installEventFilter(self)
-        if self.fr.height()+hcorr < self.height():
-            self.resize(self.width(), self.fr.height()+hcorr)
-        y = self.ewidget.y() + self.ewidget.height()
-        if (y + self.height() > self.parent().height()):
-            self.resize(self.width(), self.parent().height()-y)
-        self.fr.resize(
-            self.width()-(self.verticalScrollBar().sizeHint().width()+hcorr),
-            self.fr.height())
+        self.setWidget(self.fr)
+        if frh + scorr <= selfh:
+            self.resize(self.ewidget.width(), frh+scorr)
+            self.fr.resize(self.width(), frh)
+        else:
+            self.resize(self.ewidget.width(), selfh)
+            self.fr.resize(self.width()-
+                           (self.verticalScrollBar().sizeHint().width()
+                            + scorr), frh)
         self.move(self.ewidget.x(), y)
         self.show()
 
