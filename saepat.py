@@ -735,11 +735,8 @@ class Saepat(QMainWindow):
             res[18]) # breed
 
     def focuschange(self, old, new):
-        if new:
-            ## if new in self.dds or new in self.les:
-            if new in self.cwidgets:
-                self.gc.setwidget(old=old, new=new, l=new.list)
-                ##print(new.list)
+        if new in self.cwidgets:
+            self.gc.setwidget(old=old, new=new, l=new.list)
     
     def get_cfnames(self):
         res = querydb(self,

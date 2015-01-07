@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # TODO:
-# check if completer fits into parent, else place above widget?
-#  no rather ck height and reduce self.height accordingly... done, test
+# Somehow somewhatfor saepat don't display upper left x pixels???
 # key_esc also kills parent!
 # delete completer on click somewhere else in parent, but how?
 
