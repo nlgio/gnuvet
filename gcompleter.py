@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # TODO:
-# Key_Up on top Gcompcell kills completer:  Why?  This is Nonsense!
 # check if completer fits into parent, else place above widget?
 #  no rather ck height and reduce self.height accordingly... done, test
 # key_esc also kills parent!
@@ -261,7 +260,8 @@ That should suffice.
         
     def setwidget(self, old=None, new=None, l=None):
         """Bind Gcompleter to a (new) widget with a completion list."""
-        if old == new:  return
+        if old == new: # spose this never gonna happen
+            return
         if old:
             old.removeEventFilter(self)
         self.clist = l or []
@@ -274,4 +274,5 @@ That should suffice.
         ch_conn(self, 'widget', wid.textEdited, self.listmatch)
         self.otxt = str(wid.text().toLatin1()).lower()
         self.ewidget = new
-        self.delcompl()
+        if old and (hasattr(self, 'fr') and old != self.fr):
+            self.delcompl()
