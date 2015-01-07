@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # TODO:
 # Somehow somewhatfor saepat don't display upper left x pixels???
+# And gc shows more than 7 (maxshow) choices! F##!
 # key_esc also kills parent!
 # delete completer on click somewhere else in parent, but how?
 
