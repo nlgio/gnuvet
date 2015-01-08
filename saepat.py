@@ -260,6 +260,7 @@ class Saepat(QMainWindow):
         self.get_cfnames()
         self.get_csnames()
         self.gc = Gcompleter(parent=self.w.saeFr)
+        self.gc.hide()
         QApplication.instance().focusChanged.connect(self.focuschange)
         #    FURTHER WIDGET CONNECTIONS
         self.w.ageSb.valueChanged.connect(self.adapt_dob)

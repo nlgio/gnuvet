@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 # TODO:
-# Somehow somewhatfor saepat don't display upper left x pixels???
-# And gc shows more than 7 (maxshow) choices! F##!
 # key_esc also kills parent!
 # delete completer on click somewhere else in parent, but how?
 
@@ -88,15 +86,15 @@ That should suffice.
         super(Gcompleter, self).__init__(parent)
         self.conns = {} # pyqt bug disconnect
         self.sigs = {} # dto
-        self.gclist = [] # new 1412181748
+        self.gclist = []
         self.setHorizontalScrollBarPolicy(1) # never
         self.setVerticalScrollBarPolicy(0)   # as needed
         self.setFrameShape(0)
+        self.hide()
         self.clist = l or []
         if not self.clist:  return
         if widget:
             self.setwidget(new=widget, l=l)
-        self.hide()
 
     def delcompl(self):
         """Kill the completer (fr w/ labels)."""
@@ -116,6 +114,7 @@ That should suffice.
         if ev.key() == 0x01000000: # Qt.Key_Escape
             self.delcompl()
             print('gcompleter esc')
+            ##ev.accept() # doesn't make any diff
             return True
         if ev.key() == 0x01000015: # Qt.Key_Down
             if hasattr(self, 'fr'):
@@ -208,7 +207,7 @@ That should suffice.
             return
         y = self.ewidget.y() + self.ewidget.height()
         vplace = self.parent().height() - y
-        if vplace < self.ewidget.height()*self.maxshow:
+        if vplace > self.ewidget.height()*self.maxshow:
             selfh = self.ewidget.height() * self.maxshow
         else:
             selfh = vplace
