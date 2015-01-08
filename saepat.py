@@ -268,6 +268,7 @@ class Saepat(QMainWindow):
         #    FINISH
         self.keycheck = Keycheck(self)
         self.installEventFilter(self.keycheck)
+        ch_conn(self, 'esc', self.keycheck.esc, self.close)
         self.age_toggle()
         if act == 's':
             self.prep_s()

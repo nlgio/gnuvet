@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # TODO:
-# key_esc also kills parent!
 # delete completer on click somewhere else in parent, but how?
 
 from PyQt4.QtCore import pyqtSignal, QString
@@ -113,8 +112,6 @@ That should suffice.
             return False
         if ev.key() == 0x01000000: # Qt.Key_Escape
             self.delcompl()
-            print('gcompleter esc')
-            ##ev.accept() # doesn't make any diff
             return True
         if ev.key() == 0x01000015: # Qt.Key_Down
             if hasattr(self, 'fr'):

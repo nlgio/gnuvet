@@ -460,8 +460,6 @@ class Ui_Saepat(object):
             QApplication.translate("Saepat", "&back to Search", None, 1))
         self.cancelPb.setText(
             QApplication.translate("Saepat", "Cancel", None, 1))
-        self.cancelPb.setShortcut(
-            QApplication.translate("Saepat", "Esc", None, 1))
         self.errOk.setText(
             QApplication.translate("Saepat", "OK", None, 1))
         self.no_dbconn.setText(
