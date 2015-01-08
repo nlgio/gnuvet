@@ -9,7 +9,6 @@
 
 # todo:
 # poss set tooltip for individual Dd item via itemIcon -- no.
-# check (tab)order
 # sort out cliLb and cliNameLb/in add/edit
 
 from PyQt4.QtCore import Qt
@@ -19,6 +18,9 @@ from PyQt4.QtGui import (QApplication, QCheckBox, QComboBox, QDateEdit, QFont,
                          QSpacerItem,QSpinBox,QWidget)
 from gtable import Gtable
 
+def tl(txt=''):
+    return QApplication.translate("Saepat", txt, None, 1)
+    
 class Ui_Saepat(object):
     def setupUi(self, Saepat):
         Saepat.resize(870, 626)
@@ -48,12 +50,11 @@ class Ui_Saepat(object):
         self.qPix.setPixmap(QPixmap(":/images/question.png"))
         self.noMLb = QLabel(self.noMFr)
         self.noMLb.setGeometry(230, 100, 421, 261)
-        #self.noMLb.setAutoFillBackground(False)
         self.noMLb.setAlignment(Qt.AlignCenter)
         self.noMLb.setTextFormat(Qt.RichText)
         self.noMLb.setWordWrap(True)
         self.noMFr.hide()
-        # match[es] frame: list
+        # match[es] frame
         self.matchFr = QFrame(self.centralwidget)
         self.matchFr.setGeometry(10, 10, 850, 521)
         self.matchFr.setMinimumSize(850, 491)
@@ -324,128 +325,84 @@ class Ui_Saepat(object):
         self.retranslateUi(Saepat)
 
     def retranslateUi(self, Saepat):
-        self.sortbyLb.setText(
-            QApplication.translate("Saepat", "order by", None, 1))
-        self.sbydateRb.setText(
-            QApplication.translate("Saepat", "Last &Seen", None, 1))
-        self.sbynameRb.setText(
-            QApplication.translate("Saepat", "&Name", None, 1))
-        self.breedLb.setText(
-            QApplication.translate("Saepat", "Patient &Breed", None, 1))
-        self.xbredCb.setText(
-            QApplication.translate("Saepat", "C&rossbred", None, 1))
-        self.specLb.setText(
-            QApplication.translate("Saepat", "&Patient Species", None, 1))
-        self.specDd.setWhatsThis(QApplication.translate(
-            "Saepat", "Grouping of Breeds rather than \'species\' in the "
-            "scientific sense.", None, 1))
-        self.mixedcolCb.setText(
-            QApplication.translate("Saepat", "&mixed colour", None, 1))
-        self.mixedcolCb.setToolTip(
-            QApplication.translate("Saepat", "Search for chosen colour in any "
-                                   "combination", None, 1))
-        self.sexLb.setText(
-            QApplication.translate("Saepat", "Patient Se&x", None, 1))
-        self.agespecDd.setToolTip(
-            QApplication.translate("Saepat", "< search younger than\n= search "
-                                   "± 1 unit\n> search older than", None, 1))
-        # above does not cause the 'load glyph failed QFontEngine' Error
-        self.agespecDd.setWhatsThis(QApplication.translate(
-            "Saepat", "With this you can search for Age ranges.  If you set "
-            "this to \"=\" it will search for Age ranges plus/minus one of the "
-            "given Age Units", None, 1))
+        self.sortbyLb.setText(tl("order by"))
+        self.sbydateRb.setText(tl("Last &Seen"))
+        self.sbynameRb.setText(tl("&Name"))
+        self.breedLb.setText(tl("Patient &Breed"))
+        self.xbredCb.setText(tl("C&rossbred"))
+        self.specLb.setText(tl("&Patient Species"))
+        self.specDd.setWhatsThis(tl(
+            "Grouping of Breeds rather than \'species\' in the "
+            "scientific sense."))
+        self.mixedcolCb.setText(tl("&mixed colour"))
+        self.mixedcolCb.setToolTip(tl(
+            "Search for chosen colour in any combination"))
+        self.sexLb.setText(tl("Patient Se&x"))
+        self.agespecDd.setToolTip(tl(
+            "< search younger than\n= search ± 1 unit\n> search older than"))
+        self.agespecDd.setWhatsThis(tl(
+            "With this you can search for Age ranges.  If you set this to "
+            "\"=\" it will search for Age ranges plus/minus one of the given "
+            "Age Units"))
         self.agespecDd.addItem("")
         self.agespecDd.addItem("<")
         self.agespecDd.addItem("=")
         self.agespecDd.addItem(">")
-        self.ageLb.setText(QApplication.translate("Saepat", "&Age", None, 1))
-        self.ageuLb.setText(
-            QApplication.translate("Saepat", "Age &Unit", None, 1))
-        self.ageuDd.addItem(QApplication.translate("Saepat", "years", None, 1))
-        self.ageuDd.addItem(QApplication.translate("Saepat", "months", None, 1))
-        self.ageuDd.addItem(QApplication.translate("Saepat", "weeks", None, 1))
-        self.ageuDd.addItem(QApplication.translate("Saepat", "days", None, 1))
-        self.agesuLb.setText(QApplication.translate("Saepat","± &unit",None, 1))
-        self.agesuDd.addItem(QApplication.translate("Saepat", "year", None, 1))
-        self.agesuDd.addItem(QApplication.translate("Saepat", "month", None, 1))
-        self.agesuDd.addItem(QApplication.translate("Saepat", "week", None, 1))
-        self.agesuDd.addItem(QApplication.translate("Saepat", "day", None, 1))
-        self.pfindDd.addItem(QApplication.translate("Saepat", "All", None, 1))
-        self.pfindDd.addItem(QApplication.translate("Saepat", "Live", None, 1))
-        self.pfindDd.addItem(QApplication.translate("Saepat", "RIP", None, 1))
-        self.agespecLb.setText(
-            QApplication.translate("Saepat", "Age Specif&ier", None, 1))
-        self.pnameLb.setText(
-            QApplication.translate("Saepat", "&Patient Name", None, 1))
-        self.dobLb.setText(
-            QApplication.translate("Saepat", "Date of &Birth", None, 1))
-        self.neuteredCb.setText(
-            QApplication.translate("Saepat", "neutere&d", None, 1))
-        self.colLb.setText(
-            QApplication.translate("Saepat", "Patient C&olour", None, 1))
-        self.dobestCb.setText(
-            QApplication.translate("Saepat", "&estimated", None, 1))
-        self.cfnameLb.setText(
-            QApplication.translate("Saepat", "Client &Forename", None, 1))
-        self.viciousCb.setText(
-            QApplication.translate("Saepat", "&vicious", None, 1))
-        self.seenCb.setText(
-            QApplication.translate("Saepat", "&seen:", None, 1))
-        self.ripCb.setText(
-            QApplication.translate("Saepat", "&RIP", None, 1))
-        self.dobDe.setDisplayFormat(
-            QApplication.translate("Saepat", "dd.MM.yyyy", None, 1))
-        self.neutBox.setTitle(
-            QApplication.translate("Saepat", "neutere&d", None, 1))
-        self.neutdateRb.setText(
-            QApplication.translate("Saepat", "&yes:", None, 1))
-        self.neutduRb.setText(
-            QApplication.translate("Saepat", "&yes, date unknown", None, 1))
-        self.neutnoRb.setText(
-            QApplication.translate("Saepat", "n&o", None, 1))
-        self.neutunRb.setText(
-            QApplication.translate("Saepat", "&unknown", None, 1))
-        self.neutDe.setDisplayFormat(
-            QApplication.translate("Saepat", "dd.MM.yyyy", None, 1))
-        self.locLb.setText(
-            QApplication.translate("Saepat", "Patient Lo&cation", None, 1))
-        self.insLb.setText(
-            QApplication.translate("Saepat", "Patient &Insurance", None, 1))
-        self.idLb.setText(
-            QApplication.translate("Saepat", "&ID", None, 1))
-        self.petpassLb.setText(
-            QApplication.translate("Saepat", "&Pet Passport", None, 1))
-        self.annoLb.setText(
-            QApplication.translate("Saepat", "Patient &Annotation", None, 1))
-        self.regLb.setText(
-            QApplication.translate("Saepat", "&Registered", None, 1))
-        self.regDe.setDisplayFormat(
-            QApplication.translate("Saepat", "dd.MM.yyyy", None, 1))
-        self.regspecDd.setToolTip(
-            QApplication.translate("Saepat", "< search prior to\n= search "
-                                   "± 1 month\n> search after", None, 1))
-        self.regspecDd.setWhatsThis(QApplication.translate(
-            "Saepat", "With this you can search for the Registration Date. If "
+        self.ageLb.setText(tl("&Age"))
+        self.ageuLb.setText(tl("Age &Unit"))
+        self.ageuDd.addItem(tl("years"))
+        self.ageuDd.addItem(tl("months"))
+        self.ageuDd.addItem(tl("weeks"))
+        self.ageuDd.addItem(tl("days"))
+        self.agesuLb.setText(tl("± &unit"))
+        self.agesuDd.addItem(tl("year"))
+        self.agesuDd.addItem(tl("month"))
+        self.agesuDd.addItem(tl("week"))
+        self.agesuDd.addItem(tl("day"))
+        self.pfindDd.addItem(tl("All"))
+        self.pfindDd.addItem(tl("Live"))
+        self.pfindDd.addItem(tl("RIP"))
+        self.agespecLb.setText(tl("Age Specif&ier"))
+        self.pnameLb.setText(tl("&Patient Name"))
+        self.dobLb.setText(tl("Date of &Birth"))
+        self.neuteredCb.setText(tl("neutere&d"))
+        self.colLb.setText(tl("Patient C&olour"))
+        self.dobestCb.setText(tl("&estimated"))
+        self.cfnameLb.setText(tl("Client &Forename"))
+        self.viciousCb.setText(tl("&vicious"))
+        self.seenCb.setText(tl("&seen:"))
+        self.ripCb.setText(tl("&RIP"))
+        self.dobDe.setDisplayFormat(tl("dd.MM.yyyy"))
+        self.neutBox.setTitle(tl("neutere&d"))
+        self.neutdateRb.setText(tl("&yes:"))
+        self.neutduRb.setText(tl("&yes, date unknown"))
+        self.neutnoRb.setText(tl("n&o"))
+        self.neutunRb.setText(tl("&unknown"))
+        self.neutDe.setDisplayFormat(tl("dd.MM.yyyy"))
+        self.locLb.setText(tl("Patient Lo&cation"))
+        self.insLb.setText(tl("Patient &Insurance"))
+        self.idLb.setText(tl("&ID"))
+        self.petpassLb.setText(tl("&Pet Passport"))
+        self.annoLb.setText(tl("Patient &Annotation"))
+        self.regLb.setText(tl("&Registered"))
+        self.regDe.setDisplayFormat(tl("dd.MM.yyyy"))
+        self.regspecDd.setToolTip(tl(
+            "< search prior to\n= search ± 1 month\n> search after"))
+        self.regspecDd.setWhatsThis(tl(
+            "With this you can search for the Registration Date. If "
             "you set this to \"=\" it will search for the given date plusminus "
-            "one month, otherwise after or prior to the given date.", None, 1))
+            "one month, otherwise after or prior to the given date."))
         self.regspecDd.addItem("")
         self.regspecDd.addItem("<")
         self.regspecDd.addItem("=")
         self.regspecDd.addItem(">")
-        self.regspecLb.setText(
-            QApplication.translate("Saepat", "&Reg.Spec", None, 1))
-        self.detailedCb.setText(
-            QApplication.translate("Saepat", "&Detailed Search", None, 1))
-        self.pfindLb.setText(
-            QApplication.translate("Saepat", "&Find:", None, 1))
-        self.backPb.setText(
-            QApplication.translate("Saepat", "&back to Search", None, 1))
-        self.cancelPb.setText(
-            QApplication.translate("Saepat", "Cancel", None, 1))
-        self.errOk.setText(
-            QApplication.translate("Saepat", "OK", None, 1))
-        self.no_dbconn.setText(
-            QApplication.translate('Saepat', 'No db connection...', None, 1))
+        self.regspecLb.setText(tl("&Reg.Spec"))
+        self.detailedCb.setText(tl("&Detailed Search"))
+        self.pfindLb.setText(tl("&Find:"))
+        self.backPb.setText(tl("&back to Search"))
+        self.cancelPb.setText(tl("Cancel"))
+        self.errOk.setText(tl("OK"))
+        self.no_dbconn.setText(tl('No db connection...'))
 
 if __name__ == '__main__':
     from PyQt4.QtGui import QMainWindow, QShortcut
