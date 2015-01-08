@@ -183,7 +183,6 @@ class Ui_Saecli(object):
         self.regLb = QLabel(self.saeFr)
         self.regLb.setGeometry(105, 464, 67, 15)
         self.regLb.setTextFormat(Qt.PlainText)
-        self.regLb.setTextInteractionFlags(Qt.NoTextInteraction)
         self.lastspecDd = QComboBox(self.saeFr)
         self.lastspecDd.setGeometry(260, 440, 65, 21) # +175
         self.lastspecLb = QLabel(self.saeFr)
@@ -215,7 +214,6 @@ class Ui_Saecli(object):
         self.errLb.setGeometry(95, 66, 221, 101)
         self.errLb.setTextFormat(Qt.RichText)
         self.errLb.setWordWrap(True)
-        self.errLb.setTextInteractionFlags(Qt.NoTextInteraction)
         self.errOk = QPushButton(self.errFr)
         self.errOk.setGeometry(130, 190, 107, 24)
         # buttonbox

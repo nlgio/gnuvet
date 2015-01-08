@@ -90,7 +90,6 @@ class Ui_Client(object):
         self.patientsLb.setGeometry(10, 156, 66, 18)
         self.patientsLb.setFont(font)
         self.patientsLb.setTextFormat(Qt.PlainText)
-        self.patientsLb.setTextInteractionFlags(Qt.NoTextInteraction)
         self.newPb = QPushButton(self.centralwidget)
         self.newPb.setGeometry(330, 130, 140, 24)
         self.ripPb = QPushButton(self.centralwidget)
@@ -100,7 +99,6 @@ class Ui_Client(object):
         self.plist.setMinimumSize(621, 371)
         self.balLb = QLabel(self.centralwidget)
         self.balLb.setGeometry(10, 570, 107, 18)
-        self.balLb.setTextInteractionFlags(Qt.NoTextInteraction)
         self.balanceLb = QLabel(self.centralwidget)
         self.balanceLb.setGeometry(130, 570, 72, 18)
         self.balanceLb.setAlignment(
