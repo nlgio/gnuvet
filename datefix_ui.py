@@ -4,10 +4,12 @@
 # Created: Fr May 31 15:04:29
 #      by: gnuvet
 
-from PyQt4.QtCore import Qt
 from PyQt4.QtGui import (
     QApplication,QCheckBox,QComboBox,QDateEdit,QLabel,QPushButton)
 from tle import QTextLEdit
+
+def tl(txt=''):
+    return QApplication.translate("Datefix", txt, None, 1)
 
 class Ui_Datefix(object):
     def setupUi(self, Datefix):
@@ -61,34 +63,20 @@ class Ui_Datefix(object):
         self.retranslateUi(Datefix)
 
     def retranslateUi(self, Datefix):
-        Datefix.setWindowTitle(QApplication.translate(
-            "Datefix", "GnuVet: Set Appointment", None, 1))
-        self.shortCb.setText(QApplication.translate(
-            "Datefix", "&no duration", None, 1))
-        self.dateLb.setText(QApplication.translate(
-            "Datefix", "&Date:", None, 1))
-        self.timeLb.setText(QApplication.translate(
-            "Datefix", "&Time:", None, 1))
-        self.staffLb.setText(QApplication.translate(
-            "Datefix", "&Staff:", None, 1)) # tr_de: 'Für'
-        self.patPb.setText(QApplication.translate(
-            "Datefix", "&Pat: unknown", None, 1))
-        self.cliPb.setText(QApplication.translate(
-            "Datefix", "&Cli: unknown", None, 1))
-        self.txtLb.setText(QApplication.translate(
-            "Datefix", "Te&xt:", None, 1))
-        self.shortCb.setToolTip(QApplication.translate(
-            "Datefix", "Set this for short time activities", None, 1))
-        self.durLb.setText(QApplication.translate(
-            "Datefix", "D&uration:", None, 1))
-        self.markLb.setText(QApplication.translate(
-            "Datefix", "&Mark as:", None, 1))
-        self.okPb.setText(QApplication.translate(
-            "Datefix", "OK", None, 1))
-        self.resetPb.setText(QApplication.translate(
-            "Datefix", "&Reset", None, 1))
-        self.ccPb.setText(QApplication.translate(
-            "Datefix", "Cancel", None, 1))
+        Datefix.setWindowTitle(tl("GnuVet: Set Appointment"))
+        self.shortCb.setText(tl("&no duration"))
+        self.dateLb.setText(tl("&Date:"))
+        self.timeLb.setText(tl("&Time:"))
+        self.staffLb.setText(tl("&Staff:")) # tr_de: 'Für'
+        self.patPb.setText(tl("&Pat: unknown"))
+        self.cliPb.setText(tl("&Cli: unknown"))
+        self.txtLb.setText(tl("Te&xt:"))
+        self.shortCb.setToolTip(tl("Set this for short time activities"))
+        self.durLb.setText(tl("D&uration:"))
+        self.markLb.setText(tl("&Mark as:"))
+        self.okPb.setText(tl("OK"))
+        self.resetPb.setText(tl("&Reset"))
+        self.ccPb.setText(tl("Cancel"))
 
 if __name__ == '__main__':
     from PyQt4.QtGui import QMainWindow, QShortcut

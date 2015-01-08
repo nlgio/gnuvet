@@ -13,11 +13,13 @@
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import (QApplication, QButtonGroup, QCheckBox, QComboBox,
                          QDateTimeEdit, QDoubleSpinBox, QFont, QFrame, QLabel,
-                         QLineEdit, QRadioButton, QPushButton, QScrollArea,
-                         QTextBrowser, QToolButton)
+                         QLineEdit, QRadioButton, QPushButton, QToolButton)
 from gtable import Gtable
 from tle import QTextLEdit
 import gv_qrc
+
+def tl(txt=''):
+    return QApplication.translate("Products", txt, None, 1)
 
 class Ui_Products(object):
     def setupUi(self, Products):
@@ -268,64 +270,38 @@ class Ui_Products(object):
         button.setPalette(self.pal)
         
     def retranslateUi(self, Products):
-        Products.setWindowTitle(QApplication.translate(
-            "Products", "GnuVet: Select Product", None, 1))
-        self.srchLb.setText(QApplication.translate(
-            "Products", "&Search:", None, 1))
-        self.vatLb.setText(QApplication.translate(
-            "Products", "&VAT:", None, 1))
-        self.vatDd.setToolTip(QApplication.translate(
-            "Products", "Set VAT applicable for selected item.", None, 1))
-        self.markupLb.setText(QApplication.translate(
-            "Products", "&Markup:", None, 1))
-        self.markupDd.setToolTip(QApplication.translate(
-            "Products", "Set markup applicable for selected items.", None, 1))
-        self.priceLb.setText(QApplication.translate(
-            "Products", "gr. &price:", None, 1))
-        self.avatLb.setText(QApplication.translate(
-            "Products", "&VAT:", None, 1))
-        self.tsysRb.setText(QApplication.translate(
-            "Products", "s&ystem time", None, 1))
-        self.tstopRb.setText(QApplication.translate(
-            "Products", "timer &stop", None, 1))
-        self.trunRb.setText(QApplication.translate(
-            "Products", "timer &run", None, 1))
-        self.sympLb.setText(QApplication.translate(
-            "Products", "&Lead Symptom:", None, 1))
-        self.dateLb.setText(QApplication.translate(
-            "Products", "&Date and Time:", None, 1))
-        self.amountLb.setText(QApplication.translate(
-            "Products", "&Amount:", None, 1))
-        self.alertLb.setText(QApplication.translate(
-            "Products", "Please select Lead Symptom", None, 1))
+        Products.setWindowTitle(tl("GnuVet: Select Product"))
+        self.srchLb.setText(tl("&Search:"))
+        self.vatLb.setText(tl("&VAT:"))
+        self.vatDd.setToolTip(tl("Set VAT applicable for selected item."))
+        self.markupLb.setText(tl("&Markup:"))
+        self.markupDd.setToolTip(tl(
+            "Set markup applicable for selected items."))
+        self.priceLb.setText(tl("gr. &price:"))
+        self.avatLb.setText(tl("&VAT:"))
+        self.tsysRb.setText(tl("s&ystem time"))
+        self.tstopRb.setText(tl("timer &stop"))
+        self.trunRb.setText(tl("timer &run"))
+        self.sympLb.setText(tl("&Lead Symptom:"))
+        self.dateLb.setText(tl("&Date and Time:"))
+        self.amountLb.setText(tl("&Amount:"))
+        self.alertLb.setText(tl("Please select Lead Symptom"))
         self.hcharLb.setText('1024')
-        self.hcharLb.setToolTip(QApplication.translate(
-            "Products", "Chars free in history field.\n[Note: Use of colours "
-            "will eat lotsa chars due to markup]", None, 1))
-        self.blkPb.setToolTip(QApplication.translate(
-            "Products", "Set Text Colour: black", None, 1))
-        self.redPb.setToolTip(QApplication.translate(
-            "Products", "Set Text Colour: red", None, 1))
-        self.bluPb.setToolTip(QApplication.translate(
-            "Products", "Set Text Colour: blue", None, 1))
-        self.infLb.setText(QApplication.translate(
-            "Products", "Hit Ctrl+Enter or click OK when done", None, 1))
-        self.forLb.setText(
-            QApplication.translate("Products", 'for', None, 1))
-        self.codeLb.setText(QApplication.translate(
-            "Products", "&Code:", None, 1))
-        self.freetxtCb.setText(QApplication.translate(
-            "Products", "&Free Text", None, 1))
-        self.confLb.setText(QApplication.translate(
-            "Products", "<i>Please confirm:</i>", None, 1))
-        self.okPb.setText(QApplication.translate(
-            "Products", "OK", None, 1))
-        self.backPb.setText(QApplication.translate(
-            "Products", "&back", None, 1))
-        self.ccPb.setText(QApplication.translate(
-            "Products", "Cancel", None, 1))
-        self.skipPb.setText(QApplication.translate(
-            "Products", "&Skip printing", None, 1))
+        self.hcharLb.setToolTip(tl(
+            "Chars free in history field.\n[Note: Use of colours "
+            "will eat lotsa chars due to markup]"))
+        self.blkPb.setToolTip(tl("Set Text Colour: black"))
+        self.redPb.setToolTip(tl("Set Text Colour: red"))
+        self.bluPb.setToolTip(tl("Set Text Colour: blue"))
+        self.infLb.setText(tl("Hit Ctrl+Enter or click OK when done"))
+        self.forLb.setText(tl('for'))
+        self.codeLb.setText(tl("&Code:"))
+        self.freetxtCb.setText(tl("&Free Text"))
+        self.confLb.setText(tl("<i>Please confirm:</i>"))
+        self.okPb.setText(tl("OK"))
+        self.backPb.setText(tl("&back"))
+        self.ccPb.setText(tl("Cancel"))
+        self.skipPb.setText(tl("&Skip printing"))
 
 if __name__ == '__main__':
     a = QApplication([])

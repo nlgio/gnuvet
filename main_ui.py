@@ -8,10 +8,12 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4.QtGui import (QApplication, QFont, QFrame, QLabel, QLineEdit,
-                         QMenu, QMenuBar, QPixmap, QPushButton,
-                         QShortcut, QStatusBar, QWidget,)
+                         QMenu, QPixmap, QPushButton, QShortcut, QWidget,)
 from PyQt4.QtCore import Qt # for alignment
 
+def tl(txt=''):
+    return QApplication.translate("Mainform", txt, None, 1)
+    
 class Ui_Mainform(object):
     def setupUi(self, Mainform):
         Mainform.resize(390,280)
@@ -53,7 +55,7 @@ class Ui_Mainform(object):
         self.lognameLb = QLabel(self.lFr)
         self.lognameLe = QLineEdit(self.lFr)
         self.logpassLb = QLabel(self.lFr)
-        self.logpassLe   = QLineEdit(self.lFr)
+        self.logpassLe = QLineEdit(self.lFr)
         self.logokPb   = QPushButton(self.lFr)
         self.lognameLb.setGeometry(20, 73, 102, 19)
         self.lognameLe.setGeometry(160, 72, 151, 21)
@@ -69,14 +71,12 @@ class Ui_Mainform(object):
         self.lFr.hide()
         # Mainform further
         Mainform.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(Mainform)
+        self.menubar = Mainform.menuBar()
         self.taskM = QMenu(self.menubar)
         self.maintM = QMenu(self.menubar)
         self.helpM = QMenu(self.menubar)
-        Mainform.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(Mainform)
+        self.statusbar = Mainform.statusBar()
         self.statusbar.setSizeGripEnabled(False)
-        Mainform.setStatusBar(self.statusbar)
         #    NODBCONN
         self.no_dbconn = QLabel(self.statusbar)
         self.no_dbconn.setGeometry(100, 240, 198, 19)
@@ -91,35 +91,20 @@ class Ui_Mainform(object):
         self.retranslateUi(Mainform)
 
     def retranslateUi(self, Mainform):
-        Mainform.setWindowTitle(
-            QApplication.translate("Mainform", "GnuVet", None, 1))
-        self.closeLb.setText(
-            QApplication.translate("Mainform", "You want to close GnuVet?",
-                                   None, 1))
-        self.noPb.setText(
-            QApplication.translate("Mainform", "&No", None, 1))
-        self.noPb.setShortcut(
-            QApplication.translate("Mainform", "N", None, 1))
-        self.yesPb.setText(
-            QApplication.translate("Mainform", "&Yes", None, 1))
-        self.yesPb.setShortcut(
-            QApplication.translate("Mainform", "Y", None, 1))
-        self.maintM.setTitle(
-            QApplication.translate("Mainform", "&Maintenance", None, 1))
-        self.taskM.setTitle(
-            QApplication.translate("Mainform", "&Task", None, 1))
-        self.helpM.setTitle(
-            QApplication.translate("Mainform", "&Help", None, 1))
-        self.lognameLb.setText(
-            QApplication.translate("Mainform", "&Username:", None, 1))
-        self.logpassLb.setText(
-            QApplication.translate("Mainform", "&Password:", None, 1))
-        self.logokPb.setText(
-            QApplication.translate("Mainform", "&Login", None, 1))
-        self.lLb.setText(
-            QApplication.translate("Mainform", "no login", None, 1))
-        self.no_dbconn.setText(
-            QApplication.translate("Mainform", 'No db connection...', None, 1))
+        Mainform.setWindowTitle(tl("GnuVet"))
+        self.closeLb.setText(tl("You want to close GnuVet?"))
+        self.noPb.setText(tl("&No"))
+        self.noPb.setShortcut(tl("N"))
+        self.yesPb.setText(tl("&Yes"))
+        self.yesPb.setShortcut(tl("Y"))
+        self.maintM.setTitle(tl("&Maintenance"))
+        self.taskM.setTitle(tl("&Task"))
+        self.helpM.setTitle(tl("&Help"))
+        self.lognameLb.setText(tl("&Username:"))
+        self.logpassLb.setText(tl("&Password:"))
+        self.logokPb.setText(tl("&Login"))
+        self.lLb.setText(tl("no login"))
+        self.no_dbconn.setText(tl('No db connection...'))
 
 if __name__ == '__main__':
     import gv_qrc

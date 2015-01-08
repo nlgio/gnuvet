@@ -14,6 +14,9 @@ from PyQt4.QtGui import (QApplication, QFont, QWidget, QLabel, QPixmap,
                          QPushButton)
 from gtable import Gtable
 
+def tl(txt=''):
+    return QApplication.translate("Client", txt, None, 1)
+
 class Ui_Client(object):
     def setupUi(self, Client):
         Client.resize(957, 660)
@@ -111,58 +114,33 @@ class Ui_Client(object):
         self.retranslateUi(Client)
 
     def retranslateUi(self, Client):
-        Client.setWindowTitle(QApplication.translate(
-            "Client", "GnuVet: Client", None, 1))
+        Client.setWindowTitle(tl("GnuVet: Client"))
         # devel:
-        self.nameLb.setText(QApplication.translate(
-            "Client", "Mr Client N", None, 1))
-        self.addr1Lb.setText(QApplication.translate(
-            "Client", "House Street", None, 1))
-        self.addr2Lb.setText(QApplication.translate(
-            "Client", "Village, City", None, 1))
-        self.addr3Lb.setText(QApplication.translate(
-            "Client", "B76 0BA", None, 1))
-        self.telhomeLb.setText(QApplication.translate(
-            "Client", "Home: 01675 478 133", None, 1))
-        self.telworkLb.setText(QApplication.translate(
-            "Client", "Work: 01675 478 133", None, 1))
-        self.mobile1Lb.setText(QApplication.translate(
-            "Client", "Mobile: 07725 899 122", None, 1))
-        self.mobile2Lb.setText(QApplication.translate(
-            "Client", "Mobile: 07725 899 122", None, 1))
-        self.balanceLb.setText(QApplication.translate(
-            "Client", "0.00", None, 1))
-        self.ldateLb.setText(QApplication.translate(
-            "Client", "30.04.2009", None, 1))
-        self.regdateLb.setText(QApplication.translate(
-            "Client", "18.12.2008", None, 1))
+        self.nameLb.setText(tl("Mr Client N"))
+        self.addr1Lb.setText(tl("House Street"))
+        self.addr2Lb.setText(tl("Village, City"))
+        self.addr3Lb.setText(tl("B76 0BA"))
+        self.telhomeLb.setText(tl("Home: 01675 478 133"))
+        self.telworkLb.setText(tl("Work: 01675 478 133"))
+        self.mobile1Lb.setText(tl("Mobile: 07725 899 122"))
+        self.mobile2Lb.setText(tl("Mobile: 07725 899 122"))
+        self.balanceLb.setText(tl("0.00"))
+        self.ldateLb.setText(tl("30.04.2009"))
+        self.regdateLb.setText(tl("18.12.2008"))
         # end devel
-        self.annoLb.setText(QApplication.translate(
-            "Client", "Annotations:", None, 1))
-        self.bdPix.setToolTip(QApplication.translate(
-            "Client", "Bad Debtor", None, 1))
-        self.emailLb.setText(QApplication.translate(
-            "Client", "client.surname@provider.net", None, 1))
-        self.lastLb.setText(QApplication.translate(
-            "Client", "Last Seen:", None, 1))
-        self.regLb.setText(QApplication.translate(
-            "Client", "Registered:", None, 1))
-        self.patientsLb.setText(QApplication.translate(
-            "Client", "Patients:", None, 1))
-        self.newPb.setText(QApplication.translate(
-            "Client", "New Patient", None, 1))
-        self.ripPb.setText(QApplication.translate(
-            "Client", "&Mark as deceased", None, 1))
-        self.balLb.setText(QApplication.translate(
-            "Client", "Current Balance:", None, 1))
-        self.mainPb.setText(QApplication.translate(
-            "Client", "Select &Patient", None, 1))
-        self.cancelPb.setText(QApplication.translate(
-            "Client", "Cancel", None, 1))
-        self.cancelPb.setShortcut(QApplication.translate(
-            "Client", "Esc", None, 1))
-        self.no_dbconn.setText(QApplication.translate(
-            "Client", "No db connection...", None, 1))
+        self.annoLb.setText(tl("Annotations:"))
+        self.bdPix.setToolTip(tl("Bad Debtor"))
+        self.emailLb.setText(tl("client.surname@provider.net"))
+        self.lastLb.setText(tl("Last Seen:"))
+        self.regLb.setText(tl("Registered:"))
+        self.patientsLb.setText(tl("Patients:"))
+        self.newPb.setText(tl("New Patient"))
+        self.ripPb.setText(tl("&Mark as deceased"))
+        self.balLb.setText(tl("Current Balance:"))
+        self.mainPb.setText(tl("Select &Patient"))
+        self.cancelPb.setText(tl("Cancel"))
+        self.cancelPb.setShortcut(tl("Esc"))
+        self.no_dbconn.setText(tl("No db connection..."))
 
 if __name__ == '__main__':
     from PyQt4.QtGui import QMainWindow, QShortcut

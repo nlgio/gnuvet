@@ -4,8 +4,10 @@
 # Created: Wed May 22 16:41:23
 #      by: gnuvet
 
-from PyQt4.QtCore import Qt
 from PyQt4.QtGui import (QApplication,QDateEdit,QPushButton)
+
+def tl(txt=''):
+    return QApplication.translate("Datesel", txt, None, 1)
 
 class Ui_Datesel(object):
     def setupUi(self, Datesel):
@@ -24,12 +26,9 @@ class Ui_Datesel(object):
         self.retranslateUi(Datesel)
 
     def retranslateUi(self, Datesel):
-        Datesel.setWindowTitle(QApplication.translate(
-            "Datesel", "GnuVet: Select date", None, 1))
-        self.okPb.setText(QApplication.translate(
-            "Datesel", "Select", None, 1))
-        self.ccPb.setText(QApplication.translate(
-            "Datesel", "Cancel", None, 1))
+        Datesel.setWindowTitle(tl("GnuVet: Select date"))
+        self.okPb.setText(tl("Select"))
+        self.ccPb.setText(tl("Cancel"))
 
 if __name__ == '__main__':
     from PyQt4.QtGui import QMainWindow, QShortcut

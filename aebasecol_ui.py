@@ -9,8 +9,10 @@
 from PyQt4.QtGui import (QApplication, QCheckBox, QFont, QFrame, QLabel,
                          QLineEdit, QPixmap, QPushButton, QRadioButton,
                          QScrollArea)
-
 import gv_qrc
+
+def tl(txt=''):
+    return QApplication.translate("Aebasecol", txt, None, 1)
 
 class Ui_Aebasecol(object):
     devels = 0
@@ -106,56 +108,28 @@ class Ui_Aebasecol(object):
         self.retranslateUi(Aebasecol)
 
     def retranslateUi(self, Aebasecol):
-        Aebasecol.setWindowTitle(
-            QApplication.translate(
-                "Aebasecol", "GnuVet: Add Basecolour", None, 1))
-        self.no_dbconn.setText(
-            QApplication.translate("Aebasecol", "No db connection...", None, 1))
-        self.bcnameLb.setText(
-            QApplication.translate("Aebasecol", "BaseC&olour Name:", None, 1))
-        self.okPb.setText(
-            QApplication.translate("Aebasecol", "OK", None, 1))
-        self.closePb.setText(
-            QApplication.translate("Aebasecol", "Cancel", None, 1))
-        self.closePb.setShortcut(
-            QApplication.translate("Aebasecol", "Esc", None, 1))
-        self.combLb.setText(
-            QApplication.translate(
-                "Aebasecol", "Combinations with other Basecolours:", None, 1))
-        self.possRb.setText(
-            QApplication.translate("Aebasecol", "&possible", None, 1))
-        self.possRb.setToolTip(
-            QApplication.translate(
-                "Aebasecol", "This Basecolour can be combined with others",
-                None, 1))
-        self.possRb.setStatusTip(
-            QApplication.translate(
-                "Aebasecol", "Combination possible", None, 1))
-        self.oblRb.setText(
-            QApplication.translate("Aebasecol", "n&ecessary", None, 1))
-        self.oblRb.setToolTip(
-            QApplication.translate(
-                "Aebasecol", "This Basecolour has to be combined with another",
-                None, 1))
-        self.oblRb.setStatusTip(
-            QApplication.translate(
-                "Aebasecol", "Combination required", None, 1))
-        self.noRb.setText(
-            QApplication.translate("Aebasecol", "&none", None, 1))
-        self.noRb.setToolTip(
-            QApplication.translate(
-                "Aebasecol", "This Basecolour can not be combined with others",
-                None, 1))
-        self.noRb.setStatusTip(
-            QApplication.translate("Aebasecol", "No combination possible",
-                                   None, 1))
-        self.specLb.setText(
-            QApplication.translate(
-                "Aebasecol",
-                "Please select species for which new basecolour applies:",
-                None, 1))
-        self.togglePb.setText(
-            QApplication.translate("Aebasecol", "Toggle &All", None, 1))
+        Aebasecol.setWindowTitle(tl("GnuVet: Add Basecolour"))
+        self.no_dbconn.setText(tl("No db connection..."))
+        self.bcnameLb.setText(tl("BaseC&olour Name:"))
+        self.okPb.setText(tl("OK"))
+        self.closePb.setText(tl("Cancel"))
+        self.closePb.setShortcut(tl("Esc"))
+        self.combLb.setText(tl("Combinations with other Basecolours:"))
+        self.possRb.setText(tl("&possible"))
+        self.possRb.setToolTip(tl(
+            "This Basecolour can be combined with others"))
+        self.possRb.setStatusTip(tl("Combination possible"))
+        self.oblRb.setText(tl("n&ecessary"))
+        self.oblRb.setToolTip(tl(
+            "This Basecolour has to be combined with another"))
+        self.oblRb.setStatusTip(tl("Combination required"))
+        self.noRb.setText(tl("&none"))
+        self.noRb.setToolTip(tl(
+            "This Basecolour can not be combined with others"))
+        self.noRb.setStatusTip(tl("No combination possible"))
+        self.specLb.setText(tl(
+                "Please select species for which new basecolour applies:"))
+        self.togglePb.setText(tl("Toggle &All"))
 
     def develf(self):
         if self.devels == 0:
