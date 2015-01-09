@@ -1,5 +1,6 @@
 """Common utility functions."""
 from psycopg2 import OperationalError
+from PyQt4.QtGui import QAction
 
 def ch_conn(caller=None, name='', sig=None, func=None):
     """Disconnect function conns[name] from signal sigs[name],
@@ -18,7 +19,7 @@ def ch_conn(caller=None, name='', sig=None, func=None):
         sig.connect(func)
         caller.conns[name] = func
         caller.sigs[name] = sig
-
+    
 def gprice(nprice=0, vatrate=0):
     if not 'Decimal' in locals():
         from decimal import Decimal
@@ -28,6 +29,15 @@ def money(val, mult=1):
     if not 'Decimal' in locals():
         from decimal import Decimal
     return (val * mult).quantize(Decimal('0.00'))
+
+def new_action(caller=None, txt=None, stip=None, short=None):
+    action = QAction(caller.tr(txt), caller)
+    action.setAutoRepeat(0)
+    if stip:
+        action.setStatusTip(caller.tr(stip))
+    if short:
+        action.setShortcut(caller.tr(short))
+    return action
 
 def percent(val):
     if int(val) == val:

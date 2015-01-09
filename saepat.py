@@ -16,12 +16,11 @@
 from datetime import date, timedelta
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import (QAction, QApplication, QMainWindow,
-                         QMenu, QStringListModel)
+from PyQt4.QtGui import (QApplication, QMainWindow, QMenu)
 import gv_qrc
 from gcompleter import Gcompleter
 from keycheck import Keycheck
-from util import ch_conn, querydb
+from util import ch_conn, new_action, querydb
 from saepat_ui import Ui_Saepat
 
 class Saepat(QMainWindow):
@@ -34,9 +33,7 @@ class Saepat(QMainWindow):
     needcid  = pyqtSignal(tuple) # check this, makes sense?
     restoreme = pyqtSignal(tuple)
     savestate = pyqtSignal(tuple)
-    addedspec = pyqtSignal(int)
     pidsig    = pyqtSignal(int)
-    #nocc     = pyqtSignal(int) # what's this? no client change?
 
     # vars:
     adding = db_err = idok = nameok = False
@@ -60,60 +57,31 @@ class Saepat(QMainWindow):
         self.pids = []
         self.startv = {}
         #    ACTIONS
-        self.dbA = QAction(self.tr('&Reconnect to database'), self)
-        self.dbA.setAutoRepeat(0)
-        self.dbA.setStatusTip(self.tr('Try to reconnect to database'))
-        self.dbA.setShortcut(self.tr('Ctrl+R'))
-        self.clichangeA = QAction(self.tr('&Change Owner'), self)
-        self.clichangeA.setAutoRepeat(0)
-        self.clichangeA.setStatusTip(self.tr('Change owner of current patient'))
-        closeA = QAction(self.tr('Close'), self)
-        closeA.setAutoRepeat(0)
-        closeA.setStatusTip(self.tr('Close this window'))
-        closeA.setShortcut(self.tr('Ctrl+W'))
-        self.newpatA = QAction(self.tr('&Patient'), self)
-        self.newpatA.setAutoRepeat(0)
-        self.newpatA.setStatusTip(self.tr(
-            'create Patient record from entered data'))
-        self.newpatA.setShortcut(self.tr('Ctrl+P'))
-        self.newbreedA = QAction(self.tr('&Breed'), self)
-        self.newbreedA.setAutoRepeat(0)
-        self.newbreedA.setStatusTip(self.tr('create new Breed entry'))
-        self.newbreedA.setShortcut(self.tr('Ctrl+B'))
-        self.newspecA = QAction(self.tr('&Species'), self)
-        self.newspecA.setAutoRepeat(0)
-        self.newspecA.setStatusTip(self.tr('create new Species entry'))
-        self.newspecA.setShortcut(self.tr('Ctrl+S'))
-        self.newcolA = QAction(self.tr('C&olour'), self)
-        self.newcolA.setAutoRepeat(0)
-        self.newcolA.setStatusTip(self.tr('create new Colour entry'))
-        self.newcolA.setShortcut(self.tr('Ctrl+O'))
-        self.newlocA = QAction(self.tr('Locatio&n'), self)
-        self.newlocA.setAutoRepeat(0)
-        self.newlocA.setStatusTip(self.tr('create new Location entry'))
-        self.newlocA.setShortcut(self.tr('Ctrl+N'))
-        self.newinsA = QAction(self.tr('&Insurance'), self)
-        self.newinsA.setAutoRepeat(0)
-        self.newinsA.setStatusTip(self.tr('create new Insurance entry'))
-        self.newinsA.setShortcut(self.tr('Ctrl+I'))
+        self.dbA = new_action(self, '&Reconnect to database',
+                              'Try to reconnect to database', 'Ctrl+R')
+        self.clichangeA = new_action(
+            self, '&Change Owner', 'Change owner of current patient')
+        closeA = new_action(self, 'Close', 'Close this window', 'Ctrl+W')
+        self.newpatA = new_action(
+            self,'&Patient','create Patient record from entered data','Ctrl+P')
+        self.newbreedA = new_action(
+            self, '&Breed', 'create new Breed entry', 'Ctrl+B')
+        self.newspecA = new_action(
+            self, '&Species', 'create new Species entry', 'Ctrl+S')
+        self.newcolA = new_action(
+            self, 'C&olour', 'create new Colour entry', 'Ctrl+O')
+        self.newlocA = new_action(
+            self, 'Locatio&n', 'create new Location entry', 'Ctrl+N')
+        self.newinsA = new_action(
+            self, '&Insurance', 'create new Insurance entry', 'Ctrl+I')
         # devel:
-        debugA = QAction('Debug', self)
-        debugA.setAutoRepeat(0)
-        debugA.setShortcut('Ctrl+D')
+        debugA = new_action(self, 'Debug', short='Ctrl+D')
         debugA.triggered.connect(self.debugf)
         self.addAction(debugA)
         # end devel
-        helpA = QAction(self.tr('&Help'), self)
-        helpA.setAutoRepeat(0)
-        helpA.setStatusTip(self.tr('context sensitive help'))
-        helpA.setShortcut(self.tr('F1'))
-        aboutA = QAction(self.tr('About &GnuVet'), self)
-        aboutA.setAutoRepeat(0)
-        aboutA.setStatusTip(self.tr('GnuVet version info'))
-        quitA = QAction(self.tr('&Quit GnuVet'), self)
-        quitA.setAutoRepeat(0)
-        quitA.setStatusTip(self.tr('Quit GnuVet'))
-        quitA.setShortcut(self.tr('Ctrl+Q'))
+        helpA = new_action(self, '&Help', 'context sensitive help', 'F1')
+        aboutA = new_action(self, 'About &GnuVet', 'GnuVet version info')
+        quitA = new_action(self, '&Quit GnuVet', 'Quit GnuVet', 'Ctrl+Q')
         #    MENUES
         taskM = QMenu(self.w.menubar)
         taskM.setTitle(self.tr('&Task'))
@@ -487,7 +455,7 @@ class Saepat(QMainWindow):
         self.await_adding()
         ## ael.addedloc.connect(self.set_addedloc)
 
-    def add_spec(self):
+    def add_spec(self): # hierwei: move this into aespec
         """Add a new 'species' to the db."""
         if self.db_err:
             return
@@ -498,7 +466,6 @@ class Saepat(QMainWindow):
         self.aesp.show()
         self.adding = True
         self.await_adding()
-        ## aesp.addedspec.connect(self.set_addedspec)
 
     def ae_connect(self):
         """Set connections for add-edit."""
@@ -1971,7 +1938,6 @@ class Saepat(QMainWindow):
         self.popul_species()
         self.w.specDd.setCurrentIndex(self.w.specDd.findData(new_spec), 32)
         self.adapt_breeds(new_spec)
-        self.addedspec.emit(new_spec)
     
     def set_cname(self):
         """Set the client name."""
