@@ -192,16 +192,17 @@ That should suffice.
                 wid = self.ewidget.lineEdit()
                 self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))
             self.otxt = mlist[0].lower()
-            if self.otxt.startswith(txt) and self.otxt != txt:
-                markstart = len(txt)
-                while len(mlist) == 1:
-                    txt = txt[:-1]
-                    mlist = self.mklist(txt)
-                if self.mtxt == txt:
-                    markstart -= 1
-                wid.setSelection(markstart, 80)
-                self.mtxt = txt
-            return
+            if len(self.clist) > 1:
+                if self.otxt.startswith(txt) and self.otxt != txt:
+                    markstart = len(txt)
+                    while len(mlist) == 1:
+                        txt = txt[:-1]
+                        mlist = self.mklist(txt)
+                    if self.mtxt == txt:
+                        markstart -= 1
+                    wid.setSelection(markstart, 80)
+                    self.mtxt = txt
+                return
         y = self.ewidget.y() + self.ewidget.height()
         vplace = self.parent().height() - y
         if vplace > self.ewidget.height()*self.maxshow:
