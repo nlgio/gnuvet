@@ -20,7 +20,7 @@ from PyQt4.QtGui import (QApplication, QMainWindow, QMenu)
 import gv_qrc
 from gcompleter import Gcompleter
 from keycheck import Keycheck
-from util import ch_conn, new_action, querydb
+from util import ch_conn, newaction, querydb
 from saepat_ui import Ui_Saepat
 
 class Saepat(QMainWindow):
@@ -57,31 +57,31 @@ class Saepat(QMainWindow):
         self.pids = []
         self.startv = {}
         #    ACTIONS
-        self.dbA = new_action(self, '&Reconnect to database',
+        self.dbA = newaction(self, '&Reconnect to database',
                               'Try to reconnect to database', 'Ctrl+R')
-        self.clichangeA = new_action(
+        self.clichangeA = newaction(
             self, '&Change Owner', 'Change owner of current patient')
-        closeA = new_action(self, 'Close', 'Close this window', 'Ctrl+W')
-        self.newpatA = new_action(
+        closeA = newaction(self, 'Close', 'Close this window', 'Ctrl+W')
+        self.newpatA = newaction(
             self,'&Patient','create Patient record from entered data','Ctrl+P')
-        self.newbreedA = new_action(
+        self.newbreedA = newaction(
             self, '&Breed', 'create new Breed entry', 'Ctrl+B')
-        self.newspecA = new_action(
+        self.newspecA = newaction(
             self, '&Species', 'create new Species entry', 'Ctrl+S')
-        self.newcolA = new_action(
+        self.newcolA = newaction(
             self, 'C&olour', 'create new Colour entry', 'Ctrl+O')
-        self.newlocA = new_action(
+        self.newlocA = newaction(
             self, 'Locatio&n', 'create new Location entry', 'Ctrl+N')
-        self.newinsA = new_action(
+        self.newinsA = newaction(
             self, '&Insurance', 'create new Insurance entry', 'Ctrl+I')
         # devel:
-        debugA = new_action(self, 'Debug', short='Ctrl+D')
+        debugA = newaction(self, 'Debug', short='Ctrl+D')
         debugA.triggered.connect(self.debugf)
         self.addAction(debugA)
         # end devel
-        helpA = new_action(self, '&Help', 'context sensitive help', 'F1')
-        aboutA = new_action(self, 'About &GnuVet', 'GnuVet version info')
-        quitA = new_action(self, '&Quit GnuVet', 'Quit GnuVet', 'Ctrl+Q')
+        helpA = newaction(self, '&Help', 'context sensitive help', 'F1')
+        aboutA = newaction(self, 'About &GnuVet', 'GnuVet version info')
+        quitA = newaction(self, '&Quit GnuVet', 'Quit GnuVet', 'Ctrl+Q')
         #    MENUES
         taskM = QMenu(self.w.menubar)
         taskM.setTitle(self.tr('&Task'))

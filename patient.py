@@ -43,10 +43,10 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal, QString, Qt
-from PyQt4.QtGui import (QAction, QMainWindow, QMenu, QScrollArea)
+from PyQt4.QtGui import (QMainWindow, QMenu, QScrollArea)
 import gv_qrc
 from keycheck import Keycheck
-from util import ch_conn, gprice, money, querydb
+from util import ch_conn, gprice, money, newaction, querydb
 from ticker import Ticker
 from patient_ui import Ui_Patient
 
@@ -100,71 +100,35 @@ class Patient(QMainWindow):
                 ])
         #    ACTIONS
         # devel
-        debA = QAction('Debug', self)
-        debA.setAutoRepeat(0)
-        debA.setShortcut('Ctrl+D')
-        debA.setStatusTip('Current debug func')
+        debA = newaction(self, 'Debug', 'Current debug func', 'Ctrl+D')
         debA.triggered.connect(self.develf)
         # end devel
-        closeA = QAction(self.tr('Close &Window'), self)
-        closeA.setAutoRepeat(0)
-        closeA.setShortcut(self.tr('Ctrl+W'))
-        closeA.setStatusTip(self.tr('Close this window'))
-        self.dbA = QAction(self.tr('&Reconnect to database'), self) # add func?
-        self.dbA.setAutoRepeat(0)
-        self.dbA.setShortcut(self.tr('Ctrl+R'))
-        self.dbA.setStatusTip(self.tr('Try to reconnect to database'))
-        self.aboutA = QAction(self.tr('About &GnuVet'), self)
-        self.aboutA.setAutoRepeat(0)
-        self.aboutA.setStatusTip(self.tr('GnuVet version info'))
-        helpA = QAction(self.tr('&Help'), self)
-        helpA.setAutoRepeat(0)
-        helpA.setShortcut(self.tr('F1'))
-        helpA.setStatusTip(self.tr('context sensitive help'))
-        quitA = QAction(self.tr('&Quit GnuVet'), self)
-        quitA.setAutoRepeat(0)
-        quitA.setShortcut(self.tr('Ctrl+Q'))
-        quitA.setStatusTip(self.tr('Quit GnuVet'))
-        self.editA = QAction(self.tr('&Edit Patient'), self) # add func
-        self.editA.setAutoRepeat(0)
-        self.editA.setShortcut(self.tr('Ctrl+E'))
-        self.editA.setStatusTip(self.tr('Edit patient description'))
-        self.histA = QAction(self.tr('&History'), self) # add func
-        self.histA.setAutoRepeat(0)
-        self.histA.setShortcut(self.tr('Ctrl+H'))
-        self.histA.setStatusTip(
-            self.tr('Add history entry to clinical history'))
-        self.saleA = QAction(self.tr('S&ale'), self) # add func
-        self.saleA.setAutoRepeat(0)
-        self.saleA.setShortcut(self.tr('Ctrl+A'))
-        self.saleA.setStatusTip(
-            self.tr('Add new sale (foods, goods)'))
-        self.mrgA = QAction(self.tr('&Merge Patient'), self) # add func
-        self.mrgA.setAutoRepeat(0)
-        self.mrgA.setStatusTip(
-            self.tr('Merge this account with additional from same patient'))
-        self.toggleinsA = QAction(self.tr('&Insurance Info'), self)
-        self.toggleinsA.setAutoRepeat(0)
-        self.toggleinsA.setShortcut(self.tr('Ctrl+I'))
-        self.toggleinsA.setStatusTip(
-            self.tr('Toggle full vs short insurance info'))
-        self.togglelocA = QAction(self.tr('&Location Info'), self)
-        self.togglelocA.setAutoRepeat(0)
-        self.togglelocA.setShortcut(self.tr('Ctrl+L'))
-        self.togglelocA.setStatusTip(
-            self.tr('Toggle full vs short location info'))
-        self.trtA = QAction(self.tr('&Treatment'), self) # add func
-        self.trtA.setAutoRepeat(0)
-        self.trtA.setShortcut(self.tr('Ctrl+T'))
-        self.trtA.setStatusTip(
-            self.tr('Add treatment entry to clinical history'))
-        self.payA = QAction(self.tr('Pa&yment'), self)
-        self.payA.setAutoRepeat(0)
-        self.payA.setShortcut('Ctrl+Y')
-        self.payA.setStatusTip(self.tr('Take payment'))
-        ## self.vaccA = QAction(self)
-        ## self.vaccA.setAutoRepeat(0)
-        ## self.vaccA.setShortcut(self.tr('Ctrl+V')) # ?
+        closeA = newaction(self, 'Close &Window','Close this window','Ctrl+W')
+        self.dbA = newaction(self, '&Reconnect to database',
+                             'Try to reconnect to database', 'Ctrl+R')
+        self.aboutA = newaction(self, 'About &GnuVet', 'GnuVet version info')
+        helpA = newaction(self, '&Help', 'context sensitive help', 'F1')
+        quitA = newaction(self, '&Quit GnuVet', 'Exit GnuVet', 'Ctrl+Q')
+        self.editA = newaction(
+            self, '&Edit Patient', 'Edit patient description', 'Ctrl+E')
+        self.histA = newaction(
+            self, '&History', 
+            'Add history entry to clinical history', 'Ctrl+H')
+        self.saleA = newaction(
+            self, 'S&ale', 'Add new sale (foods, goods)', 'Ctrl+A')
+        self.mrgA = newaction(
+            self, '&Merge Patient', 
+            'Merge this account with additional account from same patient')
+        self.toggleinsA = newaction(
+            self, '&Insurance Info', 
+            'Toggle full vs short insurance info', 'Ctrl+I')
+        self.togglelocA = newaction(
+            self,'&Location Info','Toggle full vs short location info','Ctrl+L')
+        self.trtA = newaction(
+            self, '&Treatment', 
+            'Add treatment entry to clinical history', 'Ctrl+T')
+        self.payA = newaction(self, 'Pa&yment', 'Take payment', 'Ctrl+Y')
+        ## self.vaccA = newaction(self, short='Ctrl+V')) # ?
         #    MENUES
         taskM = QMenu(self.w.menubar)
         taskM.setTitle(self.tr('&Task'))
@@ -194,30 +158,26 @@ class Patient(QMainWindow):
         newM.addAction(self.trtA)
         repM = QMenu(newM)
         repM.setTitle(self.tr('&Repeat'))
-        repM.setStatusTip(self.tr('Add repeat medication or diet to clinical '
-                                  'history'))
-        medA = QAction(self.tr('Rep &medication'), self) # add func
-        medA.setAutoRepeat(0)
-        medA.setShortcut(self.tr('Ctrl+M'))
-        medA.setStatusTip(self.tr('Add repeat medication to clinical history'))
-        dietA = QAction(self.tr('Rep &diet'), self) # add func
-        dietA.setAutoRepeat(0)
-        ##dietA.setShortcut(self.tr('Ctrl+D'))
-        dietA.setStatusTip(self.tr('Add repeat diet to clinical history'))
+        repM.setStatusTip(
+            self.tr('Add repeat medication or diet to clinical history'))
+        medA = newaction(self, 'Rep &medication',
+                         'Add repeat medication to clinical history', 'Ctrl+M')
+        dietA = newaction(
+            self, 'Rep &diet', 'Add repeat diet to clinical history', 'Ctrl+D')
         repM.addAction(medA)
         repM.addAction(dietA)
         newM.addAction(repM.menuAction())
         newM.addAction(self.histA)
         newM.addAction(self.saleA)
-        newM.addAction(self.payA) # add func
+        newM.addAction(self.payA)
         helpM.addAction(helpA)
         helpM.addSeparator()
         helpM.addAction(self.aboutA)
         #    right-click menu for htable
         self.rcM = QMenu(self.w.htable)
-        rceditA = QAction(self.tr('&edit entry'), self.rcM)
-        rcdelA = QAction(self.tr('&delete entry'), self.rcM)
-        rcsrchA = QAction(self.tr('&search history'), self.rcM)
+        rceditA = newaction(self, '&edit entry'), self.rcM) # hierwei:newaction?
+        rcdelA = newaction(self, '&delete entry'), self.rcM)
+        rcsrchA = newaction(self, '&search history'), self.rcM)
         self.rcM.addAction(rceditA)
         self.rcM.addAction(rcdelA)
         self.rcM.addAction(rcsrchA)

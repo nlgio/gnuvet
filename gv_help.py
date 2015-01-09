@@ -1,9 +1,10 @@
 """The help module."""
 from os import uname, path
 from PyQt4.QtCore import QUrl, pyqtSignal
-from PyQt4.QtGui import QMainWindow, QAction, QMenu
+from PyQt4.QtGui import QMainWindow, QMenu
 from help_ui import Ui_Help
 import gv_qrc
+from util import newaction
 
 class Help(QMainWindow):
     def __init__(self, parent=None, hdoc='toc.html'):
@@ -12,33 +13,13 @@ class Help(QMainWindow):
         self.w.setupUi(self)
         self.w.textBrowser.setSearchPaths(self.help_dir())
         #    ACTIONS
-        self.backA = QAction(self.tr('Bac&k'), self)
-        self.backA.setAutoRepeat(0)
-        self.backA.setShortcut(self.tr('Alt+Left'))
-        self.backA.setStatusTip(self.tr('Go to previous page'))
-        self.forwardA = QAction(self.tr('&Forward'), self)
-        self.forwardA.setAutoRepeat(0)
-        self.forwardA.setShortcut(self.tr('Alt+Right'))
-        self.forwardA.setStatusTip(self.tr('Go to next page'))
-        closeA = QAction(self.tr('&Close'), self)
-        closeA.setAutoRepeat(0)
-        closeA.setShortcut(self.tr('Ctrl+W'))
-        closeA.setStatusTip(self.tr('Close Help Window'))
-        contentsA = QAction(self.tr('Co&ntents'), self)
-        contentsA.setAutoRepeat(0)
-        contentsA.setStatusTip(self.tr('Go to Table of Contents'))
-        indexA = QAction(self.tr('Help &Index'), self)
-        indexA.setAutoRepeat(0)
-        indexA.setShortcut(self.tr('Ctrl+I'))
-        indexA.setStatusTip(self.tr('Go to Help Index'))
-        quitA = QAction(self.tr('&Quit GnuVet'), self)
-        quitA.setAutoRepeat(0)
-        quitA.setShortcut(self.tr('Ctrl+Q'))
-        quitA.setStatusTip(self.tr('Quit GnuVet'))
-        helpA = QAction(self.tr('&Help'), self)
-        helpA.setAutoRepeat(0)
-        helpA.setShortcut('F1')
-        helpA.setStatusTip(self.tr('How to use the Help System'))
+        self.backA = newaction(self, 'Bac&k', 'Go to previous page', 'Alt+Left')
+        self.forwardA = newaction(self,'&Forward','Go to next page','Alt+Right')
+        closeA = newaction(self, '&Close', 'Close Help Window', 'Ctrl+W')
+        contentsA = newaction(self, 'Co&ntents', 'Go to Table of Contents')
+        indexA = newaction(self, 'Help &Index', 'Go to Help Index', 'Ctrl+I')
+        quitA = newaction(self, '&Quit GnuVet', 'Quit GnuVet', 'Ctrl+Q')
+        helpA = newaction(self, '&Help', 'How to use the Help System', 'F1')
         #    MENUES
         goM = QMenu(self.w.menubar)
         goM.setTitle(self.tr('&Go'))

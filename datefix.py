@@ -2,9 +2,9 @@
 from datetime import datetime, timedelta # date, time
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import QAction, QMainWindow, QIcon
+from PyQt4.QtGui import QMainWindow, QIcon
 from keycheck import Keycheck
-from util import ch_conn, querydb
+from util import ch_conn, newaction, querydb
 from datefix_ui import Ui_Datefix
 import gv_qrc
 
@@ -35,24 +35,16 @@ class Datefix(QMainWindow):
         self.w.setupUi(self)
         self.conns = {} # pyqt bug: disconnect() w/o arg can segfault
         self.sigs  = {}
-        develA = QAction(self)
-        develA.setAutoRepeat(False)
-        develA.setShortcut('Ctrl+B')
+        develA = newaction(self, short='Ctrl+B')
         develA.triggered.connect(self.develf)
         self.addAction(develA)
-        quitA = QAction(self)
-        quitA.setAutoRepeat(False)
-        quitA.setShortcut(self.tr('Ctrl+Q'))
+        quitA = newaction(self, short='Ctrl+Q')
         quitA.triggered.connect(self.gv_quitconfirm)
         self.addAction(quitA)
-        closeA = QAction(self)
-        closeA.setAutoRepeat(False)
-        closeA.setShortcut(self.tr('Ctrl+W'))
+        closeA = newaction(self, short='Ctrl+W')
         closeA.triggered.connect(self.close)
         self.addAction(closeA)
-        helpA = QAction(self)
-        helpA.setAutoRepeat(False)
-        helpA.setShortcut(self.tr('F1'))
+        helpA = newaction(self, 'F1')
         helpA.triggered.connect(self.help_self)
         self.addAction(helpA)
         if parent: # devel if

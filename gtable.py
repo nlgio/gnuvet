@@ -938,7 +938,8 @@ if __name__ == '__main__':
     def develf():
         b.append_row(['one', 'two', 'tre'])
         
-    from PyQt4.QtGui import QAction, QApplication, QLineEdit
+    from PyQt4.QtGui import QApplication, QLineEdit
+    from util import newaction
     a = QApplication([])
     a.setStyle('plastique')
     c = QFrame()
@@ -948,21 +949,13 @@ if __name__ == '__main__':
     b.setGeometry(30, 10, 380, 170)
     d = QLineEdit(c)
     d.setGeometry(30, 200, 50, 24)
-    clearA = QAction(b)
-    clearA.setShortcut('Ctrl+C')
-    clearA.setAutoRepeat(0)
+    clearA = newaction(caller=b, short='Ctrl+C')
     clearA.triggered.connect(b.clear)
-    devA = QAction(b)
-    devA.setShortcut('Ctrl+D')
-    devA.setAutoRepeat(0)
+    devA = newaction(caller=b, short='Ctrl+D')
     devA.triggered.connect(develf)
-    fillA  = QAction(b)
-    fillA.setShortcut('Ctrl+F')
-    fillA.setAutoRepeat(0)
+    fillA  = newaction(caller=b, short='Ctrl+F')
     fillA.triggered.connect(filltable)
-    quitA = QAction(b)
-    quitA.setShortcut('Ctrl+Q')
-    quitA.setAutoRepeat(0)
+    quitA = newaction(caller=b, short='Ctrl+Q')
     quitA.triggered.connect(exit)
     b.addActions([clearA, devA, fillA, quitA])
     b.set_headers(['one', 'two', 'tre'])

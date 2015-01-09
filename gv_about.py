@@ -1,8 +1,9 @@
 """GnuVet 'About' Dialog."""
-from PyQt4.QtGui import QAction, QMainWindow
+from PyQt4.QtGui import QMainWindow
 from about_ui import Ui_About
 import gv_version
 from keycheck import Keycheck
+from util import newaction
 
 class About(QMainWindow):
     gaia = None
@@ -11,14 +12,10 @@ class About(QMainWindow):
         super(About, self).__init__(parent)
         self.w = Ui_About()
         self.w.setupUi(self)
-        quitA = QAction(self.tr('&Quit'), self)
-        quitA.setAutoRepeat(0)
-        quitA.setShortcut(self.tr('Ctrl+Q'))
+        quitA = newaction(caller=self, txt='&Quit', short='Ctrl+Q')
         self.addAction(quitA)
         quitA.triggered.connect(self.gv_quitconfirm)
-        closeA = QAction(self)
-        closeA.setAutoRepeat(0)
-        closeA.setShortcut('Ctrl+W')
+        closeA = newaction(caller=self, short='Ctrl+W')
         closeA.triggered.connect(self.close)
         self.w.okPb.clicked.connect(self.close)
         self.w.okPb.setDefault(1)

@@ -6,10 +6,10 @@
 
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import (QAction, QCheckBox, QLabel, QMainWindow, QMenu)
+from PyQt4.QtGui import (QCheckBox, QLabel, QMainWindow, QMenu)
 
 from keycheck import Keycheck
-from util import ch_conn, querydb
+from util import ch_conn, newaction, querydb
 from aebasecol_ui import Ui_Aebasecol
 
 class Aebasecol(QMainWindow):
@@ -26,25 +26,13 @@ class Aebasecol(QMainWindow):
         self.conns = {} # pyqt bug: disconnect() w/o arg can segfault
         self.sigs  = {}
         #    ACTIONS
-        closeA = QAction(self.tr('Close &Window'), self)
-        closeA.setAutoRepeat(False)
-        closeA.setShortcut(self.tr('Ctrl+W'))
-        closeA.setStatusTip(self.tr('Close this window'))
-        self.dbA = QAction(self.tr('&Reconnect to database'), self)
-        self.dbA.setAutoRepeat(False)
-        self.dbA.setShortcut(self.tr('Ctrl+R'))
-        self.dbA.setStatusTip(self.tr('Try to reconnect to database'))
-        helpA = QAction(self.tr('&Help'), self)
-        helpA.setAutoRepeat(False)
-        helpA.setShortcut(self.tr('F1'))
-        helpA.setStatusTip(self.tr('Context sensitive help'))
-        aboutA = QAction(self.tr('About &GnuVet'), self)
-        aboutA.setAutoRepeat(False)
-        aboutA.setStatusTip(self.tr('GnuVet version info'))
-        quitA = QAction(self.tr('&Quit GnuVet'), self)
-        quitA.setAutoRepeat(False)
-        quitA.setShortcut(self.tr('Ctrl+Q'))
-        quitA.setStatusTip(self.tr('Close all windows and quit GnuVet'))
+        closeA = newaction(self, 'Close &Window', 'Close this window', 'Ctrl+W')
+        self.dbA = newaction(self, '&Reconnect to database',
+                             'Try to reconnect to database', 'Ctrl+R')
+        helpA = newaction(self, '&Help', 'Context sensitive help', 'F1')
+        aboutA = newaction(self, 'About &GnuVet', 'GnuVet version info')
+        quitA = newaction(
+            self, '&Quit GnuVet', 'Close all windows and quit GnuVet', 'Ctrl+Q')
         self.addAction(closeA)
         #    MENUES
         taskM = QMenu('&Task', self.w.menubar)

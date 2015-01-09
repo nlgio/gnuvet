@@ -30,9 +30,14 @@ def money(val, mult=1):
         from decimal import Decimal
     return (val * mult).quantize(Decimal('0.00'))
 
-def new_action(caller=None, txt=None, stip=None, short=None):
-    action = QAction(caller.tr(txt), caller)
-    action.setAutoRepeat(0)
+def newaction(caller=None, txt='', stip=None, short=None, icon=None):
+    if icon:
+        if not 'QIcon' in locals():
+            from PyQt4.QtGui import QIcon
+        action = QAction(QIcon(icon), caller.tr(txt), caller)
+    else:
+        action = QAction(caller.tr(txt), caller)
+    action.setAutoRepeat(False)
     if stip:
         action.setStatusTip(caller.tr(stip))
     if short:

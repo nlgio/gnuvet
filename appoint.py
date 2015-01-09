@@ -8,9 +8,9 @@ from datetime import date, datetime, time, timedelta
 from locale import LC_ALL, resetlocale, setlocale
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal, Qt
-from PyQt4.QtGui import (QAction, QIcon, QMainWindow, QMenu)
+from PyQt4.QtGui import (QMainWindow, QMenu)
 from keycheck import Keycheck
-from util import ch_conn, querydb
+from util import ch_conn, newaction, querydb
 from appoint_ui import Ui_Appointer
 from gtable import Gcell
 
@@ -60,64 +60,32 @@ border-radius: 3px;
         self.w.setupUi(self)
         #    ACTIONS
         # devel
-        develA = QAction('&Devel helper', self)
-        develA.setAutoRepeat(False)
-        develA.setShortcut('Ctrl+B')
+        develA = newaction(self, '&Devel helper', short='Ctrl+B')
         # end devel
-        closeA = QAction(self.tr('Close &Window'), self)
-        closeA.setAutoRepeat(False)
-        closeA.setShortcut(self.tr('Ctrl+W'))
-        closeA.setStatusTip(self.tr('Close this window'))
-        self.dbA = QAction(self.tr('&Reconnect to database'), self)
-        self.dbA.setAutoRepeat(False)
-        self.dbA.setShortcut(self.tr('Ctrl+R'))
-        self.dbA.setStatusTip(self.tr('Try to reconnect to database'))
-        self.delA = QAction(self.tr('&Delete appointment'), self)
-        self.delA.setAutoRepeat(False)
-        self.delA.setShortcut(self.tr('Ctrl+D'))
-        self.delA.setStatusTip(self.tr('Delete selected appointment'))
-        self.editA = QAction(self.tr('&Edit appointment'), self)
-        self.editA.setAutoRepeat(False)
-        self.editA.setShortcut(self.tr('Ctrl+E'))
-        self.editA.setStatusTip(self.tr('Edit selected appointment'))
-        helpA = QAction(self.tr('&Help'), self)
-        helpA.setAutoRepeat(False)
-        helpA.setShortcut(self.tr('F1'))
-        helpA.setStatusTip(self.tr('Context sensitive help'))
-        self.opencA = QAction(self.tr("Open client"), self)
-        self.opencA.setAutoRepeat(False)
-        self.opencA.setShortcut(self.tr('Ctrl+C'))
-        self.opencA.setStatusTip(self.tr('Open selected client'))
-        self.openpA = QAction(self.tr("Open patient"), self)
-        self.openpA.setAutoRepeat(False)
-        self.openpA.setShortcut(self.tr('Ctrl+P'))
-        self.openpA.setStatusTip(self.tr('Open selected patient'))
+        closeA = newaction(self, 'Close &Window', 'Close this window', 'Ctrl+W')
+        self.dbA = newaction(self, '&Reconnect to database',
+                             'Try to reconnect to database', 'Ctrl+R')
+        self.delA = newaction(
+            self,'&Delete appointment','Delete selected appointment','Ctrl+D')
+        self.editA = newaction(
+            self, '&Edit appointment', 'Edit selected appointment', 'Ctrl+E')
+        helpA = newaction(self, '&Help', 'Context sensitive help', 'F1')
+        self.opencA = newaction(
+            self, 'Open client', 'Open selected client', 'Ctrl+C')
+        self.openpA = newaction(
+            self, 'Open patient', 'Open selected patient', 'Ctrl+P')
         self.markM = QMenu(self.tr('&Mark appointment as'), self)
-        markopenA = QAction(QIcon(':/images/markopen.png'),
-                            self.tr('open'), self)
-        markdoneA = QAction(QIcon(':/images/markdone.png'),
-                            self.tr('done'), self)
-        markmissedA = QAction(QIcon(':/images/markmissed.png'),
-                            self.tr('missed'), self)
-        self.newappA = QAction(self.tr('&Add new appoinment'), self)
-        self.newappA.setAutoRepeat(False)
-        self.newappA.setShortcut(self.tr('Ctrl+N'))
-        self.newappA.setStatusTip(
-            self.tr('Set new appointment at selected date or other'))
-        quitA = QAction(self.tr('&Quit GnuVet'), self)
-        quitA.setAutoRepeat(False)
-        quitA.setShortcut(self.tr('Ctrl+Q'))
-        quitA.setStatusTip(self.tr('Close all windows and quit GnuVet.'))
-        self.selectA = QAction(self.tr('&Select date'), self)
-        self.selectA.setAutoRepeat(False)
-        self.selectA.setShortcut(self.tr('Ctrl+S'))
-        self.selectA.setStatusTip(self.tr('Select a specific date'))
-        aboutA = QAction(self.tr('About &GnuVet'), self)
-        aboutA.setAutoRepeat(False)
-        aboutA.setStatusTip(self.tr('GnuVet version info'))
-        self.todayA = QAction(self.tr('Select &Today'), self) # self?todayA
-        self.todayA.setAutoRepeat(False)
-        self.todayA.setShortcut(self.tr('Ctrl+T'))
+        markopenA = newaction(self, 'open', icon=':/images/markopen.png')
+        markdoneA = newaction(self, 'done', icon=':/images/markdone.png')
+        markmissedA = newaction(self, 'missed', ':/images/markmissed.png')
+        self.newappA = newaction(
+            self, '&Add new appointment', 'Set new appointment', 'Ctrl+N')
+        quitA = newaction(
+            self,'&Quit GnuVet','Close all windows and quit GnuVet.','Ctrl+Q')
+        self.selectA = newaction(
+            self, '&Select date', 'Select a specific date', 'Ctrl+S')
+        aboutA = newaction(self, 'About &GnuVet', 'GnuVet version info')
+        self.todayA = newaction(self, 'Select &Today', short='Ctrl+T')
         # hierwei further actions
         #    MENUES
         taskM = QMenu(self.w.menubar)

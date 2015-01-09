@@ -10,9 +10,9 @@ from sys import argv, platform, stderr
 from os import path as os_path
 from getopt import gnu_getopt, GetoptError
 from datetime import date
-from PyQt4.QtGui import (QMainWindow, QLabel, QFont, QAction, QApplication)
+from PyQt4.QtGui import (QMainWindow, QLabel, QFont, QApplication)
 from PyQt4.QtCore import pyqtSignal
-from util import querydb
+from util import newaction, querydb
 
 import dbmod
 import gv_qrc
@@ -50,54 +50,29 @@ class Gnuv_MainWin(QMainWindow):
         self.w.noPb.clicked.connect(self.gv_quitno)
         #    ACTIONS
         # devel:
-        debugA = QAction(self)
-        debugA.setAutoRepeat(False)
-        debugA.setShortcut('Ctrl+D')
+        debugA = newaction(caller=self, short='Ctrl+D')
         self.addAction(debugA)
         debugA.triggered.connect(self.debugf)
         # end devel
-        self.dbA = QAction(self.tr('&Reconnect to db'), self)
-        self.dbA.setAutoRepeat(0) # default autoRepeat is True!
-        self.dbA.setStatusTip(self.tr('Try to reconnect to database'))
-        self.dbA.setShortcut(self.tr('Ctrl+R'))
-        self.patA = QAction(self.tr('&Patients'), self)
-        self.patA.setAutoRepeat(0)
-        self.patA.setStatusTip(self.tr('Search for Patients'))
-        self.patA.setShortcut(self.tr('Ctrl+P'))
-        self.cliA = QAction(self.tr('&Clients'), self)
-        self.cliA.setAutoRepeat(0)
-        self.cliA.setShortcut(self.tr('Ctrl+C'))
-        self.cliA.setStatusTip(self.tr('Search for Clients'))
-        self.vaccremA = QAction(self.tr('&Vacc. Reminders'), self)
-        self.vaccremA.setAutoRepeat(0)
-        self.vaccremA.setShortcut(self.tr('Ctrl+V'))
-        self.vaccremA.setStatusTip(self.tr('Check vacc. reminders'))
-        self.ssearchA = QAction(self.tr('&Special Search'), self)
-        self.ssearchA.setAutoRepeat(0)
-        self.ssearchA.setShortcut(self.tr('Ctrl+S'))
-        self.ssearchA.setStatusTip(
-            self.tr('Search in medication/clinical history/seen date etc.'))
-        self.appointA = QAction(self.tr('&Appointments'), self)
-        self.appointA.setAutoRepeat(0)
-        self.appointA.setShortcut(self.tr('Ctrl+A'))
-        self.appointA.setStatusTip(self.tr('Open appointment diary'))
+        self.dbA = newaction(
+            self, '&Reconnect to db', 'Try to reconnect to database', 'Ctrl+R')
+        self.patA = newaction(
+            self, '&Patients', 'Search for Patients', 'Ctrl+P')
+        self.cliA = newaction(self, '&Clients', 'Search for Clients', 'Ctrl+C')
+        self.vaccremA = newaction(
+            self, '&Vacc. Reminders', 'Check vacc. reminders', 'Ctrl+V')
+        self.ssearchA = newaction(
+            self, '&Special Search',
+            'Search in medication/clinical history/seen date etc.', 'Ctrl+S')
+        self.appointA = newaction(
+            self, '&Appointments', 'Open appointment diary', 'Ctrl+A')
         #    ETC.PP.:
         # ordA jouA finA medA srvA sysA stkA
-        chuserA = QAction(self.tr('Change &User'), self)
-        chuserA.setAutoRepeat(0)
-        chuserA.setShortcut(self.tr('Ctrl+U'))
-        chuserA.setStatusTip(self.tr('Login as different user'))
-        quitA = QAction(self.tr('&Quit'), self)
-        quitA.setAutoRepeat(0)
-        quitA.setShortcut(self.tr('Ctrl+Q'))
-        quitA.setStatusTip(self.tr('Exit GnuVet'))
-        helpA = QAction(self.tr('&Help'), self)
-        helpA.setAutoRepeat(0)
-        helpA.setShortcut('F1')
-        helpA.setStatusTip(self.tr('context sensitive Help'))
-        aboutA = QAction(self.tr('About &GnuVet'), self)
-        aboutA.setAutoRepeat(0)
-        aboutA.setStatusTip(self.tr('GnuVet version information'))
+        chuserA = newaction(
+            self, 'Change &User', 'Login as different user', 'Ctrl+U')
+        quitA = newaction(self, '&Quit', 'Exit GnuVet', 'Ctrl+Q')
+        helpA = newaction(self, '&Help', 'context sensitive Help', 'F1')
+        aboutA = newaction(self, 'About &GnuVet', 'GnuVet version information')
         #    MENUS
         self.w.taskM.addAction(self.dbA)
         self.w.taskM.addSeparator()

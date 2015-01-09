@@ -9,10 +9,10 @@ from datetime import date
 from decimal import Decimal as D
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import QAction, QMainWindow, QMenu
+from PyQt4.QtGui import QMainWindow, QMenu
 import gv_qrc
 from keycheck import Keycheck
-from util import ch_conn, gprice, money, querydb # ch_conn so far unused
+from util import ch_conn, gprice, money, newaction, querydb
 from client_ui import Ui_Client
 
 class Client(QMainWindow):
@@ -36,50 +36,24 @@ class Client(QMainWindow):
         self.installEventFilter(keych)
         #    LOCAL VARIABLES
         #    ACTIONS
-        closeA = QAction(self.tr('Close &Window'), self)
-        closeA.setAutoRepeat(0)
-        closeA.setShortcut(self.tr('Ctrl+W'))
-        closeA.setStatusTip(self.tr('Close this window'))
-        self.dbA = QAction(self.tr('&Reconnect to database'), self)
-        self.dbA.setAutoRepeat(0)
-        self.dbA.setShortcut(self.tr('Ctrl+R'))
-        self.dbA.setStatusTip(self.tr('Try to reconnect to database'))
-        aboutA = QAction(self.tr('About &Gnuvet'), self)
-        aboutA.setAutoRepeat(0)
-        aboutA.setStatusTip(self.tr('GnuVet version info'))
-        helpA = QAction(self.tr('&Help'), self)
-        helpA.setAutoRepeat(0)
-        helpA.setShortcut(self.tr('F1'))
-        helpA.setStatusTip(self.tr('context sensitive help'))
-        quitA = QAction(self.tr('&Quit GnuVet'), self)
-        quitA.setAutoRepeat(0)
-        quitA.setShortcut(self.tr('Ctrl+Q'))
-        quitA.setStatusTip(self.tr('Quit GnuVet'))
-        self.editA = QAction(self.tr('&Edit Client'), self)
-        self.editA.setAutoRepeat(0)
-        self.editA.setShortcut(self.tr('Ctrl+E'))
-        self.editA.setStatusTip(self.tr('Edit client record'))
-        self.mrgA = QAction(self.tr('&Merge Client'), self)
-        self.mrgA.setAutoRepeat(0)
-        self.mrgA.setStatusTip(
-            self.tr('Merge this client\'s accounts if you have more than one'))
-        self.newpatA = QAction(self.tr('&Patient'), self)
-        self.newpatA.setAutoRepeat(0)
-        self.newpatA.setShortcut(self.tr('Ctrl+P'))
-        self.newpatA.setStatusTip(self.tr("Add a patient to this client"))
-        self.newsaleA = QAction(self.tr('S&ale'), self)
-        self.newsaleA.setAutoRepeat(0)
-        self.newsaleA.setShortcut(self.tr('Ctrl+A'))
-        self.newsaleA.setStatusTip(self.tr('Enter patient-unrelated sale'))
-        self.newpayA = QAction(self.tr('Pa&yment'), self)
-        self.newpayA.setAutoRepeat(0)
-        self.newpayA.setShortcut(self.tr('Ctrl+Y'))
-        self.newpayA.setStatusTip(self.tr('Take payment'))
-        self.rippatA = QAction(
-            self.tr('&Mark patient deceased'), self)
-        self.rippatA.setAutoRepeat(0)
-        self.rippatA.setShortcut(self.tr('Ctrl+K'))
-        self.rippatA.setStatusTip(self.tr('Mark selected patient as deceased'))
+        closeA = newaction(self, 'Close &Window', 'Close this window', 'Ctrl+W')
+        self.dbA = newaction(self, '&Reconnect to database',
+                             'Try to reconnect to database', 'Ctrl+R')
+        aboutA = newaction(self, 'About &Gnuvet', 'GnuVet version info')
+        helpA = newaction(self, '&Help', 'Context sensitive help', 'F1')
+        quitA = newaction(self, '&Quit GnuVet', 'Quit GnuVet', 'Ctrl+Q')
+        self.editA = newaction(
+            self, '&Edit Client', 'Edit client record', 'Ctrl+E')
+        self.mrgA = newaction(
+            self, '&Merge Client',
+            'Merge this client\'s accounts if you have more than one')
+        self.newpatA = newaction(
+            self, '&Patient', 'Add a patient to this client', 'Ctrl+P')
+        self.newsaleA = newaction(
+            self, 'S&ale', 'Enter patient-unrelated sale', 'Ctrl+A')
+        self.newpayA = newaction(self, 'Pa&yment', 'Take payment', 'Ctrl+Y')
+        self.rippatA = newaction(self, '&Mark patient deceased',
+                                 'Mark selected patient as deceased', 'Ctrl+K')
         # ...
         #    MENUES
         taskM = QMenu(self.w.menubar)
