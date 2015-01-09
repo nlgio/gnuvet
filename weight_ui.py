@@ -84,40 +84,24 @@ class Ui_Weight(object):
         self.retranslateUi(Weight)
 
     def retranslateUi(self, Weight):
-        Weight.setWindowTitle(QApplication.translate(
-            "Weight", "GnuVet: Patient Weight", None, 1))
-        self.dLb.setText(QApplication.translate(
-            "Weight", "&Date:", None, 1))
-        self.wLb.setText(QApplication.translate(
-            "Weight", "&kg", None, 1))
-        self.estCb.setText(QApplication.translate(
-            "Weight", "&estimated", None, 1))
-        self.entrydelLb.setText(QApplication.translate(
-            "Weight", "Entr&y", None, 1))
-        self.addPb.setText(QApplication.translate("Weight", "&Add", None, 1))
-        self.addPb.setToolTip(
-            QApplication.translate("Weight", "Add entry as set above", None, 1))
-        self.delPb.setText(QApplication.translate("Weight", "De&lete", None, 1))
-        self.delPb.setToolTip(
-            QApplication.translate("Weight", "Delete an entry", None, 1))
-        self.periodPb.setText(
-            QApplication.translate("Weight", "Pe&riod", None, 1))
-        self.periodPb.setToolTip(QApplication.translate(
-            "Weight", "Select time period to display", None, 1))
-        self.printPb.setText(QApplication.translate(
-            "Weight", "&Print", None, 1))
-        self.closePb.setText(QApplication.translate(
-            "Weight", "Close", None, 1))
-        self.confirmPb.setText(
-            QApplication.translate("Weight", "&Add", None, 1))
-        self.confirm_cancelPb.setText(
-            QApplication.translate("Weight", "&Cancel", None, 1))
-        self.loLb.setText(QApplication.translate("Weight", "&from", None, 1))
-        self.hiLb.setText(QApplication.translate("Weight", "&to", None, 1))
-        self.dselPb.setText(QApplication.translate("Weight", "&Ok", None, 1))
-        self.dsel_cancelPb.setText(
-            QApplication.translate("Weight", "&Cancel", None, 1))
-        self.entrydelPb.setText(
-            QApplication.translate("Weight", "De&lete", None, 1))
-        self.entrydel_cancelPb.setText(
-            QApplication.translate("Weight", "&Cancel", None, 1))
+        Weight.setWindowTitle(tl("GnuVet: Patient Weight"))
+        self.dLb.setText(tl("&Date:"))
+        self.wLb.setText(tl("&kg"))
+        self.estCb.setText(tl("&estimated"))
+        self.entrydelLb.setText(tl("Entr&y"))
+        self.addPb.setText(tl("&Add"))
+        self.addPb.setToolTip(tl("Add entry as set above"))
+        self.delPb.setText(tl("De&lete"))
+        self.delPb.setToolTip(tl("Delete an entry"))
+        self.periodPb.setText(tl("Pe&riod"))
+        self.periodPb.setToolTip(tl("Select time period to display"))
+        self.printPb.setText(tl("&Print"))
+        self.closePb.setText(tl("Close"))
+        self.confirmPb.setText(tl("&Add"))
+        self.confirm_cancelPb.setText(tl("&Cancel"))
+        self.loLb.setText(tl("&from"))
+        self.hiLb.setText(tl("&to"))
+        self.dselPb.setText(tl("&Ok"))
+        self.dsel_cancelPb.setText(tl("&Cancel"))
+        self.entrydelPb.setText(tl("De&lete"))
+        self.entrydel_cancelPb.setText(tl("&Cancel"))

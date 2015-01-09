@@ -7,23 +7,17 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-## from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QApplication, QLabel, QFont, QPushButton
 
 class Ui_About(object):
     def setupUi(self, About):
-        ## About.setWindowModality(Qt.NonModal)
         About.resize(361,275)
-        ## sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
-        ##                                QtGui.QSizePolicy.Fixed)
-        ## About.setSizePolicy(sizePolicy)
         About.setSizePolicy(0, 0)
         self.vLb = QLabel(About)
         self.vLb.setGeometry(93,20,165,19)
         font = QFont()
         font.setBold(True)
         self.vLb.setFont(font)
-        ## self.vLb.setAlignment(Qt.AlignCenter)
         self.aboutLb = QLabel(About)
         self.aboutLb.setGeometry(25,50,298,160)
         self.aboutLb.setWordWrap(True)

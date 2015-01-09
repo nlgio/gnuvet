@@ -1,8 +1,7 @@
 """Search Add Edit patient interface."""
+# Add completer for petpassLe and idLe
 # change self.action to self.act and use that insto self.stage
 # recheck all -- still functional, useful? connect.s? g|setattr(self, what)!!!
-#     avoid dependence on gnuv.py, should be ready for other modules as well
-# add search for breed, spec, col, loc, ins - done?
 # switch off completers when adding patient?
 # re-implement state_write and db_err and _changes_ and suchlike
 # test pat_add things with client list (clis)
@@ -16,12 +15,11 @@
 
 from datetime import date, timedelta
 from psycopg2 import OperationalError
-# eliminated: Qt # effin Qt for ItemFlags
 from PyQt4.QtCore import pyqtSignal
-# eliminated: QCheckBox,QComboBox,QDateEdit,QLineEdit,QRadioButton,QSpinBox, 
-from PyQt4.QtGui import (QAction, QApplication, QCompleter, QMainWindow,
+from PyQt4.QtGui import (QAction, QApplication, QMainWindow,
                          QMenu, QStringListModel)
 import gv_qrc
+from gcompleter import Gcompleter
 from keycheck import Keycheck
 from util import ch_conn, querydb
 from saepat_ui import Ui_Saepat
@@ -57,9 +55,6 @@ class Saepat(QMainWindow):
         self.w = Ui_Saepat()
         self.w.setupUi(self)
         #    instance VARIABLES
-        (self.blist, self.slist, self.clist, self.llist, self.ilist) = (
-            [''], [''], [''], [], ['']) # for dd completers
-        self.cflist, self.cslist, self.plist = [], [], [] # dito but les
         self.conns = {} # (py)qt bug: segfaults on disconnect() w/o arg
         self.sigs  = {}
         self.pids = []
@@ -229,10 +224,9 @@ class Saepat(QMainWindow):
         if self.curs:
             self.dbA.setVisible(0)
             self.dbA.setEnabled(0)
-            logname = querydb(
-                self,
-                'select stf_logname from staff where stf_id=%s',
-                (self.staffid,))
+            logname = querydb(self,
+                              'select stf_logname from staff where stf_id=%s',
+                              (self.staffid,))
             if logname is None:  return # db error
             logname = logname[0][0]
         self.w.lLb.setText(logname)
@@ -255,36 +249,17 @@ class Saepat(QMainWindow):
         self.w.detailedCb.stateChanged.connect(self.details_toggle)
         if not pid:
             self.w.regDe.setEnabled(False)
-        #    COMPLETER HELPERS
-        self.dds = (self.w.breedDd, self.w.colDd, self.w.insDd, self.w.locDd,
-                   self.w.specDd)
-        self.les = (self.w.pnameLe, self.w.csnameLe, self.w.cfnameLe)
-        self.setupdd(self.w.breedDd, 'b')
-        self.setupdd(self.w.colDd, 'c')
-        self.setupdd(self.w.insDd, 'i')
-        self.setupdd(self.w.locDd, 'l')
-        self.setupdd(self.w.specDd, 's')
-        setattr(self.w.csnameLe, 'list', self.cslist)
-        setattr(self.w.cfnameLe, 'list', self.cflist)
-        setattr(self.w.pnameLe, 'list', self.plist)
-        #    COMPLETERs: d Dd, l Le
-        self.dmodel = QStringListModel(self)
-        self.dcompl = QCompleter(self)
-        self.dcompl.setCaseSensitivity(0)
-        self.dcompl.setModelSorting(1)
-        self.dcompl.setCompletionMode(1)
-        self.dcompl.setModel(self.dmodel)
-        self.lmodel = QStringListModel(self)
-        self.lcompl = QCompleter(self)
-        self.lcompl.setCaseSensitivity(0)
-        self.lcompl.setModelSorting(1)
-        self.lcompl.setCompletionMode(0)
-        self.lcompl.setModel(self.lmodel)
-        #    LISTFILL lEs
-        if not self.db_err:
-            self.get_pnames()
-            self.get_cfnames()
-            self.get_csnames()
+        #    COMPLETERS
+        self.cwidgets = []
+        for w in ('breedDd', 'cfnameLe', 'colDd', 'csnameLe', 'insDd', 'locDd',
+                  'pnameLe', 'specDd'):
+            self.cwidgets.append(getattr(self.w, w))
+        #    LISTFILL lEs:
+        ## if not self.db_err:
+        self.get_pnames()
+        self.get_cfnames()
+        self.get_csnames()
+        self.gc = Gcompleter(parent=self.w.saeFr)
         QApplication.instance().focusChanged.connect(self.focuschange)
         #    FURTHER WIDGET CONNECTIONS
         self.w.ageSb.valueChanged.connect(self.adapt_dob)
@@ -293,6 +268,7 @@ class Saepat(QMainWindow):
         #    FINISH
         self.keycheck = Keycheck(self)
         self.installEventFilter(self.keycheck)
+        ch_conn(self, 'esc', self.keycheck.esc, self.close)
         self.age_toggle()
         if act == 's':
             self.prep_s()
@@ -318,7 +294,7 @@ class Saepat(QMainWindow):
         #self.w.mainPb.setDefault(yes)
     
     def adapt2colours(self, idx):
-        """Adapt breed/spec combos to selection [idx] in colours.
+        """Adapt breed/spec Dds to selection [idx] in colours.
         Triggered by colDd.currentIndexChanged."""
         self.w.mixedcolCb.setEnabled(idx > 1)
         if self.w.specDd.currentIndex()>0 or self.w.breedDd.currentIndex()>0:
@@ -329,36 +305,40 @@ class Saepat(QMainWindow):
                 'select c_speccode from colours where col_id=%s',
                 (self.w.colDd.itemData(idx, 32).toInt()[0],))
             if scode is None:  return # db error
-            scode = scode[0][0] # e.g.1048543
+            scode = scode[0][0] # e.g.1048543, or 0
         else:
-            scode = 'a'
-            # new: scode = 0 # all
+            ## scode = 'a'
+            scode = ''
         self.breed2spec = {}
         self.w.breedDd.currentIndexChanged.disconnect(self.adapt_colours)
         self.w.breedDd.clear()
         self.w.breedDd.addItem('', 0)
         self.w.breedDd.currentIndexChanged.connect(self.adapt_colours)
-        codestring = ''
-        if scode != 'a':
-            codestring += self.curs.mogrify(
-                ' and spec_code in %s', (tuple('a' + scode),))
-        self.blist = []
+        ## codestring = ''
+        ## if scode != 'a':
+        ##     codestring += self.curs.mogrify(
+        ##         ' and spec_code in %s', (tuple('a' + scode),))
+        if scode:
+            scode = ' and bool({}&(1<<b_spec-1))'.format(scode)
+        else:
+            scode = ''
+        blist = []
         res = querydb( # not even at gunpoint?  Ha!
             self,
+            ## 'select distinct breed_id,breed_name,b_spec from breeds,species '
+            ## 'where spec_id=b_spec{} order by breed_name'.format(codestring))
+            # hierwei: do we need species and spec_id here?
             'select distinct breed_id,breed_name,b_spec from breeds,species '
-            'where spec_id=b_spec{} order by breed_name'.format(codestring))
-        # new:
-        #    'select distinct breed_id,breed_name,b_spec from breeds '
-        #    'where spec_id=b_spec and %s|(1<<b_spec-1)=%s',
-        #    (spcode,spcode)
+            'where spec_id=b_spec{} order by breed_name'.format(scode))
         if res is None:  return # db error
         for e in res:
             self.w.breedDd.addItem(e[1], e[0])
-            self.blist.append(e[1])
+            blist.append(e[1])
             self.breed2spec[e[0]] = e[2]
+        self.w.breedDd.list = blist
 
     def adapt_age(self):
-        """Adapt age combo to changes in dobDe."""
+        """Adapt ageDd to changes in dobDe."""
         if self.w.ageSb.hasFocus() or self.w.ageuDd.hasFocus():
             return
         age = self.w.dobDe.date().daysTo(self.today)
@@ -378,7 +358,7 @@ class Saepat(QMainWindow):
             self.w.ageSb.setValue(age)
     
     def adapt_breeds(self, idx):
-        """Adapt breed combo to spec change/breed addition.
+        """Adapt breedDd to spec change/breed addition.
         Triggered by specDd.activated, called by set_addedspec."""
         bdx = 0
         self.w.breedDd.currentIndexChanged.disconnect(self.adapt_colours)
@@ -395,22 +375,22 @@ class Saepat(QMainWindow):
                 'breed_name')
         if res is None:  return # db error
         self.breed2spec = {}
-        self.blist = []
+        blist = []
         bdx = self.w.breedDd.itemData(self.w.breedDd.currentIndex(), 32)
         self.w.breedDd.clear()
         self.w.breedDd.addItem('', 0)
         for e in res:
             self.w.breedDd.addItem(e[1], e[0])
-            self.blist.append(e[1])
+            blist.append(e[1])
             self.breed2spec[e[0]] = e[2]
-        self.w.breedDd.list = self.blist # this is it
+        self.w.breedDd.list = blist
         self.w.breedDd.setCurrentIndex(self.w.breedDd.findData(bdx, 32))
         self.adapt_colours(self.w.breedDd.currentIndex())
         self.w.breedDd.currentIndexChanged.connect(self.adapt_colours)
 
     def adapt_colours(self, idx=0):
         """Adapt colours to species chosen by selecting breed.  Triggered by
-        breedDd.cIC [compl_b, pat_edit]. Called by set_addedbreed."""
+        breedDd.cIC [pat_edit]. Called by set_addedbreed."""
         if idx == -1:  return
         if idx:
             self.currentspec = self.breed2spec[
@@ -600,79 +580,6 @@ class Saepat(QMainWindow):
         ##     self.state_write()
         if self.gaia and hasattr(self.gaia, 'xy_decr'):
             self.gaia.xy_decr()
-
-    def compldd(self, dd, txt):
-        """Common actions on text input in Dd."""
-        if not txt:
-            dd.olen = 0
-            dd.setCurrentIndex(0)
-            return
-        if not dd.completer():
-            self.setcompleter(dd)
-        if len(txt) <= dd.olen: # bs, del or replace
-            result = dd.query(txt)
-            while len(result) < 2 or len(txt) == dd.olen:
-                txt = txt[:-1]
-                if not txt:
-                    dd.olen = 0
-                    dd.setCurrentIndex(0)
-                    return
-                result = dd.query(txt)
-            self.dmodel.setStringList(result)
-        else: # text added
-            self.dmodel.setStringList(dd.query(txt))
-        self.complete_dd(dd, txt)
-    
-    def complete_dd(self, dd, txt):
-        """Complete partly entered data in dropdown (QComboBox)."""
-        if len(self.dmodel.stringList()) == 1: # one match
-            dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
-            dd.completer().setWidget(None)
-            dd.setCompleter(None)
-            dd.olen = len(dd.currentText())
-            return
-        elif len(self.dmodel.stringList()): # several
-            dd.setCurrentIndex(dd.findText(self.dmodel.stringList()[0]))
-        else: # None
-            idx = 0
-            if type(txt) is not str:
-                txt = str(txt)
-            print('c_dd: {} is {}'.format(txt, type(txt)))
-            txt = txt[:-1].lower()
-            while txt:
-                l = [e for e in dd.list if e.lower().startswith(txt)]
-                l.extend([e for e in dd.list
-                          if e.lower().count(txt) and e not in l])
-                if l:
-                    idx = dd.list.index(l[0])
-                    break
-                else:
-                    txt = txt[:-1]
-            dd.setCurrentIndex(idx)
-        dd.olen = len(txt)
-        ch_conn(self, 'activated', self.dcompl.activated, dd.setlen)
-        self.dcompl.setCompletionPrefix(txt)
-        self.dcompl.complete()
-        if len(dd.currentText()) > dd.olen:
-            dd.lineEdit().setSelection(dd.olen, 80)
-    
-    def compl_b(self, txt):
-        """Breed completer."""
-        self.compldd(self.w.breedDd, txt)
-
-    def compl_c(self, txt):
-        """Colour completer."""
-        self.compldd(self.w.colDd, txt)
-
-    def compl_i(self, txt):
-        """Insurance completer."""
-        self.compldd(self.w.insDd, txt)
-
-    def compl_l(self, txt):
-        self.compldd(self.w.locDd, txt)
-
-    def compl_s(self, txt):
-        self.compldd(self.w.specDd, txt)
         
     def db_state(self, db=None): # hierwei ck vs gaia from gnuv.py
         """Actions to be taken on db loss and gain."""
@@ -774,7 +681,7 @@ class Saepat(QMainWindow):
     def err_ok(self):
         self.w.errFr.hide()
 
-    def error_msg(self, err_msg=''):
+    def error_msg(self, err_msg=''): # obsolete? ck gaia re dberror
         """Display error message in errFr when: db-error or pat_exists."""
         self.w.saeFr.setEnabled(0)
         self.w.errLb.setText(self.tr(err_msg))
@@ -829,27 +736,26 @@ class Saepat(QMainWindow):
             res[18]) # breed
 
     def focuschange(self, old, new):
-        if new:
-            if new in self.dds or new in self.les:
-                self.setcompleter(new)
+        if new in self.cwidgets:
+            self.gc.setwidget(old=old, new=new, l=new.list)
     
     def get_cfnames(self):
         res = querydb(self,
                       'select distinct c_fname from clients order by c_fname')
         if res is None:  return # db error
-        self.cflist.extend([e[0] for e in res])
+        self.w.cfnameLe.list = [e[0] for e in res]
     
     def get_csnames(self):
         res = querydb(self,
                       'select distinct c_sname from clients order by c_sname')
         if res is None:  return # db error
-        self.cslist.extend([e[0] for e in res])
+        self.w.csnameLe.list = [e[0] for e in res]
         
     def get_pnames(self):
         res = querydb(self,
                       'select distinct p_name from patients order by p_name')
         if res is None:  return # db error
-        self.plist.extend([e[0] for e in res])
+        self.w.pnameLe.list = [e[0] for e in res]
 
     def gv_quit(self, quitnow=False): # hierwei: cave action.checked=False
         """Signal children if quitting GnuVet or not.  Add self.shutdown?"""
@@ -1177,7 +1083,7 @@ class Saepat(QMainWindow):
         print('double name check')
         if not self.nameok:
             print('not nameok')
-
+            # hierwei
             if self.stage == 'e':
                 res = querydb(
                     self,
@@ -1445,10 +1351,6 @@ class Saepat(QMainWindow):
 
     def pat_save(self):
         """Insert/Update changes to db."""
-        ## # Check Dds for validity -- shouldn't be nec anymore
-        ## for dd in (self.w.breedDd, self.w.specDd, self.w.colDd,
-        ##            self.w.locDd, self.w.insDd):
-        ##     self.complete_dd(dd)
         ## ck update p set (col, col, ...) = (val, val, ...)
         ## signal finish, like via addpat, chdpat or suchlike
         neut = neutdu = False
@@ -1564,7 +1466,7 @@ class Saepat(QMainWindow):
         ##     self.chgpat.emit(res[0][0])
 
     def popul_breeds(self):
-        """(Re-)Populate breed combo."""
+        """(Re-)Populate breed Dd."""
         if self.db_err:
             return
         result = querydb(
@@ -1574,45 +1476,36 @@ class Saepat(QMainWindow):
         self.breed2spec = {}
         self.w.breedDd.clear()
         self.w.breedDd.addItem('', 0)
-        self.blist = []
+        blist = []
         for res in result:
             self.w.breedDd.addItem(res[1], res[0])
-            self.blist.append(res[1])
+            blist.append(res[1])
             self.breed2spec[res[0]] = res[2]
+        self.w.breedDd.list = blist
 
     def popul_colours(self):
-        """(Re-)Populate colour combo."""
+        """(Re-)Populate colour Dd."""
         if self.db_err:
             return
         idx = 0
         if self.w.colDd.currentIndex() > 0:
             idx = self.w.colDd.itemData(self.w.colDd.currentIndex(), 32)
-        self.clist = []
+        clist = []
         ch_conn(self, 'coldd')#, self.w.colDd.currentIndexChanged)
         self.w.colDd.clear()
         self.w.colDd.addItem('', 0)
-        scode = ''
-        # neu: scode = 0
+        scode = 0
         if self.w.specDd.currentIndex() > 0:
-            scode = self.spec2code[
-                self.w.specDd.itemData(
-                    self.w.specDd.currentIndex(), 32).toInt()[0]]
-            # neu: scode = 1<<self.w.specDd.itemData(
-            ##         self.w.specDd.currentIndex(), 32).toInt()[0]-1
+            scode = 1<<(self.w.specDd.itemData(
+                self.w.specDd.currentIndex(), 32).toInt()[0]-1)
+            # e.g. 1, 2, 4, 8, 16, 32, 64, ...
         elif self.currentspec:
-            scode = self.spec2code[self.currentspec]
-            # neu: scode = 1<<self.currentspec-1
-        if scode == 'a':
-            scode = " and c_speccode='a'"
+            scode = 1<<(self.currentspec-1)
+        if scode == 0:
+            scode = ''
         else:
-            scode = (" and ((c_speccode='a') or " +
-                         "(c_speccode like '%" + scode + "%'))")
-        # neu:
-        # if scode:
-        #     scode = ' and (c_speccode|{}=c_speccode)'.format(scode)
-        # else:
-        #     scode = ''
-        result = querydb( # hierwei
+            scode = ' and ((c_speccode=0) or bool(c_speccode&'+str(scode)+'))'
+        result = querydb(
             self,
             'select col_id,b1.bcol,b2.bcol,b3.bcol from basecolours b1,'
             'basecolours b2,basecolours b3,colours where b1.bcol_id=col1 '
@@ -1623,35 +1516,36 @@ class Saepat(QMainWindow):
         for res in result:
             tmp = '-'.join([col for col in res[1:] if col])
             self.w.colDd.addItem(tmp, res[0])
-            self.clist.append(tmp)
+            clist.append(tmp)
         if idx:
             self.w.colDd.setCurrentIndex(self.w.colDd.findData(idx, 32))
         ch_conn(self, 'coldd',
                 self.w.colDd.currentIndexChanged, self.adapt2colours)
-        self.w.colDd.list = self.clist
+        self.w.colDd.list = clist
         
     def popul_ins(self):
-        """(Re-)Populate insurance combo."""
+        """(Re-)Populate insurance Dd."""
         if self.db_err:
             return
         result = querydb(self,
                          'select i_name,i_id from insurances order by i_name')
         if result is None:  return # db error
-        self.ilist = []
+        ilist = []
         self.w.insDd.clear()
         self.w.insDd.addItem('', 0)
         for res in result:
             self.w.insDd.addItem(res[0], res[1])
-            self.ilist.append(res[0])
+            ilist.append(res[0])
         if len(result) < 2:
             self.w.insDd.setEnabled(0)
             self.w.insLb.setEnabled(0)
         else:
             self.w.insDd.setEnabled(1)
             self.w.insLb.setEnabled(1)
+        self.w.insLb.list = ilist
 
     def popul_locs(self):
-        """(Re-)Populate location combo."""
+        """(Re-)Populate location Dd."""
         if self.db_err:
             return
         result = querydb(
@@ -1659,35 +1553,35 @@ class Saepat(QMainWindow):
             'select l_id,l_name,housen,street from locations,addresses where '
             'l_address=addr_id order by l_name,housen,street')
         if result is None:  return # db error
-        self.llist = []
+        llist = []
         self.w.locDd.clear()
         for res in result:
             self.w.locDd.addItem(', '.join([e for e in res[1:] if e]),
                                  res[0])
-            self.llist.append(', '.join([e for e in res[1:] if e]))
+            llist.append(', '.join([e for e in res[1:] if e]))
         if len(result) < 2:
             self.w.locDd.setEnabled(0)
             self.w.locLb.setEnabled(0)
         else:
             self.w.locDd.setEnabled(1)
             self.w.locLb.setEnabled(1)
+        self.w.locLb.list = llist
 
     def popul_species(self):
-        """(Re-)Populate 'species' combo and spec2code dict{id: code}."""
+        """(Re-)Populate 'species' Dd."""
         if self.db_err:
             return
         result = querydb(
-            self, 'select spec_id,spec_name,spec_code from species order by '
+            self, 'select spec_id,spec_name from species order by '
             'spec_name')
         if result is None:  return # db error
-        self.spec2code = {} # obsolete
-        self.slist = []
+        slist = []
         self.w.specDd.clear()
         self.w.specDd.addItem('', 0)
         for res in result:
             self.w.specDd.addItem(res[1], res[0])
-            self.spec2code[res[0]] = res[2] # obsolete
-            self.slist.append(res[1])
+            slist.append(res[1])
+        self.w.specDd.list = slist
     
     def prep_ae(self):
         """Prepare A&E (add/edit) stage of search-add-edit patient window."""
@@ -1796,32 +1690,6 @@ class Saepat(QMainWindow):
         self.w.detailedCb.setChecked(self.options['srchdetails'])
         self.details_toggle(self.w.detailedCb.isChecked())
         self.w.pnameLe.setFocus()
-
-    def query_b(self, txt=''):
-        """These query_ functions are called as dd.query."""
-        return self.querycompl(self.w.breedDd, txt)
-
-    def query_c(self, txt=''): # hierwei test
-        dlist = []
-        for i in xrange(1, self.w.colDd.count()+1):
-            dlist.append(str(self.w.colDd.itemText(i).toLatin1()))
-        txt = str(txt.toLatin1()).lower()
-        l = [e for e in dlist if e.lower().startswith(txt)]
-        l.extend([e for e in dlist if len(e.split('-')) > 1 and
-                  e.split('-')[1].lower().startswith(txt) and e not in l])
-        l.extend([e for e in dlist if len(e.split('-')) > 2 and
-                  e.split('-')[2].lower().startswith(txt) and e not in l])
-        l.extend([e for e in dlist if e.lower().count(txt) and e not in l])
-        return l
-
-    def query_i(self, txt=''):
-        return self.querycompl(self.w.insDd, txt)
-
-    def query_l(self, txt=''):
-        return self.querycompl(self.w.locDd, txt)
-
-    def query_s(self, txt=''):
-        return self.querycompl(self.w.specDd, txt)
     
     def query_string(self, s_byname):
         """Construct query string from user input."""
@@ -1992,13 +1860,6 @@ class Saepat(QMainWindow):
         return  ('select ' + query_sel + ' from ' + query_from +
                  ' where ' + query_where + ' order by ' + query_order)
 
-    def querycompl(self, dd, txt):
-        """Get list for diff Dds."""
-        txt = str(txt.toLatin1()).lower()
-        l = [e for e in dd.list if e.lower().startswith(txt)]
-        l.extend([e for e in dd.list if e.lower().count(txt) and e not in l])
-        return l
-
     def regde_toggle(self, state):
         self.w.regDe.setEnabled(state)
 
@@ -2108,52 +1969,6 @@ class Saepat(QMainWindow):
         tmp = ' '.join([e for e in tmp if e])
         self.w.clientLb.setText(tmp)
         return True    
-    
-    def setcompleter(self, w):
-        """Called by focusChange to adapt completer."""
-        if w in self.dds:
-            w.setCompleter(self.dcompl)
-            self.dcompl.setWidget(w)
-        elif w in self.les:
-            w.setCompleter(self.lcompl)
-            self.lmodel.setStringList(w.list)
-            self.lcompl.setWidget(w) # dont seem nec here test hierwei
-        
-    def setlen(self, dd, arg):
-        """Triggered via activated signals to set index and dd.olen."""
-        if isinstance(arg, int): # dd.activated(int)
-            dd.setCurrentIndex(arg)
-        else: # compl.activated(str)
-            if not arg in dd.list:
-                print('"{}" not in {}'.format(arg, dd.list))
-            dd.setCurrentIndex(dd.list.index(arg))
-        dd.lineEdit().deselect()
-        dd.olen = len(dd.currentText())
-        
-    def setlenb(self, arg):
-        self.setlen(self.w.breedDd, arg)
-
-    def setlenc(self, arg):
-        self.setlen(self.w.colDd, arg)
-
-    def setleni(self, arg):
-        self.setlen(self.w.insDd, arg)
-        
-    def setlenl(self, arg):
-        self.setlen(self.w.locDd, arg)
-
-    def setlens(self, arg):
-        self.setlen(self.w.specDd, arg)
-
-    def setupdd(self, dd, n):
-        """Called by __init__ to set Dd vars for completer."""
-        setattr(dd, 'olen', 0)
-        setattr(dd, 'setlen', getattr(self, 'setlen'+n))
-        setattr(dd, 'list', getattr(self, n+'list'))
-        setattr(dd, 'lname', n+'list') # unused 'lname'
-        setattr(dd, 'query', getattr(self, 'query_'+n))
-        dd.lineEdit().textEdited.connect(getattr(self, 'compl_'+n))
-        dd.activated.connect(dd.setlen)
         
     def state_write(self):
         """Signal unsaved changes to parent for filing for later restoration."""

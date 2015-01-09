@@ -1,27 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Replace QCompleter with something more to my liking, that offers not only 
-entries that start with txt, but also those that CONTAIN it, and doesn't 
-cause as much unused overhead.
-
-Use: create a completer object, taking care to use the parent of the widgets
-
-> self.gc = Gcompleter(self.widgetparent, self.widget, self.list)
-
-If more than one widget shall use the completer, create a list of widgets
-to use the completer, prepare a list or method to get a list for each widget,
-then add a
-
-> QApplication.instance().focusChanged.connect(self.focuschange)
-
-focuschange can of course be any name you like if appropriate.
-And add the function:
-
-> def focuschange(self, old, new):
->     if new in self.widgetlist:
->         self.gc.setwidget(old=old, new=new, l=new.list)
-
-That should suffice.
-"""
+# TODO:
+# delete completer on click somewhere else in parent, but how?
 
 from PyQt4.QtCore import pyqtSignal, QString
 from PyQt4.QtGui import (QComboBox, QFrame, QMouseEvent, QLabel,
@@ -67,6 +46,38 @@ border-radius: 3px;
         self.setStyleSheet(self.gccellss.format(*self.normal))
         
 class Gcompleter(QScrollArea):
+    """Replacement for QCompleter with something more to my liking, that offers
+not only entries that start with txt, but also those that CONTAIN it, and
+doesn't cause as much unused overhead.
+
+USE
+Create a completer object, taking care to use the parent of the widget(s)
+for correct placement of completer.  Prepare a list -- or method to produce
+a list -- for the widget.  Then add
+    self.gc = Gcompleter(self.widgetparent, self.widget, self.list)
+to your __init__ or whatever sets the completer.
+
+If more than one widget shall use the completer, create a list of the widgets
+to use the completer, prepare a list -- or method to produce a list -- for
+each widget.  I recommend to
+    setattr(widget, 'list', wlist)
+for each widget involved.
+
+Then add
+    self.gc = Gcompleter(self.widgetparent)
+    QApplication.instance().focusChanged.connect(self.focuschange)
+to your __init__ or whatever sets the completer.
+
+focuschange can of course be any name you like if appropriate.
+And add the function:
+    def focuschange(self, old, new):
+        if new in self.widgetlist:
+            self.gc.setwidget(old=old, new=new, l=new.list)
+    
+That should suffice.
+"""
+
+    mtxt    = ''
     maxshow = 7
     selected = None
 
@@ -74,15 +85,15 @@ class Gcompleter(QScrollArea):
         super(Gcompleter, self).__init__(parent)
         self.conns = {} # pyqt bug disconnect
         self.sigs = {} # dto
-        self.gclist = [] # new 1412181748
+        self.gclist = []
         self.setHorizontalScrollBarPolicy(1) # never
         self.setVerticalScrollBarPolicy(0)   # as needed
         self.setFrameShape(0)
+        self.hide()
         self.clist = l or []
         if not self.clist:  return
         if widget:
             self.setwidget(new=widget, l=l)
-        self.hide()
 
     def delcompl(self):
         """Kill the completer (fr w/ labels)."""
@@ -110,9 +121,9 @@ class Gcompleter(QScrollArea):
                     self.fr.installEventFilter(self)
                     self.select_cell(self.gclist[0])
                 elif self.fr.hasFocus():
-                    new = (len(self.gclist)>self.gclist.index(self.selected) and
-                           self.gclist[self.gclist.index(self.selected)+1] or
-                           self.selected)
+                    new = (len(self.gclist)-1>self.gclist.index(self.selected)
+                           and self.gclist[self.gclist.index(self.selected)+1]
+                           or self.selected)
                     self.select_cell(new)
                 return True
         elif ev.key() == 0x01000013: # Qt.Key_Up
@@ -143,25 +154,22 @@ class Gcompleter(QScrollArea):
         elif ev.key() == 0x01000016: # Key_PageUp
             if hasattr(self, 'fr') and self.fr.hasFocus():
                 self.select_cell(self.gclist[
-                    self.gclist.index(self.selected)-7 > 0 and
-                    self.gclist.index(self.selected)-7 or 0])
-                self.ensureWidgetVisible(self.selected, 0, 0)
+                    self.gclist.index(self.selected)-6 > 0 and
+                    self.gclist.index(self.selected)-6 or 0])
                 self.fr.move(0, self.fr.y()) # (py?)qt bug
                 return True
             return False
         elif ev.key() == 0x01000017: # Key_PageDown
             if hasattr(self, 'fr') and self.fr.hasFocus():
                 self.select_cell(self.gclist[
-                    self.gclist.index(self.selected)+7 < len(self.gclist) and
-                    self.gclist.index(self.selected)+7 or -1])
-                self.ensureWidgetVisible(self.selected, 0, 0)
+                    self.gclist.index(self.selected)+6 < len(self.gclist) and
+                    self.gclist.index(self.selected)+6 or -1])
                 self.fr.move(0, self.fr.y())
                 return True
             return False
         elif ev.key() in (0x01000004, 0x01000005, 0x01000014): # Ret Enter Right
             if self.selected:
                 self.select(self.selected.text())
-                self.delcompl()
                 return True
         return False
         
@@ -170,6 +178,7 @@ class Gcompleter(QScrollArea):
         self.delcompl()
         if not txt:
             self.otxt = ''
+            self.mtxt = ''
             return
         txt = str(txt).lower()
         if len(self.otxt) < len(txt):
@@ -183,35 +192,51 @@ class Gcompleter(QScrollArea):
                 wid = self.ewidget.lineEdit()
                 self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))
             self.otxt = mlist[0].lower()
-            if self.otxt.startswith(txt) and self.otxt != txt: # backspace etc.
+            if self.otxt.startswith(txt) and self.otxt != txt:
+                markstart = len(txt)
                 while len(mlist) == 1:
                     txt = txt[:-1]
                     mlist = self.mklist(txt)
-                markstart = len(txt)
+                if self.mtxt == txt:
+                    markstart -= 1
                 wid.setSelection(markstart, 80)
+                self.mtxt = txt
             return
-        self.resize(self.ewidget.width(), self.ewidget.height()*self.maxshow)
+        y = self.ewidget.y() + self.ewidget.height()
+        vplace = self.parent().height() - y
+        if vplace > self.ewidget.height()*self.maxshow:
+            selfh = self.ewidget.height() * self.maxshow
+        else:
+            selfh = vplace
         self.setFrameShape(1)
         ipos = 0
+        scorr = 2
         self.fr = QFrame(self)
-        self.fr.resize(self.ewidget.width(), self.ewidget.height()*len(mlist))
+        frh = self.ewidget.height()*len(mlist)
         for e in mlist:
             i = Gcompcell(self.fr, e)
-            i.setGeometry(0, ipos, self.fr.width(), self.ewidget.height())
+            i.setGeometry(0, ipos, self.ewidget.width(), self.ewidget.height())
             self.gclist.append(i)
             ipos += i.height()
             i.clicked.connect(self.select)
-        self.setWidget(self.fr)
         self.ewidget.installEventFilter(self)
-        hcorr = 2
-        if self.fr.height()+hcorr < self.height():
-            self.resize(self.width(), self.fr.height()+hcorr)
+        self.setWidget(self.fr)
+        if frh + scorr <= selfh:
+            self.resize(self.ewidget.width(), frh+scorr)
+            self.fr.resize(self.width(), frh)
+        else:
+            self.resize(self.ewidget.width(), selfh)
+            self.fr.resize(self.width()-
+                           (self.verticalScrollBar().sizeHint().width()
+                            + scorr), frh)
+        self.move(self.ewidget.x(), y)
         self.show()
 
-    def mklist(self, txt=''):
+    def mklist(self, txt='', within=True):
         mlist = [e for e in self.clist if e.lower().startswith(txt)]
-        mlist.extend([e for e in self.clist if e.lower().count(txt)
-                      and e not in mlist])
+        if within:
+            mlist.extend([e for e in self.clist if e.lower().count(txt)
+                          and e not in mlist])
         return mlist
     
     def select(self, txt):
@@ -226,16 +251,16 @@ class Gcompleter(QScrollArea):
         if self.selected:
             self.selected.unselect()
         self.selected = gc
+        self.ensureWidgetVisible(gc, 0, 0)
         gc.enterEvent()
         
     def setwidget(self, old=None, new=None, l=None):
         """Bind Gcompleter to a (new) widget with a completion list."""
-        if old == new:  return
+        if old == new: # spose this never gonna happen
+            return
         if old:
             old.removeEventFilter(self)
         self.clist = l or []
-        self.move(new.x(),
-                  new.y()+new.height())
         if isinstance(new, QLineEdit):
             wid = new
             self.wtype = 'le'
@@ -245,4 +270,5 @@ class Gcompleter(QScrollArea):
         ch_conn(self, 'widget', wid.textEdited, self.listmatch)
         self.otxt = str(wid.text().toLatin1()).lower()
         self.ewidget = new
-        self.delcompl()
+        if old and (hasattr(self, 'fr') and old != self.fr):
+            self.delcompl()

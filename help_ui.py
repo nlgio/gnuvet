@@ -8,7 +8,10 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4.QtGui import (QWidget, QToolButton, QIcon, QPixmap, QTextBrowser,
-                         QMenuBar, QStatusBar, QApplication)
+                         QApplication)
+
+def tl(txt=''):
+    return QApplication.translate("Help", txt, None, 1)
 
 class Ui_Help(object):
     def setupUi(self, Help):
@@ -32,21 +35,14 @@ class Ui_Help(object):
         self.textBrowser.setAcceptDrops(False)
         self.textBrowser.setHorizontalScrollBarPolicy(1) # Qt.ScrollBarAlwaysOff
         Help.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(Help)
-        Help.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(Help)
+        self.menubar = Help.menuBar()
+        self.statusbar = Help.statusBar()
         self.statusbar.setSizeGripEnabled(False)
-        Help.setStatusBar(self.statusbar)
         self.retranslateUi(Help)
 
     def retranslateUi(self, Help):
-        Help.setWindowTitle(QApplication.translate(
-            "Help", "GnuVet Help", None, 1))
-        self.backTb.setToolTip(QApplication.translate(
-            "Help", "go back", None, 1))
-        self.backTb.setStatusTip(QApplication.translate(
-            "Help", "Go backwards in History", None, 1))
-        self.forwardTb.setToolTip(QApplication.translate(
-            "Help", "go forward", None, 1))
-        self.forwardTb.setStatusTip(QApplication.translate(
-            "Help", "Go forward in history", None, 1))
+        Help.setWindowTitle(tl("GnuVet Help"))
+        self.backTb.setToolTip(tl("go back"))
+        self.backTb.setStatusTip(tl("Go backwards in History"))
+        self.forwardTb.setToolTip(tl("go forward"))
+        self.forwardTb.setStatusTip(tl("Go forward in history"))

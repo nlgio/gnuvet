@@ -9,7 +9,10 @@
 
 from PyQt4.QtGui import (QApplication, QDialogButtonBox, QLabel, QRadioButton,
                          QComboBox, QDoubleSpinBox)
-from PyQt4.QtCore import Qt, QString
+from PyQt4.QtCore import Qt
+
+def tl(txt=''):
+    return QApplication.translate("Payment", txt, None, 1)
 
 class Ui_Payment(object):
     def setupUi(self, Payment):
@@ -68,34 +71,19 @@ class Ui_Payment(object):
         self.retranslateUi(Payment)
 
     def retranslateUi(self, Payment):
-        Payment.setWindowTitle(QApplication.translate(
-            "Payment", "GnuVet: Payment", None, 1))
-        self.balpatLb.setText(QApplication.translate(
-            "Payment", "Current Balance Patient:", None, 1))
-        self.balcliLb.setText(QApplication.translate(
-            "Payment", "Current Balance Client:", None, 1))
-        self.baltotLb.setText(QApplication.translate(
-            "Payment", "Total Balance Client:", None, 1))
-        self.paymentLb.setText(QApplication.translate(
-            "Payment", "&Payment:", None, 1))
-        self.changeLb.setText(QApplication.translate(
-            "Payment", "Change:", None, 1))
-        self.balpat.setText(QApplication.translate(
-            "Payment", "0.00", None, 1))
-        self.balcli.setText(QApplication.translate(
-            "Payment", "0.00", None, 1))
-        self.baltot.setText(QApplication.translate(
-            "Payment", "0.00", None, 1))
-        self.change.setText(QApplication.translate(
-            "Payment", "0.00", None, 1))
-        self.cashRb.setText(QApplication.translate(
-            "Payment", "&Cash", None, 1))
-        self.cardRb.setText(QApplication.translate(
-            "Payment", "C&redit card", None, 1))
-        self.cheqRb.setText(QApplication.translate(
-            "Payment", "C&heque", None, 1))
-        self.bankRb.setText(QApplication.translate(
-            "Payment", "&Transfer", None, 1))
-        self.invoiceLb.setText(QApplication.translate(
-            "Payment", "&Invoice:", None, 1))
-        
+        Payment.setWindowTitle(tl("GnuVet: Payment"))
+        self.balpatLb.setText(tl("Current Balance Patient:"))
+        self.balcliLb.setText(tl("Current Balance Client:"))
+        self.baltotLb.setText(tl("Total Balance Client:"))
+        self.paymentLb.setText(tl("&Payment:"))
+        self.changeLb.setText(tl("Change:"))
+        self.balpat.setText(tl("0.00"))
+        self.balcli.setText(tl("0.00"))
+        self.baltot.setText(tl("0.00"))
+        self.change.setText(tl("0.00"))
+        self.cashRb.setText(tl("&Cash"))
+        self.cardRb.setText(tl("C&redit card"))
+        self.cheqRb.setText(tl("C&heque"))
+        self.bankRb.setText(tl("&Transfer"))
+        self.invoiceLb.setText(tl("&Invoice:"))
+

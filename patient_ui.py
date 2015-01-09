@@ -15,6 +15,9 @@ from PyQt4.QtGui import (QApplication, QFont, QFrame, QLabel, QLineEdit,
 from tle import QTextLEdit
 from gtable import Gtable
 
+def tl(txt=''):
+    return QApplication.translate("Patient", txt, None, 1)
+
 class Ui_Patient(object):
     def setupUi(self, Patient):
         Patient.resize(957, 645)
@@ -29,7 +32,6 @@ class Ui_Patient(object):
         font.setBold(True)
         self.no_dbconn.setFont(font)
         self.statusbar.addPermanentWidget(self.no_dbconn, 0)
-        ## self.statusbar.
         self.no_dbconn.hide()
         self.lLb = QLabel(Patient)
         self.lLb.setGeometry(Patient.width()-90, 1, 85, 19)
@@ -179,69 +181,42 @@ class Ui_Patient(object):
         self.retranslateUi(Patient)
 
     def retranslateUi(self, Patient):
-        Patient.setWindowTitle(
-            QApplication.translate("Patient", "GnuVet: Patient", None, 1))
-        self.ripLb.setToolTip(
-            QApplication.translate("Patient", "deceased", None, 1))
-        self.bdLb.setToolTip(
-            QApplication.translate("Patient", "bad debtor", None, 1))
-        self.chrLb.setText(
-            QApplication.translate("Patient", "Chronic Conditions:", None, 1))
-        self.weightPb.setToolTip(
-            QApplication.translate(
-                "Patient", "Click here to add new weight entry "
-                "and/or display weight chart", None, 1))
-        self.vacLb.setText(
-            QApplication.translate("Patient", "Vaccinations due:", None, 1))
-        self.vacPb.setText(
-            QApplication.translate("Patient", "new &Vacc", None, 1))
-        self.aLb.setText(
-            QApplication.translate("Patient", "Annotations:", None, 1))
-        self.idLb.setText(
-            QApplication.translate("Patient", "ID", None, 1))
-        self.petpassLb.setText(
-            QApplication.translate("Patient", "Pet Passport", None, 1))
-        self.warnLb.setToolTip(
-            QApplication.translate("Patient", "vicious", None, 1))
-        self.addLb.setText(
-            QApplication.translate("Patient", "&Add:", None, 1))
-        self.addchPb.setText(
-            QApplication.translate("Patient", "Add &Text", None, 1))
-        self.addchPb.setToolTip(
-            QApplication.translate("Patient", "Add text to history", None, 1))
-        self.addconsPb.setText(QApplication.translate(
-            "Patient", "Add C&onsultation", None, 1))
-        self.addconsPb.setToolTip(
-            QApplication.translate(
-                "Patient", "Add new consultation", None, 1))
-        self.closePb.setText(
-            QApplication.translate("Patient", "Close", None, 1))
+        Patient.setWindowTitle(tl("GnuVet: Patient"))
+        self.ripLb.setToolTip(tl("deceased"))
+        self.bdLb.setToolTip(tl("bad debtor"))
+        self.chrLb.setText(tl("Chronic Conditions:"))
+        self.weightPb.setToolTip(tl("Click here to add new weight entry "
+                "and/or display weight chart"))
+        self.vacLb.setText(tl("Vaccinations due:"))
+        self.vacPb.setText(tl("new &Vacc"))
+        self.aLb.setText(tl("Annotations:"))
+        self.idLb.setText(tl("ID"))
+        self.petpassLb.setText(tl("Pet Passport"))
+        self.warnLb.setToolTip(tl("vicious"))
+        self.addLb.setText(tl("&Add:"))
+        self.addchPb.setText(tl("Add &Text"))
+        self.addchPb.setToolTip(tl("Add text to history"))
+        self.addconsPb.setText(tl("Add C&onsultation"))
+        self.addconsPb.setToolTip(tl("Add new consultation"))
+        self.closePb.setText(tl("Close"))
         ## self.closePb.setShortcut(
-        ##     QApplication.translate("Patient", "Esc", None, 1))
-        self.pbalLb.setText(
-            QApplication.translate("Patient", "Patient Balance:", None, 1))
-        self.pbalanceLb.setText(
-            QApplication.translate("Patient", "0.00", None, 1))
-        self.cbalLb.setText(
-            QApplication.translate("Patient", "Client Balance:", None, 1))
-        self.cbalanceLb.setText(
-            QApplication.translate("Patient", "0.00", None, 1))
-        self.savecLb.setText(
-            QApplication.translate("Patient", "Save Changes?", None, 1))
-        self.lastLb.setText(
-            QApplication.translate("Patient", "Last Seen:", None, 1))
-        self.no_dbconn.setText(
-            QApplication.translate("Patient", "No db connection...", None, 1))
-        self.newconsLb.setText(QApplication.translate(
-            "Patient", "Book new consultation?", None, 1))
+        ##     QApplication.translate("Patient", "Esc"))
+        self.pbalLb.setText(tl("Patient Balance:"))
+        self.pbalanceLb.setText(tl("0.00"))
+        self.cbalLb.setText(tl("Client Balance:"))
+        self.cbalanceLb.setText(tl("0.00"))
+        self.savecLb.setText(tl("Save Changes?"))
+        self.lastLb.setText(tl("Last Seen:"))
+        self.no_dbconn.setText(tl("No db connection..."))
+        self.newconsLb.setText(tl("Book new consultation?"))
         self.newcons_newPb.setText(QApplication.translate(
-            "Products", "New", None, 1))
+            "Products", "New"))
         self.newcons_selPb.setText(QApplication.translate(
-            "Products", "Use &Selected", None, 1))
+            "Products", "Use &Selected"))
         self.newcons_selPb.setToolTip(QApplication.translate(
-            "Products", "Add to &selected consultation", None, 1))
+            "Products", "Add to &selected consultation"))
         self.newcons_ccPb.setText(QApplication.translate(
-            "Products", "Cancel", None, 1))
+            "Products", "Cancel"))
 
 if __name__ == '__main__':
     from PyQt4.QtGui import QMainWindow, QShortcut
@@ -250,14 +225,10 @@ if __name__ == '__main__':
     b = Ui_Patient()
     w = QMainWindow()
     b.setupUi(w)
-    b.breedLb.setText(
-        QApplication.translate("Patient", "Breed", None, 1))
-    b.sexLb.setText(
-        QApplication.translate("Patient", "Sex", None, 1))
-    b.ageLb.setText(
-        QApplication.translate("Patient", "Age", None, 1))
-    b.colourLb.setText(
-        QApplication.translate("Patient", "Colour", None, 1))
+    b.breedLb.setText(tl("Breed"))
+    b.sexLb.setText(tl("Sex"))
+    b.ageLb.setText(tl("Age"))
+    b.colourLb.setText(tl("Colour"))
     b.identLb.setText('040096100106864')
     b.petpassnoLb.setText('040-0101555')
     b.lLb.setText('patient_ui')

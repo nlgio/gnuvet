@@ -13,6 +13,9 @@ from PyQt4.QtGui import (QApplication, QCheckBox, QFont, QFrame, QLabel,
                          QPushButton, QRadioButton, QWidget)
 from gtable import Gtable
 
+def tl(txt=''):
+    return QApplication.translate("Vaccremind", txt, None, 1)
+
 class Ui_Vaccremind(object):
     def setupUi(self, Vaccremind):
         Vaccremind.resize(870, 626)
@@ -41,7 +44,6 @@ class Ui_Vaccremind(object):
         ##self.noVLb.setAlignment(Qt.AlignLeft)
         self.noVLb.setTextFormat(Qt.PlainText)
         self.noVFr.hide()
-
         # match[es] frame: list
         self.matchFr = QFrame(Vaccremind)
         self.matchFr.setGeometry(10, 10, 850, 521)
@@ -64,7 +66,6 @@ class Ui_Vaccremind(object):
         self.plist.setGeometry(0, 34, 850, 455)
         self.plist.setMinimumSize(850, 455)
         ## self.matchFr.hide()
-
         # buttons
         self.mainPb = QPushButton(Vaccremind)
         self.mainPb.setGeometry(177, 540, 107, 24)
@@ -74,23 +75,14 @@ class Ui_Vaccremind(object):
         self.retranslateUi(Vaccremind)
 
     def retranslateUi(self, Vaccremind):
-        self.noVLb.setText(
-            QApplication.translate("Vaccremind", "No pending vaccinations.",
-                                   None, 1))
-        self.sortbyLb.setText(
-            QApplication.translate("Vaccremind", "order by", None, 1))
-        self.sbynameRb.setText(
-            QApplication.translate("Vaccremind", "&Name", None, 1))
-        self.sbydateRb.setText(
-            QApplication.translate("Vaccremind", "Vacc &due", None, 1))
-        self.sbycliRb.setText(
-            QApplication.translate("Vaccremind", "&Client", None, 1))
-        self.mainPb.setText(
-            QApplication.translate("Vaccremind", "Print Letters", None, 1))
-        self.closePb.setText(
-            QApplication.translate("Vaccremind", "Close", None, 1))
-        self.no_dbconn.setText(
-            QApplication.translate('Vaccremind', 'No db connection...', None, 1))
+        self.noVLb.setText(tl("No pending vaccinations."))
+        self.sortbyLb.setText(tl("order by"))
+        self.sbynameRb.setText(tl("&Name"))
+        self.sbydateRb.setText(tl("Vacc &due"))
+        self.sbycliRb.setText(tl("&Client"))
+        self.mainPb.setText(tl("Print Letters"))
+        self.closePb.setText(tl("Close"))
+        self.no_dbconn.setText(tl('No db connection...'))
 
 if __name__ == '__main__':
     from PyQt4.QtGui import QMainWindow, QShortcut

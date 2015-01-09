@@ -17,6 +17,9 @@ from PyQt4.QtGui import (QApplication, QCheckBox, QComboBox,
                          QSpacerItem, QSpinBox, QWidget)
 from gtable import Gtable
 
+def tl(txt=''):
+    return QApplication.translate("Saecli", txt, None, 1)
+
 class Ui_Saecli(object):
     def setupUi(self, Saecli):
         Saecli.resize(870, 626)
@@ -43,11 +46,10 @@ class Ui_Saecli(object):
         self.noMFr.setFrameShape(QFrame.StyledPanel)
         self.noMFr.setFrameShadow(QFrame.Raised)
         self.qPix = QLabel(self.noMFr)
-        self.qPix.setGeometry(182, 214, 32, 32) # was 250, 192, 32, 32
+        self.qPix.setGeometry(182, 214, 32, 32)
         self.qPix.setPixmap(QPixmap(":/images/question.png"))
         self.noMLb = QLabel(self.noMFr)
-        self.noMLb.setGeometry(230, 100, 421, 261) # was 303, 194, 245, 66
-        #self.noMLb.setAutoFillBackground(True)
+        self.noMLb.setGeometry(230, 100, 421, 261)
         self.noMLb.setAlignment(Qt.AlignCenter)
         self.noMLb.setTextFormat(Qt.RichText)
         self.noMLb.setWordWrap(True)
@@ -183,7 +185,6 @@ class Ui_Saecli(object):
         self.regLb = QLabel(self.saeFr)
         self.regLb.setGeometry(105, 464, 67, 15)
         self.regLb.setTextFormat(Qt.PlainText)
-        self.regLb.setTextInteractionFlags(Qt.NoTextInteraction)
         self.lastspecDd = QComboBox(self.saeFr)
         self.lastspecDd.setGeometry(260, 440, 65, 21) # +175
         self.lastspecLb = QLabel(self.saeFr)
@@ -215,7 +216,6 @@ class Ui_Saecli(object):
         self.errLb.setGeometry(95, 66, 221, 101)
         self.errLb.setTextFormat(Qt.RichText)
         self.errLb.setWordWrap(True)
-        self.errLb.setTextInteractionFlags(Qt.NoTextInteraction)
         self.errOk = QPushButton(self.errFr)
         self.errOk.setGeometry(130, 190, 107, 24)
         # buttonbox
@@ -268,107 +268,70 @@ class Ui_Saecli(object):
         self.retranslateUi(Saecli)
 
     def retranslateUi(self, Saecli):
-        self.noMLb.setText(
-            QApplication.translate("Saecli", "No matching client record found!"
-                                   "\n\nDo you want to register a new account\n"
-                                   "with your entries?", None, 1))
-        self.sortbyLb.setText(
-            QApplication.translate("Saecli", "order by", None, 1))
-        self.sbydateRb.setText(
-            QApplication.translate("Saecli", "Last &Seen", None, 1))
-        self.sbynameRb.setText(
-            QApplication.translate("Saecli", "&Name", None, 1))
-        self.cancelPb.setText(
-            QApplication.translate("Saecli", "Cancel", None, 1))
-        self.cancelPb.setShortcut(
-            QApplication.translate("Saecli", "Esc", None, 1))
-        self.fnameLb.setText(
-            QApplication.translate("Saecli", "Client &Forename", None, 1))
-        self.mnameLb.setText(
-            QApplication.translate("Saecli", "Client &Middle Name(s)", None, 1))
-        self.housenLb.setText(
-            QApplication.translate("Saecli", "H&ouse Name/Number", None, 1))
-        self.streetLb.setText(
-            QApplication.translate("Saecli", "&Street", None, 1))
-        self.villageLb.setText(
-            QApplication.translate("Saecli", "&Village", None, 1))
-        self.cityLb.setText(
-            QApplication.translate("Saecli", "&City", None, 1))
-        self.regionLb.setText(
-            QApplication.translate("Saecli", "&Region", None, 1))
-        self.postcodeLb.setText(
-            QApplication.translate("Saecli", "&Postcode", None, 1))
-        self.mobile2Lb.setText(
-            QApplication.translate("Saecli", "Mobile &2", None, 1))
-        self.snameLb.setText(
-            QApplication.translate("Saecli", "C&lient Surname", None, 1))
-        self.ctitleLb.setText(
-            QApplication.translate("Saecli", "T&itle", None, 1))
-        self.mobile1Lb.setText(
-            QApplication.translate("Saecli", "Mobile &1", None, 1))
-        self.telworkLb.setText(
-            QApplication.translate("Saecli", "Tel &Work", None, 1))
-        self.telhomeLb.setText(
-            QApplication.translate("Saecli", "&Tel Home", None, 1))
-        self.regLb.setText(
-            QApplication.translate("Saecli", "&Registered", None, 1))
-        self.regDe.setDisplayFormat(
-            QApplication.translate("Saecli", "dd.MM.yyyy", None, 1))
-        self.regspecDd.setToolTip(
-            QApplication.translate("Saecli", "< search prior to\n= search ± 1 "
-                                   "month\n> search after", None, 1))
-        self.regspecDd.setWhatsThis(QApplication.translate(
-            "Saecli", "With this you can search for the Registration Date. If "
+        self.noMLb.setText(tl(
+            "No matching client record found!"
+            "\n\nDo you want to register a new account\nwith your entries?"))
+        self.sortbyLb.setText(tl("order by"))
+        self.sbydateRb.setText(tl("Last &Seen"))
+        self.sbynameRb.setText(tl("&Name"))
+        self.cancelPb.setText(tl("Cancel"))
+        self.cancelPb.setShortcut(tl("Esc"))
+        self.fnameLb.setText(tl("Client &Forename"))
+        self.mnameLb.setText(tl("Client &Middle Name(s)"))
+        self.housenLb.setText(tl("H&ouse Name/Number"))
+        self.streetLb.setText(tl("&Street"))
+        self.villageLb.setText(tl("&Village"))
+        self.cityLb.setText(tl("&City"))
+        self.regionLb.setText(tl("&Region"))
+        self.postcodeLb.setText(tl("&Postcode"))
+        self.mobile2Lb.setText(tl("Mobile &2"))
+        self.snameLb.setText(tl("C&lient Surname"))
+        self.ctitleLb.setText(tl("T&itle"))
+        self.mobile1Lb.setText(tl("Mobile &1"))
+        self.telworkLb.setText(tl("Tel &Work"))
+        self.telhomeLb.setText(tl("&Tel Home"))
+        self.regLb.setText(tl("&Registered"))
+        self.regDe.setDisplayFormat(tl("dd.MM.yyyy"))
+        self.regspecDd.setToolTip(tl(
+            "< search prior to\n= search ± 1 month\n> search after"))
+        self.regspecDd.setWhatsThis(tl(
+            "With this you can search for the Registration Date. If "
             "you set this to \"=\" it will search for the given date plusminus "
-            "one month, otherwise after or prior to the given date.", None, 1))
+            "one month, otherwise after or prior to the given date."))
         self.regspecDd.addItem("")
         self.regspecDd.addItem("<")
         self.regspecDd.addItem("=")
         self.regspecDd.addItem(">")
-        self.regspecLb.setText(
-            QApplication.translate("Saecli", "&R.Spec.", None, 1))
-        self.emailLb.setText(
-            QApplication.translate("Saecli", "em&ail", None, 1))
-        self.pnameLb.setText(
-            QApplication.translate("Saecli", "Animal &Name", None, 1))
-        self.annoLb.setText(
-            QApplication.translate("Saecli", "&Annotation", None, 1))
-        self.baddebtCb.setToolTip(
-            QApplication.translate("Saecli", "Bad Debtor", None, 1))
-        self.baddebtCb.setText(
-            QApplication.translate("Saecli", "&BD", None, 1))
-        self.lastspecLb.setText(
-            QApplication.translate("Saecli", "&L.Spec.", None, 1))
-        self.lastDe.setDisplayFormat(
-            QApplication.translate("Saecli", "dd.MM.yyyy", None, 1))
-        self.lastspecDd.setToolTip(
-            QApplication.translate("Saecli", "< search prior to\n= search ± 1 "
-                                   "month\n> search after", None, 1))
-        self.lastspecDd.setWhatsThis(QApplication.translate(
-            "Saecli", "With this you can search for the date the Client has "
-            "been last seen. If "
-            "you set this to \"=\" it will search for the given date plusminus "
-            "one month, otherwise after or prior to the given date.", None, 1))
+        self.regspecLb.setText(tl("&R.Spec."))
+        self.emailLb.setText(tl("em&ail"))
+        self.pnameLb.setText(tl("Animal &Name"))
+        self.annoLb.setText(tl("&Annotation"))
+        self.baddebtCb.setToolTip(tl("Bad Debtor"))
+        self.baddebtCb.setText(tl("&BD"))
+        self.lastspecLb.setText(tl("&L.Spec."))
+        self.lastDe.setDisplayFormat(tl("dd.MM.yyyy"))
+        self.lastspecDd.setToolTip(tl(
+            "< search prior to\n= search ± 1 month\n> search after"))
+        self.lastspecDd.setWhatsThis(tl(
+            "With this you can search for the date the Client has been last "
+            "seen. If you set this to \"=\" it will search for the given date "
+            "plusminus one month, otherwise after or prior to the given date."))
         self.lastspecDd.addItem("")
         self.lastspecDd.addItem("<")
         self.lastspecDd.addItem("=")
         self.lastspecDd.addItem(">")
-        self.lastLb.setText(
-            QApplication.translate("Saecli", "&Last Seen", None, 1))
+        self.lastLb.setText(tl("&Last Seen"))
         self.balspecDd.addItem("")
         self.balspecDd.addItem("<")
         self.balspecDd.addItem(">")
-        self.balspecLb.setText(
-            QApplication.translate("Saecli", "&B.Spec.", None, 1))
-        self.balLb.setText(
-            QApplication.translate("Saecli", "Current &Balance", None, 1))
+        self.balspecLb.setText(tl("&B.Spec."))
+        self.balLb.setText(tl("Current &Balance"))
         self.errOk.setText('OK')
-        self.no_dbconn.setText(
-            QApplication.translate('Saecli', 'No db connection...', None, 1))
+        self.no_dbconn.setText(tl('No db connection...'))
 
 if __name__ == '__main__':
     from PyQt4.QtGui import QMainWindow, QShortcut
-    import gv_rc
+    import gv_qrc
     a = QApplication([])
     b = Ui_Saecli()
     w = QMainWindow()

@@ -45,7 +45,7 @@ create table titles(
 create type sex as enum('m', 'f', 'h', 'n');
 
 -- colour combination: n not, y possible, o obligatory
-create type colcombine as enum('n','y','o');
+--create type colcombine as enum('n','y','o');
 -- obs this in favour of bit null 0 1, obsoleting this type
 
 create table markups(
@@ -81,7 +81,7 @@ create table branches(
  branch_currency varchar(5),
  branch_currencysymbol varchar(3));
 
-create table boxes(
+create table boxes( -- computers in gnuvet network
  box_id serial primary key,
  box_name varchar(80) not null, --  'Surgery1', 'Reception2' etc.
  box_ipv4 inet unique not null,
@@ -137,7 +137,7 @@ create table locations(
 create table species(
  spec_id serial primary key,
  spec_name varchar(80) unique not null,
- spec_code char(1) unique not null,
+-- spec_code char(1) unique not null,
 -- this to replaced by function 1<<id-1
  spec_fa boolean not null default TRUE); -- potential food animal
 -- actually mostly genus/order not species
@@ -151,15 +151,16 @@ create table breeds(
 create table basecolours(
  bcol_id serial primary key,
  bcol varchar(25) unique,
- bc_combine colcombine not null default 'y',
+-- bc_combine colcombine not null default 'y',
 -- this to be bit(1) for null (none), 0 (poss), 1 (must)
- bc_speccode varchar(120) not null);
--- this to be bit varying(120) not null no rather int not null
+ bc_combine bit(1) default '0',
+-- bc_speccode varchar(120) not null);
+ bc_speccode int not null);
 
 create table colours(
  col_id serial primary key,
- c_speccode varchar(120) not null,
--- this to be bit varying(120) not null no rather int not null
+-- c_speccode varchar(120) not null,
+ c_speccode int not null,
  col1 integer references basecolours not null,
  col2 integer references basecolours not null,
  col3 integer references basecolours not null,
@@ -175,7 +176,7 @@ create table insurances(
  i_anno varchar(255) not null default '');
 
 create table chronics(
- chr_id bit varying(13),
+ chr_id serial primary key,
  chr_name varchar(80) not null);
 
 create table patients(
@@ -198,10 +199,11 @@ create table patients(
  rip boolean not null default False,
  p_last timestamp,
  ins integer references insurances,
- chr smallint not null default 0); --> chronic problems, bitmask
+ chr integer not null default 0); --> chronic problems, 1<<chr-1 bitmask
 
 create index p_name_idx on patients(p_name);
 
+-- maybe redundance, but i think eases search for patient seen some date:
 create table seen(seen_pid integer references patients, seen_date date);
 
 create index seen_pid_idx on seen(seen_pid);
@@ -339,7 +341,7 @@ create table app2prod(
  a2p_prid integer references products primary key,
  a2p_prod integer references applications not null);
 
-create table wd_apps(
+create table wd_apps( -- wd dependent on app type and dosage
  wda_id serial primary key,
  wda_app varchar(8));
 
