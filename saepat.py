@@ -251,14 +251,15 @@ class Saepat(QMainWindow):
             self.w.regDe.setEnabled(False)
         #    COMPLETERS
         self.cwidgets = []
-        for w in ('breedDd', 'cfnameLe', 'colDd', 'csnameLe', 'insDd', 'locDd',
-                  'pnameLe', 'specDd'):
+        for w in ('breedDd', 'cfnameLe', 'colDd', 'csnameLe', 'idLe', 'insDd',
+                  'locDd', 'pnameLe', 'petpassLe', 'specDd'):
             self.cwidgets.append(getattr(self.w, w))
         #    LISTFILL lEs:
-        ## if not self.db_err:
         self.get_pnames()
         self.get_cfnames()
         self.get_csnames()
+        self.get_ppass()
+        self.get_ids()
         self.gc = Gcompleter(parent=self.w.saeFr)
         QApplication.instance().focusChanged.connect(self.focuschange)
         #    FURTHER WIDGET CONNECTIONS
@@ -750,12 +751,28 @@ class Saepat(QMainWindow):
                       'select distinct c_sname from clients order by c_sname')
         if res is None:  return # db error
         self.w.csnameLe.list = [e[0] for e in res]
+
+    def get_ids(self):
+        res = querydb(
+            self,
+            'select distinct identno from patients where identno is not null '
+            'order by identno')
+        if res is None:  return # db error
+        self.w.idLe.list = [e[0] for e in res]
         
     def get_pnames(self):
         res = querydb(self,
                       'select distinct p_name from patients order by p_name')
         if res is None:  return # db error
         self.w.pnameLe.list = [e[0] for e in res]
+
+    def get_ppass(self):
+        res = querydb(
+            self,
+            'select distinct petpass from patients where petpass is not null '
+            'order by petpass')
+        if res is None:  return # db error
+        self.w.petpassLe.list = [e[0] for e in res]
 
     def gv_quit(self, quitnow=False): # hierwei: cave action.checked=False
         """Signal children if quitting GnuVet or not.  Add self.shutdown?"""
