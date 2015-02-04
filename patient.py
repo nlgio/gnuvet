@@ -104,8 +104,9 @@ class Patient(QMainWindow):
         debA.triggered.connect(self.develf)
         # end devel
         closeA = newaction(self, 'Close &Window','Close this window','Ctrl+W')
-        self.dbA = newaction(self, '&Reconnect to database',
-                             'Try to reconnect to database', 'Ctrl+R')
+        self.dbA = newaction(
+            self, '&Reconnect to database',
+            'Try to reconnect to database', 'Ctrl+R')
         self.aboutA = newaction(self, 'About &GnuVet', 'GnuVet version info')
         helpA = newaction(self, '&Help', 'context sensitive help', 'F1')
         quitA = newaction(self, '&Quit GnuVet', 'Exit GnuVet', 'Ctrl+Q')
@@ -175,9 +176,9 @@ class Patient(QMainWindow):
         helpM.addAction(self.aboutA)
         #    right-click menu for htable
         self.rcM = QMenu(self.w.htable)
-        rceditA = newaction(self, '&edit entry'), self.rcM) # hierwei:newaction?
-        rcdelA = newaction(self, '&delete entry'), self.rcM)
-        rcsrchA = newaction(self, '&search history'), self.rcM)
+        rceditA = newaction(self, '&edit entry')
+        rcdelA = newaction(self, '&delete entry')
+        rcsrchA = newaction(self, '&search history')
         self.rcM.addAction(rceditA)
         self.rcM.addAction(rcdelA)
         self.rcM.addAction(rcsrchA)
