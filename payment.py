@@ -1,21 +1,22 @@
-"""Payment dialog."""
+"""Payment dialog -- to be called from client only."""
 # TODO:
 # check for things like card or cheque payment only be booked as payed when
 # payment is confirmed
 
 from decimal import Decimal
-from datetime import date, datetime # ?
+##from datetime import date, datetime # ?
+from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtGui import (QMainWindow, QAction)
 from payment_ui import Ui_Payment
 
 class Payment(QMainWindow):
     def __init__(self, parent=None, db=None, options={},
-                 cid=0, patid=0, staffid=0):
+                 cid=0, pid=0, staffid=0): # these 3 nec?
         super(Payment, self).__init__(parent)
         self.db = db
         self.options = options
         self.cid = cid
-        self.patid = patid
+        self.pid = pid
         self.staffid = staffid
         self.w = Ui_Payment()
         self.w.setupUi(self)

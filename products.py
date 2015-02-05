@@ -14,10 +14,10 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal, Qt
-from PyQt4.QtGui import QAction, QMainWindow, QMenu, QWidget
+from PyQt4.QtGui import QMainWindow, QMenu, QWidget
 from keycheck import Keycheck
 from ticker import Ticker
-from util import ch_conn, gprice, money, percent, querydb
+from util import ch_conn, gprice, money, newaction, percent, querydb
 from products_ui import Ui_Products
 
 class Products(QMainWindow):
@@ -52,38 +52,20 @@ class Products(QMainWindow):
         self.w.setupUi(self)
         #    instance vars
         self.conns = {} # for ch_conn
-        self.sigs  = {} # dto # currently unused
+        self.sigs  = {} # dto
         #    data
         logname = self.tr('no login')
         #    ACTIONS
-        self.dbA = QAction(self.tr('&Reconnect to database'), self)
-        self.dbA.setAutoRepeat(0)
-        self.dbA.setStatusTip(self.tr('Try to reconnect to database'))
-        self.dbA.setShortcut(self.tr('Ctrl+R'))
-        aboutA = QAction(self.tr('About &GnuVet'), self)
-        aboutA.setAutoRepeat(0)
-        aboutA.setStatusTip(self.tr('GnuVet version info'))
-        closeA = QAction(self.tr('Close'), self)
-        closeA.setAutoRepeat(0)
-        closeA.setStatusTip(self.tr('Close this window'))
-        closeA.setShortcut(self.tr('Ctrl+W'))
-        helpA = QAction(self.tr('&Help'), self)
-        helpA.setAutoRepeat(0)
-        helpA.setStatusTip(self.tr('context sensitive help'))
-        helpA.setShortcut(self.tr('F1'))
-        quitA = QAction(self.tr('&Quit GnuVet'), self)
-        quitA.setAutoRepeat(0)
-        quitA.setStatusTip(self.tr('Quit GnuVet'))
-        quitA.setShortcut('Ctrl+Q')
-        self.blkA = QAction(self.tr('set text colour: blac&k'), self)
-        self.blkA.setAutoRepeat(0)
-        self.blkA.setShortcut(self.tr('Ctrl+K'))
-        self.redA = QAction(self.tr('set text colour: r&ed'), self)
-        self.redA.setAutoRepeat(0)
-        self.redA.setShortcut(self.tr('Ctrl+E'))
-        self.bluA = QAction(self.tr('set text colour: &blue'), self)
-        self.bluA.setAutoRepeat(0)
-        self.bluA.setShortcut(self.tr('Ctrl+B'))
+        self.dbA = newaction(
+            self, '&Reconnect to database',
+            'Try to reconnect to database', 'Ctrl+R')
+        aboutA = newaction(self, 'About &GnuVet', 'GnuVet version info')
+        closeA = newaction(self, 'Close', 'Close this window', short='Ctrl+W')
+        helpA = newaction(self, '&Help', 'context sensitive help', short='F1')
+        quitA = newaction(self, '&Quit GnuVet', 'Quit GnuVet', short='Ctrl+Q')
+        self.blkA = newaction(self, 'set text colour: blac&k', short='Ctrl+K')
+        self.redA = newaction(self, 'set text colour: r&ed', short='Ctrl+E')
+        self.bluA = newaction(self, 'set text colour: &blue', short='Ctrl+B')
         #    MENUES
         taskM = QMenu(self.w.menubar)
         taskM.setTitle(self.tr('&Task'))
@@ -105,8 +87,7 @@ class Products(QMainWindow):
         helpM.addSeparator()
         helpM.addAction(aboutA)
         # develAction:
-        debugA = QAction('devel help', self)
-        debugA.setShortcut('Ctrl+D')
+        debugA = newaction(self, 'devel help', short='Ctrl+D')
         debugA.triggered.connect(self.debugf)
         helpM.addSeparator()
         helpM.addAction(debugA)
