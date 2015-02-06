@@ -11,6 +11,9 @@ from PyQt4.QtGui import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
                          QDoubleSpinBox, QFrame, QLabel, QPushButton,)
 from PyQt4.QtCore import Qt
 
+def tl(txt=''):
+    return QApplication.translate("Weight", txt, None, 1)
+
 class Ui_Weight(object):
     def setupUi(self, Weight):
         Weight.resize(500, 405)
