@@ -234,7 +234,8 @@ That should suffice.
         self.show()
 
     def mklist(self, txt='', within=True):
-        mlist = [e for e in self.clist if e.lower().startswith(txt)]
+        if not txt:  return []
+        mlist = [e for e in self.clist if (e.lower().startswith(txt))]
         if within:
             mlist.extend([e for e in self.clist if e.lower().count(txt)
                           and e not in mlist])
