@@ -8,13 +8,12 @@
 from datetime import date
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import (QAction, QMainWindow,
-                         QMenu, QPixmap, QStringListModel,)
+from PyQt4.QtGui import (QMainWindow, QMenu, QPixmap, QStringListModel,)
 import gv_qrc
 from saecli_ui import Ui_Saecli
 from gcompleter import Gcompleter
 from keycheck import Keycheck
-from util import ch_conn, querydb
+from util import ch_conn, newaction, querydb
 
 class Saecli(QMainWindow):
     # signals:
@@ -53,36 +52,19 @@ class Saecli(QMainWindow):
         self.conns = {} # pyqt bug: segfaults on disconnect() w/o arg
         self.sigs  = {}
         #    ACTIONS
-        self.dbA = QAction(self.tr('&Reconnect to database'), self)
-        self.dbA.setAutoRepeat(0)
-        self.dbA.setStatusTip(self.tr('Try to reconnect to database'))
-        self.dbA.setShortcut(self.tr('Ctrl+R'))
-        closeA = QAction(self.tr('Close'), self)
-        closeA.setAutoRepeat(0)
-        closeA.setStatusTip(self.tr('Close this window'))
-        closeA.setShortcut(self.tr('Ctrl+W'))
-        self.newcliA = QAction(self.tr('&Client'), self)
-        self.newcliA.setAutoRepeat(0)
-        self.newcliA.setStatusTip(self.tr(
-            'create new Client record from entered data'))
-        self.newcliA.setShortcut(self.tr('Ctrl+C'))
+        self.dbA = newaction(self, '&Reconnect to database',
+                             'Try to reconnect to database', 'Ctrl+R')
+        closeA = newaction(self, 'Close', 'Close this window', 'Ctrl+W')
+        self.newcliA = newaction(
+            self, '&Client',
+            'create new Client record from entered data', 'Ctrl+C')
         # devel
-        debugA = QAction('Debug', self)
-        debugA.setAutoRepeat(0)
-        debugA.setShortcut('Ctrl+D')
+        debugA = newaction(self, 'Debug', short='Ctrl+D')
         self.addAction(debugA)
         # end devel
-        helpA = QAction(self.tr('&Help'), self)
-        helpA.setAutoRepeat(0)
-        helpA.setStatusTip(self.tr('context sensitive help'))
-        helpA.setShortcut(self.tr('F1'))
-        aboutA = QAction(self.tr('About &GnuVet'), self)
-        aboutA.setAutoRepeat(0)
-        aboutA.setStatusTip(self.tr('GnuVet version info'))
-        quitA = QAction(self.tr('Quit GnuVet'), self)
-        quitA.setAutoRepeat(0)
-        quitA.setStatusTip(self.tr('Quit GnuVet'))
-        quitA.setShortcut(self.tr('Ctrl+Q'))
+        helpA = newaction(self, '&Help', 'context sensitive help', 'F1')
+        aboutA = newaction(self, 'About &GnuVet', 'GnuVet version info')
+        quitA = newaction(self, 'Quit GnuVet', 'Quit GnuVet', 'Ctrl+Q')
         #    MENUES
         taskM = QMenu(self.w.menubar)
         taskM.setTitle(self.tr('&Task'))

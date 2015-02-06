@@ -7,9 +7,9 @@ from datetime import date, datetime
 from decimal import Decimal, ROUND_UP, ROUND_DOWN
 from psycopg2 import OperationalError
 from PyQt4.QtCore import Qt, QPointF, pyqtSignal
-from PyQt4.QtGui import (QMainWindow, QAction, QPainter, QPolygonF, QWidget)
+from PyQt4.QtGui import (QMainWindow, QPainter, QPolygonF, QWidget)
 from keycheck import Keycheck
-from util import ch_conn
+from util import ch_conn, newaction
 from weight_ui import Ui_Weight
 
 def D(arg=0):
@@ -359,15 +359,9 @@ class Weight(QMainWindow):
         dt = datetime.now() # WEIGHT
         self.w.wDe.setDateTime(dt)
         self.w.wDe.setMaximumDate(dt)
-        closeA = QAction(self)
-        closeA.setAutoRepeat(0)
-        closeA.setShortcut(self.tr('Ctrl+W'))
-        helpA = QAction(self)
-        helpA.setAutoRepeat(0)
-        helpA.setShortcut(self.tr('F1'))
-        quitA = QAction(self)
-        quitA.setAutoRepeat(0)
-        quitA.setShortcut(self.tr('Ctrl+Q'))
+        closeA = newaction(self, short='Ctrl+W')
+        helpA = newaction(self, short='F1')
+        quitA = newaction(self, short='Ctrl+Q')
         self.addAction(closeA)
         self.addAction(helpA)
         self.addAction(quitA)

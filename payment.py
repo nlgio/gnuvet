@@ -11,7 +11,7 @@ from payment_ui import Ui_Payment
 
 class Payment(QMainWindow):
     def __init__(self, parent=None, db=None, options={},
-                 cid=0, pid=0, staffid=0): # these 3 nec?
+                 cid=0, pid=0, staffid=0): # these 3 nec?  Yes.
         super(Payment, self).__init__(parent)
         self.db = db
         self.options = options
