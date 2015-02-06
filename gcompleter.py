@@ -180,8 +180,8 @@ That should suffice.
             self.otxt = ''
             self.mtxt = ''
             return
-        txt = str(txt).lower()
-        if len(self.otxt) < len(txt):
+        txt = txt.toLower() # hierwei: cave QString
+        if self.otxt.length < txt.length():
             self.otxt = txt
         mlist = self.mklist(txt)
         if len(mlist) == 1:
@@ -191,12 +191,12 @@ That should suffice.
             elif self.wtype == 'dd':
                 wid = self.ewidget.lineEdit()
                 self.ewidget.setCurrentIndex(self.ewidget.findText(mlist[0]))
-            self.otxt = mlist[0].lower()
+            self.otxt = QString(mlist[0].lower())
             if len(self.clist) > 1:
-                if self.otxt.startswith(txt) and self.otxt != txt:
+                if self.otxt.startsWith(txt) and self.otxt != txt:
                     markstart = len(txt)
                     while len(mlist) == 1:
-                        txt = txt[:-1]
+                        txt = txt.chop(1)
                         mlist = self.mklist(txt)
                     if self.mtxt == txt:
                         markstart -= 1
@@ -269,7 +269,7 @@ That should suffice.
             wid = new.lineEdit()
             self.wtype = 'dd'
         ch_conn(self, 'widget', wid.textEdited, self.listmatch)
-        self.otxt = str(wid.text().toLatin1()).lower()
+        self.otxt = wid.text().toLower()
         self.ewidget = new
         if old and (hasattr(self, 'fr') and old != self.fr):
             self.delcompl()
