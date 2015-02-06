@@ -1,6 +1,6 @@
 """Search Add Edit patient interface."""
+# TODO:
 # Add completer for petpassLe and idLe
-# change self.action to self.act and use that insto self.stage
 # recheck all -- still functional, useful? connect.s? g|setattr(self, what)!!!
 # switch off completers when adding patient?
 # re-implement state_write and db_err and _changes_ and suchlike
@@ -48,7 +48,7 @@ class Saepat(QMainWindow):
         super(Saepat, self).__init__(parent)
         self.parent = parent
         self.pid = pid
-        self.action = act
+        self.act = act
         self.w = Ui_Saepat()
         self.w.setupUi(self)
         #    instance VARIABLES
@@ -756,7 +756,7 @@ class Saepat(QMainWindow):
     def help_self(self):
         """Launch help window with help on saepat."""
         if self.w.saeFr.isVisible():
-            if self.action == 'e':
+            if self.act == 'e':
                 self.helpsig.emit('patedad.html')
             else:
                 self.helpsig.emit('patsearch.html#search')
@@ -800,7 +800,7 @@ class Saepat(QMainWindow):
     def match_list(self, s_byname=True):
         """Set widgets to states for successful search."""
         # check resize things!
-        self.stage = 'l' # was 2
+        self.act = 'l' # was 2
         # mklabel for 'Searching patients seen ... [date]'
         if (self.width()-self.w.matchFr.width() > 20 or
                 self.height()-self.w.matchFr.height() > 135):
@@ -904,7 +904,7 @@ class Saepat(QMainWindow):
 
     def no_matches(self):
         # change: no q to add if not enough data entered?
-        self.stage = 'n' # was 1
+        self.act = 'n' # was 1
         self.w.saeFr.hide()
         self.w.matchFr.hide()
         ch_conn(self, 'mainpb', self.w.mainPb.clicked, self.pat_act)
@@ -936,7 +936,7 @@ class Saepat(QMainWindow):
     def pat_add(self, cid=0):
         """Add a new patient to the db."""
         self.cid = cid
-        self.stage = 'a'
+        self.act = 'a'
         self.setWindowTitle('GnuVet: ' + self.tr('Add Patient'))
         self.prep_ae()
         if self.w.neuteredCb.isChecked():
@@ -1068,7 +1068,7 @@ class Saepat(QMainWindow):
         if not self.nameok:
             print('not nameok')
             # hierwei
-            if self.stage == 'e':
+            if self.act == 'e':
                 res = querydb(
                     self,
                     'select p_id from patients where p_name=%s and p_cid='
@@ -1089,7 +1089,7 @@ class Saepat(QMainWindow):
                     self.w.pnameLe.text().toLatin1() + '</b>' +
                     self.tr('registered on this client\'s account.') + '<br>' +
                     self.tr('Please confirm to ') +
-                    self.stage=='e' and self.tr('save this further') or
+                    self.act=='e' and self.tr('save this further') or
                     self.tr('register this new') +
                     self.tr('Patient of the same name.'))
                 ch_conn(self, 'errok',
@@ -1183,7 +1183,7 @@ class Saepat(QMainWindow):
         """Edit patient, pid signalled from parent."""
         # Check breedDd.cIC.connected (self.adapt_colours)
         # check startv and self.startv ???
-        self.stage = 'e'
+        self.act = 'e'
         startv = {}
         self.prep_ae()
         self.setWindowTitle('GnuVet: ' + self.tr('Edit Patient'))
@@ -1338,7 +1338,7 @@ class Saepat(QMainWindow):
         ## ck update p set (col, col, ...) = (val, val, ...)
         ## signal finish, like via addpat, chdpat or suchlike
         neut = neutdu = False
-        if self.stage == 'a':
+        if self.act == 'a':
             query_s = (
                 'insert into patients(p_name,p_cid,breed,xbreed,dob,dobest,'
                 'colour,sex,neutd,vicious,p_reg,p_anno,loc,identno,rip,'
@@ -1381,7 +1381,7 @@ class Saepat(QMainWindow):
                         self.w.insDd.currentIndex(), 32).toInt()[0],
                     ))
             if res is None:  return # db error
-        elif self.stage == 'e':
+        elif self.act == 'e':
             if (self.startv['pname'] != self.w.pnameLe.text().toLatin1() or
                 self.startv['breed'] != self.w.itemData(
                     self.w.breedDd.currentIndex(), 32).toInt()[0] or
@@ -1588,7 +1588,7 @@ class Saepat(QMainWindow):
         self.w.csnameLb.setText('C&lient')
         self.w.csnameLe.hide()
         self.today = date.today()
-        if self.stage == 'a':
+        if self.act == 'a':
             self.initdob = self.today-timedelta(56)
             self.w.dobDe.setDate(self.initdob)
         self.w.dobDe.setMaximumDate(self.today)
@@ -1616,7 +1616,7 @@ class Saepat(QMainWindow):
     def prep_s(self):
         """Setup search stage of the search-add-edit patient window."""
         # todo: dob disable, hierwei
-        self.stage = 's' # was 0
+        self.act = 's' # was 0
         self.clichangeA.setEnabled(0)
         self.clichangeA.setVisible(0)
         self.w.sbynameRb.setChecked(1)
@@ -1957,7 +1957,7 @@ class Saepat(QMainWindow):
         """Signal unsaved changes to parent for filing for later restoration."""
         # hierwei: UPDATE THIS, take care of string conversions etc
         meself = self.objectName()
-        save_things = ['{}:stage:{}'.format(meself, self.stage)]
+        save_things = ['{}:act:{}'.format(meself, self.act)]
         if self.w.idLe.text():
             save_things.append('{}:idLe:{}'.format(
                 meself, self.w.idLe.text().toLatin1().replace(':', '\t')))
