@@ -59,3 +59,9 @@ if __name__ == '__main__':
     w = Payment(None, [], options)
     w.show()
     exit(a.exec_())
+
+## unpaid:
+##     select sum(acc_npr*(1+vat_rate)) from acc{},vats where acc_vat=vat_id and not acc_paid
+## outstanding:
+##     select sum(acc_npr*(1+vat_rate)) from acc{},vats where acc_vat=vat_id and acc_paid is null
+# acc_paid: default false.  null: paid but payment not confirmed.
