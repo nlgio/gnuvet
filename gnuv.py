@@ -54,18 +54,21 @@ class Gnuv_MainWin(QMainWindow):
         self.addAction(debugA)
         debugA.triggered.connect(self.debugf)
         # end devel
-        self.dbA = newaction(
-            self, '&Reconnect to db', 'Try to reconnect to database', 'Ctrl+R')
-        self.patA = newaction(
-            self, '&Patients', 'Search for Patients', 'Ctrl+P')
-        self.cliA = newaction(self, '&Clients', 'Search for Clients', 'Ctrl+C')
-        self.vaccremA = newaction(
-            self, '&Vacc. Reminders', 'Check vacc. reminders', 'Ctrl+V')
-        self.ssearchA = newaction(
-            self, '&Special Search',
-            'Search in medication/clinical history/seen date etc.', 'Ctrl+S')
         self.appointA = newaction(
             self, '&Appointments', 'Open appointment diary', 'Ctrl+A')
+        self.dbA = newaction(
+            self, '&Reconnect to db', 'Try to reconnect to database', 'Ctrl+R')
+        self.cliA = newaction(self, '&Clients', 'Search for Clients', 'Ctrl+C')
+        self.patA = newaction(
+            self, '&Patients', 'Search for Patients', 'Ctrl+P')
+        self.payconfA = newaction( # hierwei: implement
+            self, 'Confirm Pa&yments',
+            'Confirm deferred payments like Credit Card etc.', 'Ctrl+Y')
+        self.ssearchA = newaction( # hierwei: implement
+            self, '&Special Search',
+            'Search in medication/clinical history/seen date etc.', 'Ctrl+S')
+        self.vaccremA = newaction(
+            self, '&Vacc. Reminders', 'Check vacc. reminders', 'Ctrl+V')
         #    ETC.PP.:
         # ordA jouA finA medA srvA sysA stkA
         chuserA = newaction(
@@ -80,6 +83,7 @@ class Gnuv_MainWin(QMainWindow):
         self.w.taskM.addAction(self.cliA)
         self.w.taskM.addSeparator()
         self.w.taskM.addAction(self.appointA)
+        self.w.taskM.addAction(self.payconfA)
         self.w.taskM.addAction(self.vaccremA)
         # ordA Sep jouA finA
         self.w.taskM.addSeparator()
