@@ -39,7 +39,7 @@ class Ui_Options(object):
         self.lSympCb.setText(tl("Lead Symptom"))
 
 if __name__ == '__main__':
-    from PyQt4.QtGui import QApplication, QMainWindow, QShortcut
+    from PyQt4.QtGui import QMainWindow, QShortcut
     a = QApplication([])
     b = Ui_Options()
     w = QMainWindow()
