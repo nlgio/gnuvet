@@ -109,15 +109,23 @@ create table clients(
  c_mname varchar(25) not null default '',
  c_fname varchar(80) not null default '',
  c_address integer references addresses not null default 1,
- c_telhome varchar(30) not null default '',
- c_telwork varchar(30) not null default '',
- c_mobile1 varchar(30) not null default '',
- c_mobile2 varchar(30) not null default '',
+-- c_telhome varchar(30) not null default '',
+-- c_telwork varchar(30) not null default '',
+-- c_mobile1 varchar(30) not null default '',
+-- c_mobile2 varchar(30) not null default '',
  c_email varchar(120) not null default '',
  baddebt boolean not null default False,
  c_reg date not null,
  c_last timestamp not null default current_timestamp,
  c_anno varchar(255) not null default '');
+
+create table phones(
+-- phone_id serial primary key,
+ phone_clid integer not null references clients,
+ phone_type smallint not null default 1, -- 1 home  2 work  3 mobile  4 other
+ phone_num varchar(25) not null default '',
+ phone_anno varchar(25) not null default '',
+ phone_opt integer not null);
 
 -- keys presumably overkill for up to medium-sized practice:
 --create index c_sname on clients(c_sname);

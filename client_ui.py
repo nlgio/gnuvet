@@ -8,10 +8,11 @@
 
 # TODO:
 # why's menubar smaller than in other windows?
+# eliminate self.centralwidget?
 
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import (QApplication, QFont, QWidget, QLabel, QPixmap,
-                         QPushButton)
+from PyQt4.QtGui import (QApplication, QComboBox, QFont, QWidget, QLabel,
+                         QPixmap, QPushButton)
 from gtable import Gtable
 
 def tl(txt=''):
@@ -39,58 +40,49 @@ class Ui_Client(object):
         self.nameLb.setMinimumSize(0, 19)
         self.nameLb.setMaximumSize(291, 19)
         self.addr1Lb = QLabel(self.centralwidget)
-        self.addr1Lb.setGeometry(10, 30, 241, 19)
+	self.addr1Lb.setGeometry(10, 30, 241, 19)
         self.addr1Lb.setTextInteractionFlags(
             Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.addr2Lb = QLabel(self.centralwidget)
-        self.addr2Lb.setGeometry(10, 50, 241, 19)
+	self.addr2Lb.setGeometry(10, 50, 241, 19)
         self.addr2Lb.setTextInteractionFlags(
             Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.addr3Lb = QLabel(self.centralwidget)
-        self.addr3Lb.setGeometry(10, 70, 241, 19)
+	self.addr3Lb.setGeometry(10, 70, 241, 19)
         self.addr3Lb.setTextInteractionFlags(
             Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
-        self.telhomeLb = QLabel(self.centralwidget)
-        self.telhomeLb.setGeometry(10, 90, 150, 19)
-        self.telhomeLb.setTextInteractionFlags(
-            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
-        self.telworkLb = QLabel(self.centralwidget)
-        self.telworkLb.setGeometry(10, 110, 150, 19)
-        self.telworkLb.setTextInteractionFlags(
-            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
-        self.mobile1Lb = QLabel(self.centralwidget)
-        self.mobile1Lb.setGeometry(175, 90, 150, 19)
-        self.mobile1Lb.setTextInteractionFlags(
-            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
-        self.mobile2Lb = QLabel(self.centralwidget)
-        self.mobile2Lb.setGeometry(175, 110, 150, 19)
-        self.mobile2Lb.setTextInteractionFlags(
-            Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
+        self.telLb = QLabel(self.centralwidget)
+	self.telLb.setGeometry(10, 90, 40, 19)
+        # devel:
+        # end devel
+        self.telDd = QComboBox(self.centralwidget)
+        self.telDd.setGeometry(60, 88, 270, 22)
+        
         self.bdPix = QLabel(self.centralwidget)
         self.bdPix.setGeometry(300, 10, 17, 20)
         self.bdPix.setPixmap(QPixmap(":/images/redflag.png"))
         self.emailLb = QLabel(self.centralwidget)
-        self.emailLb.setGeometry(370, 10, 184, 18)
+	self.emailLb.setGeometry(370, 10, 250, 18)
         self.emailLb.setMaximumSize(290, 18)
         self.lastLb = QLabel(self.centralwidget)
-        self.lastLb.setGeometry(370, 50, 68, 18)
+	self.lastLb.setGeometry(370, 50, 90, 18)
         self.ldateLb = QLabel(self.centralwidget)
-        self.ldateLb.setGeometry(450, 50, 75, 18)
+	self.ldateLb.setGeometry(465, 50, 80, 18)
         self.regLb = QLabel(self.centralwidget)
-        self.regLb.setGeometry(370, 70, 75, 18)
+	self.regLb.setGeometry(370, 70, 90, 18)
         self.regdateLb = QLabel(self.centralwidget)
-        self.regdateLb.setGeometry(450, 70, 75, 18)
+	self.regdateLb.setGeometry(465, 70, 80, 18)
         self.annoLb = QLabel(self.centralwidget)
-        self.annoLb.setGeometry(680, 10, 81, 19)
+	self.annoLb.setGeometry(680, 10, 81, 19)
         self.annoLb.setTextInteractionFlags(
             Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.annotxtLb = QLabel(self.centralwidget)
-        self.annotxtLb.setGeometry(680, 30, 251, 131)
+	self.annotxtLb.setGeometry(680, 30, 251, 131)
         self.annotxtLb.setWordWrap(1)
         self.annotxtLb.setAlignment(Qt.AlignLeft|Qt.AlignTop)
         self.nameLb.setFont(font)
         self.patientsLb = QLabel(self.centralwidget)
-        self.patientsLb.setGeometry(10, 156, 66, 18)
+	self.patientsLb.setGeometry(10, 156, 66, 18)
         self.patientsLb.setFont(font)
         self.patientsLb.setTextFormat(Qt.PlainText)
         self.newPb = QPushButton(self.centralwidget)
@@ -101,9 +93,9 @@ class Ui_Client(object):
         self.plist.setGeometry(10, 180, 921, 371)
         self.plist.setMinimumSize(621, 371)
         self.balLb = QLabel(self.centralwidget)
-        self.balLb.setGeometry(10, 570, 107, 18)
+	self.balLb.setGeometry(10, 570, 107, 18)
         self.balanceLb = QLabel(self.centralwidget)
-        self.balanceLb.setGeometry(130, 570, 72, 18)
+	self.balanceLb.setGeometry(130, 570, 72, 18)
         self.balanceLb.setAlignment(
             Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
         self.mainPb = QPushButton(self.centralwidget)
@@ -120,13 +112,11 @@ class Ui_Client(object):
         self.addr1Lb.setText(tl("House Street"))
         self.addr2Lb.setText(tl("Village, City"))
         self.addr3Lb.setText(tl("B76 0BA"))
-        self.telhomeLb.setText(tl("Home: 01675 478 133"))
-        self.telworkLb.setText(tl("Work: 01675 478 133"))
-        self.mobile1Lb.setText(tl("Mobile: 07725 899 122"))
-        self.mobile2Lb.setText(tl("Mobile: 07725 899 122"))
+        self.telLb.setText(tl("Tel:"))
         self.balanceLb.setText(tl("0.00"))
         self.ldateLb.setText(tl("30.04.2009"))
         self.regdateLb.setText(tl("18.12.2008"))
+        self.telDd.addItem(tl('+43 664 675 60 22'))
         # end devel
         self.annoLb.setText(tl("Annotations:"))
         self.bdPix.setToolTip(tl("Bad Debtor"))
@@ -146,6 +136,7 @@ if __name__ == '__main__':
     from PyQt4.QtGui import QMainWindow, QShortcut
     import gv_qrc
     a = QApplication([])
+    a.setStyle('plastique')
     b = Ui_Client()
     w = QMainWindow()
     b.setupUi(w)

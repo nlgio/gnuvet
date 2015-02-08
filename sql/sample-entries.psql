@@ -95,7 +95,9 @@ update patients set chr=288 where p_name='Elsa';
 update patients set identno='040000000123456' where p_name like 'Emiliano%';
 update patients set identno='040096100106864',petpass='040-0101555' where p_id=20;
 
-update clients set c_telhome='01675 478 322',c_mobile1='07726 898 122',c_email='enno.vet@gmx.net' where c_sname='Deimel';
+-- update clients set c_telhome='01675 478 322',c_mobile1='07726 898 122',c_email='enno.vet@gmx.net' where c_sname='Deimel';
+update clients set c_email='enno.vet@gmx.net' where c_sname='Deimel';
+insert into phones values(2,1,'01675 478 322','',2),(2,3,'07726 898 122','',1);
 
 update clients set baddebt='1' where c_id=17;
 

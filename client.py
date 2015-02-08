@@ -147,7 +147,9 @@ class Client(QMainWindow):
         res = querydb(
             self,
             'select t_title,c_sname,c_mname,c_fname,housen,street,village,city,'
-            'region,postcode,c_telhome,c_telwork,c_mobile1,c_mobile2,c_email,'
+            'region,postcode,'
+            ## 'c_telhome,c_telwork,c_mobile1,c_mobile2,'
+            'c_email,'
             'baddebt,c_reg,c_last,c_anno from clients,titles,addresses where '
             't_id=c_title and c_address=addr_id and c_id=%s',
             (self.cid,))
@@ -161,20 +163,32 @@ class Client(QMainWindow):
             self.w.addr1Lb.setText(', '.join([s for s in e[4:6] if s]))
             self.w.addr2Lb.setText(', '.join([s for s in e[6:8] if s]))
             self.w.addr3Lb.setText(e[9])
-            self.w.telhomeLb.setText(self.tr('Home: ') + e[10])
-            self.w.telworkLb.setText(self.tr('Work: ') + e[11])
-            self.w.mobile1Lb.setText(e[12])
-            self.w.mobile2Lb.setText(e[13])
-            self.w.emailLb.setText(e[14])
-            self.w.bdPix.setVisible(e[15])
-            self.w.regdateLb.setText(e[16].strftime('%d.%m.%y'))
-            self.w.ldateLb.setText(e[17].strftime('%d.%m.%y'))
-            if e[18]: # devel if
-                self.w.annotxtLb.setText(e[18])
+            ## self.w.telhomeLb.setText(self.tr('Home: ') + e[10])
+            ## self.w.telworkLb.setText(self.tr('Work: ') + e[11])
+            ## self.w.mobile1Lb.setText(e[12])
+            ## self.w.mobile2Lb.setText(e[13])
+            self.w.emailLb.setText(e[10])
+            self.w.bdPix.setVisible(e[11])
+            self.w.regdateLb.setText(e[12].strftime('%d.%m.%y'))
+            self.w.ldateLb.setText(e[13].strftime('%d.%m.%y'))
+            if e[14]: # devel if
+                self.w.annotxtLb.setText(e[14])
             else:
                 self.w.annotxtLb.setText(
                     'This is our first client, being the first sentient being '
                     'to have brought patients to our GnuVet practice.')
+        phones = querydb(
+            self,
+            'select phone_num,phone_anno from phones where phone_clid=%s '
+            'order by phone_opt,phone_type', (self.cid,))
+        if phones is None:  return # db error
+        phones = [e[0]+' '+e[1] for e in phones]
+        if not phones:
+            self.w.telDd.addItem(self.tr('n/a'))
+            self.w.telDd.setEnbaled(False)
+        else:
+            for p in phones:
+                self.w.telDd.addItem(p)
         # hierwei here was table creation
         cbal = D('0.00')
         pats = querydb(
@@ -189,14 +203,14 @@ class Client(QMainWindow):
                 self,
                 'select acc_npr,vat_rate,count from acc{0},prod{1},vats '
                 'where acc_vat=vat_id and acc_prid=prod{1}.id and acc_pid='
-                '%s and acc_paid is null'.format(self.cid, p), (p,))
+                '%s and not acc_paid'.format(self.cid, p), (p,))
             if addend is None:  return # db error
             for e in addend:
                 cbal += money(gprice(e[0], e[1]), e[2])
         self.w.balanceLb.setText(str(cbal))
         
     def closeEvent(self, ev):
-        if self.gaia:
+        if hasattr(self, 'gaia') and self.gaia:
             self.gaia.xy_decr()
 
     def dbdep_enable(self, yes=True):
@@ -284,7 +298,9 @@ class Client(QMainWindow):
         print('client.merge not yet implemented')
 
     def payment(self):
-        print('client.payment not yet implemented')
+        ## print('client.payment not yet implemented')
+        ## ck balance: acc_paid false and null.
+        pass
         
     def rip(self):
         print('client.rip not yet implemented')
