@@ -4,13 +4,14 @@
 # payment is confirmed
 
 from decimal import Decimal
-##from datetime import date, datetime # ?
 from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtGui import (QMainWindow, QAction)
 from payment_ui import Ui_Payment
 from util import ch_conn
 
 class Payment(QMainWindow):
+    payment = pyqtSignal(tuple)
+    
     def __init__(self, parent=None, totbalv=0, curbalv=0):
         super(Payment, self).__init__(parent)
         self.w = Ui_Payment()
@@ -23,11 +24,20 @@ class Payment(QMainWindow):
         closeA.triggered.connect(self.close)
         ## self.w.paymentSb.valueChanged.connect(self.change)
         ch_conn(self, 'valchanged', self.w.paymentSb.valueChanged, self.change)
-        for rb in (
-            'cashRb', 'dcardRb', 'ccardRb', 'cheqRb', 'transRb', 'directRb'):
+        self.paymodes = (
+            'cashRb', 'dcardRb', 'ccardRb', 'cheqRb', 'transRb', 'directRb')
+        for rb in self.paymodes:
             getattr(self.w, rb).toggled.connect(self.radiocheck)
         self.w.buttonBox.rejected.connect(self.close)
+        self.w.buttonBox.accepted.connect(self.done)
         self.devel()
+
+    def change(self, val):
+        dif = Decimal(str(val)) - self.curbalv
+        if dif < 0:
+            self.w.change.setText('0.00')
+        else:
+            self.w.change.setText(str(dif))
 
     def devel(self):
         self.totbalv = Decimal('80.63')
@@ -35,18 +45,23 @@ class Payment(QMainWindow):
         self.w.totbal.setText(str(self.totbalv))
         self.w.curbal.setText(str(self.curbalv))
 
-    def change(self, val): # hierwei to change
-        dif = Decimal(str(val)) - self.curbalv
-        if dif < 0:
-            self.w.change.setText('0.00')
-        else:
-            self.w.change.setText(str(dif))
-            
+    def done(self):
+        if self.w.printinvCb.isChecked():
+            prinv = True
+        if self.w.printrecCb.isChecked():
+            prrec = True
+        for rb in self.paymodes:
+            if getattr(self.w, rb).isChecked():
+                mode = rb[:-2]
+                break
+        self.payment.emit((Decimal(str(self.w.paymentSb.value())), mode,
+                          prinv, prrec)) # this signal is connected in parent
+        self.close()
+
     def radiocheck(self):
         if self.w.cashRb.isChecked():
             self.w.changeLb.show()
             self.w.change.show()
-            ## self.w.paymentSb.valueChanged.connect(self.change)
             ch_conn(
                 self, 'valchanged', self.w.paymentSb.valueChanged, self.change)
         else:
@@ -60,9 +75,3 @@ if __name__ == '__main__':
     w = Payment(None)
     w.show()
     exit(a.exec_())
-
-## unpaid:
-##     select sum(acc_npr*(1+vat_rate)) from acc{},vats where acc_vat=vat_id and not acc_paid
-## outstanding:
-##     select sum(acc_npr*(1+vat_rate)) from acc{},vats where acc_vat=vat_id and acc_paid is null
-# acc_paid: default false.  null: paid but payment not confirmed.

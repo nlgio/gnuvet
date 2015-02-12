@@ -8,7 +8,7 @@
 # WARNING! All changes made in this file will be lost!
 
 # TODO:
-# Wie Umlaute, z.B. UEberweisung, in deutsch?
+# Wie Umlaute, z.B. UEberweisung, in deutsch?  Scheint kein Problem zu sein.
 
 from PyQt4.QtCore import Qt # Alignment, alas
 from PyQt4.QtGui import (QApplication, QCheckBox, QDialogButtonBox, 
@@ -42,8 +42,10 @@ class Ui_Payment(object):
         self.change = QLabel(Payment)
         self.change.setGeometry(120, 100, 121, 20)
         self.change.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.printCb = QCheckBox(Payment)
-        self.printCb.setGeometry(20, 140, 100, 19)
+        self.printinvCb = QCheckBox(Payment)
+        self.printinvCb.setGeometry(20, 133, 100, 19)
+        self.printrecCb = QCheckBox(Payment)
+        self.printrecCb.setGeometry(20, 163, 100, 19)
         self.modeLb = QLabel(Payment)
         self.modeLb.setGeometry(280, 10, 101, 16)
         self.cashRb = QRadioButton(Payment)
@@ -78,7 +80,8 @@ class Ui_Payment(object):
         self.paymentLb.setText(tl("&Payment:"))
         self.changeLb.setText(tl("Change:"))
         self.change.setText(tl("0.00"))
-        self.printCb.setText(tl("Pri&nt invoice"))
+        self.printinvCb.setText(tl("Pri&nt invoice"))
+        self.printrecCb.setText(tl("Print r&eceipt"))
         self.modeLb.setText(tl("Payment Mode:"))
         self.cashRb.setText(tl("&Cash"))
         self.dcardRb.setText(tl("&Debit Card"))
