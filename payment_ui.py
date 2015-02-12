@@ -34,6 +34,7 @@ class Ui_Payment(object):
         self.paymentLb.setGeometry(20, 73, 57, 15)
         self.paymentSb = QDoubleSpinBox(Payment)
         self.paymentSb.setGeometry(112, 70, 151, 22)
+        self.paymentSb.setMaximum(9999.99)
         self.paymentSb.setAlignment(
             Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.changeLb = QLabel(Payment)
