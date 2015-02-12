@@ -9,6 +9,8 @@
 
 # TODO:
 # Wie Umlaute, z.B. UEberweisung, in deutsch?  Scheint kein Problem zu sein.
+#
+# Maybe: ck paymodes from db?  Increase height accordingly?
 
 from PyQt4.QtCore import Qt # Alignment, alas
 from PyQt4.QtGui import (QApplication, QCheckBox, QDialogButtonBox, 

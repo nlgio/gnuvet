@@ -1,7 +1,4 @@
 """Payment dialog -- to be called from client only."""
-# TODO:
-# check for things like card or cheque payment only be booked as payed when
-# payment is confirmed
 
 from decimal import Decimal
 from PyQt4.QtCore import pyqtSignal
@@ -22,7 +19,6 @@ class Payment(QMainWindow):
         closeA.setShortcut('Ctrl+W')
         self.addAction(closeA)
         closeA.triggered.connect(self.close)
-        ## self.w.paymentSb.valueChanged.connect(self.change)
         ch_conn(self, 'valchanged', self.w.paymentSb.valueChanged, self.change)
         self.paymodes = (
             'cashRb', 'dcardRb', 'ccardRb', 'cheqRb', 'transRb', 'directRb')

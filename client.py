@@ -4,6 +4,9 @@
 #     ChangeOwner only from patient window
 #  and resp Actions/functions
 #  and resp button connections...
+# 
+# check for things like card or cheque payment only be booked as payed when
+# payment is confirmed
 
 from datetime import date
 from decimal import Decimal as D
