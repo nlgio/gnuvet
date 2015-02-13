@@ -6,7 +6,7 @@
 #  and resp button connections...
 # 
 # check for things like card or cheque payment only be booked as payed when
-# payment is confirmed
+# payment is confirmed from gnuv.py, s. below
 
 from datetime import date
 from decimal import Decimal as D
@@ -324,3 +324,7 @@ if __name__ == '__main__':
 ## outstanding:
 ##     select sum(acc_npr*(1+vat_rate)) from acc{},vats where acc_vat=vat_id and acc_paid is null
 # acc_paid: default false.  null: 'paid' but payment not confirmed (cc, dd etc.)
+## nonono!
+        ## self.confpayA = newaction(
+        ##     self, '&Confirm payments',
+        ##     'Confirm outstanding payments have been met', 'Ctrl+C')

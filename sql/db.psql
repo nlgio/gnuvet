@@ -377,8 +377,8 @@ create table appointments(
 
 /* tables created by application on demand:
 accN:    account client N
-	 acc_id acc_invno acc_pid acc_prid acc_npr acc_vat
-	 # invno: int->invoices.invoice_id
+	 acc_id acc_pid acc_prid acc_npr acc_vat acc_paid
+	 ## invno: int->invoices.invoice_id
 	 # pid: patient.p_id
 	 # acc_prid int->medN.id
 	 # net price, vat
@@ -401,7 +401,7 @@ instN: 	 instructions for medication
 */
 
 -- create table receipts(recpt_id serial primary key, recpt_date date not null, recpt_cid integer references clients not null, recpt_sum numeric(9,2) not null, recpt_paymode varchar(30));
--- de: 'Bar', 'Kontokarte', 'Scheck', 'Kreditkarte', 'Überweisung'
+-- de: 'Bar', 'Kontokarte', 'Kreditkarte', 'Scheck', 'Überweisung', 'Einzug'
 
 -- create type statem_env as enum ('Invoice','Receipt','Letter','Statement');
 -- create table statements(stat_id serial primary key, stat_env statem_env not null, statement varchar(80) not null);

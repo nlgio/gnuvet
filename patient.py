@@ -796,7 +796,7 @@ class Patient(QMainWindow):
                 ##     "integer not null references patients,acc_prid integer "
                 ##     "not null references prod{},acc_npr numeric(9,2) not "
                 ##     "null,acc_vat integer not null references vats,acc_paid"
-                ##     " bool default false)".format(
+                ##     " bool not null default false)".format(
                 ##         self.cid, self.pid)) # _acc_invno_?
                 self.curs.execute(
                     "create table inv{0}(inv_id serial primary key,inv_no "
@@ -1400,7 +1400,7 @@ class Patient(QMainWindow):
         ch_conn(self, 'selch', self.w.htable.rowchanged, self.trackitem)
         self.w.htable.rightclicked.connect(self.rclick)
 
-    def payment(self): # hierwei: currently unused
+    def payment(self): # hierwei: currently unused, move into client
         if not hasattr(self, 'payment'):
             import payment
         self.paym = payment.Payment(self, self.db, self.options,
