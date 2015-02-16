@@ -378,8 +378,9 @@ insert into clients(c_title, c_sname, c_address, c_reg, c_last) values
 
 insert into vats(vat_name, vat_rate) values
  ('Standard VAT', .2),
- ('Reduced VAT', .1);
--- Austria: insert vats(VatName, VatRate) values ('MWSt',.2), ('erm. MWSt',.1), ('USt',.2), ('erm. USt',.1);
+ ('Reduced VAT', .1),
+ ('No VAT', 0);
+-- Austria: insert vats(VatName, VatRate) values ('MWSt',.2), ('erm. MWSt',.1), ('USt',.2), ('erm. USt',.1), ('steuerfrei', 0);
 
 insert into markups (m_name, m_rate) values -- markup usually unused in lang de
  ('None', 0), ('Standard', .8), ('Reduced', .6), ('Greyhound', .3);
