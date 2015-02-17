@@ -797,8 +797,8 @@ class Products(QMainWindow):
         self.startover()
         query = (
             'select pr_name,pr_short,pr_u,pr_nprice,vat_id,pr_id,pr_type,'
-            'pr_instr,op_markup from products,outputs,vats where not '
-            'pr_obs and {0} ilike %s and pr_vat=vat_id and pr_type=op_id and '
+            'pr_instr,pt_markup from products,ptypes,vats where not '
+            'pr_obs and {0} ilike %s and pr_vat=vat_id and pr_type=pt_id and '
             'pr_type in (%s,%s) order by {0}')
         if not prod:
             query = query.format('pr_name')
@@ -840,8 +840,8 @@ class Products(QMainWindow):
         self.startover()
         query = (
             'select pr_name,pr_short,pr_u,pr_nprice,vat_id,pr_id,pr_type,'
-            'pr_instr,op_markup from products,outputs,vats where not '
-            'pr_obs and {0} {1} %s and pr_vat=vat_id and pr_type=op_id and '
+            'pr_instr,pt_markup from products,ptypes,vats where not '
+            'pr_obs and {0} {1} %s and pr_vat=vat_id and pr_type=pt_id and '
             'pr_type not in (%s,%s) order by {0}')
         if prod.count('|'):
             likeword = 'similar to'
@@ -894,8 +894,8 @@ class Products(QMainWindow):
         spec = spec[0][0]
         query = (
             'select pr_name,pr_short,pr_u,pr_nprice,pr_vat,pr_id,pr_type,'
-            'pr_instr,op_markup from products,outputs,vats,vaccinations '
-            'where not pr_obs and pr_vat=vat_id and pr_type=op_id and '
+            'pr_instr,pt_markup from products,ptypes,vats,vaccinations '
+            'where not pr_obs and pr_vat=vat_id and pr_type=pt_id and '
             'pr_type=%s and vac_sid=pr_id and vac_spec=%s {}'
             'order by pr_name')
         addit = str(self.w.pLe.text().toLatin1()).lower()

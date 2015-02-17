@@ -441,7 +441,7 @@ insert into labels (lb_abbr, lb_txt) values -- not sure yet if i'll use this
  ('g3u3', 'Give three % three times daily (every 8 hrs)'),
  ('a3-5dtar', 'Apply three to five times per day to affected region');
 
-insert into outputs (op_id,op_name,op_markup) values
+insert into ptypes (pt_id,pt_name,pt_markup) values
  (1,'other',2),(2,'med',2),(3,'serv',1),(4,'good',2),(5,'food',2),(6,'cons',1),(7,'hist',1),(8,'vacc',2);
 
 insert into paymode values(1,'Cash',FALSE),(2,'Debit Card',FALSE),(3,'Cheque',TRUE),(4,'Credit Card',TRUE),(5,'Transfer',TRUE),(6,'Direct Debit',TRUE);

@@ -249,7 +249,7 @@ class Patient(QMainWindow):
         self.contime = 0
         if 'contime' in self.options:
             self.contime = self.options['contime']
-        self.get_outputs()
+        self.get_ptypes()
         if self.dberr:  return
         self.keycheck = Keycheck(self)
         self.installEventFilter(self.keycheck)
@@ -395,7 +395,7 @@ class Patient(QMainWindow):
             for c in self.w.htable.lrows[-1]:
                 c.setStyleSheet(
                     self.w.htable.gcellss.format(
-                        'white', self.outputs[l[8]].lower(), 'lightgray'))
+                        'white', self.ptypes[l[8]].lower(), 'lightgray'))
         if self.tt:
             self.w.htable.lrows[-1][4].setToolTip(self.tt)
     
@@ -855,7 +855,7 @@ class Patient(QMainWindow):
                 self.curs.execute(
                     "create table prod{0}(id serial primary key,consid integer "
                     "not null references e{0},dt timestamp not null default "
-                    "now(),type integer not null references outputs,txt "
+                    "now(),type integer not null references ptypes,txt "
                     "integer not null references products,count numeric(8,2) "
                     "not null default 1,symp integer not null references "
                     "symptoms default 1,staff integer not null references "
@@ -1067,19 +1067,19 @@ class Patient(QMainWindow):
         for e in res:
             self.chronics.append(e[0])
 
-    def get_outputs(self):
-        """Get outputs types colour for htable."""
-        self.outputs = [""]
+    def get_ptypes(self):
+        """Get ptypes types colour for htable."""
+        self.ptypes = [""]
         self.types = {}
-        res = querydb(self,'select op_name,op_id from outputs order by op_id')
+        res = querydb(self,'select pt_name,pt_id from ptypes order by pt_id')
         if res is None:  return # db error
         for e in res:
             setattr(self, 'type' + e[0], e[1])
             self.types[e[0]] = e[1]
             if e[0]+'_col' in self.options:
-                self.outputs.append(self.options[e[0]+'_col'])
+                self.ptypes.append(self.options[e[0]+'_col'])
             else:
-                self.outputs.append('black')
+                self.ptypes.append('black')
 
     def get_vats(self): # is this overkill?
         if not hasattr(self, 'vats'):

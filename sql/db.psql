@@ -55,10 +55,10 @@ create table markups(
  m_obs boolean not null default FALSE);
 
 -- service type: other med serv good food cons hist
-create table outputs(
- op_id serial primary key,
- op_name varchar(20) not null,
- op_markup integer not null references markups default 1);
+create table ptypes(
+ pt_id serial primary key,
+ pt_name varchar(20) not null,
+ pt_markup integer not null references markups default 1);
 
 create table addresses(
  addr_id serial primary key,
@@ -293,7 +293,7 @@ create table products(
  pr_obs boolean not null default FALSE, -- to keep for old records
  pr_name varchar(80) not null,
  pr_short varchar(10) not null,
- pr_type integer references outputs not null default 1, -- srv, med etc.
+ pr_type integer references ptypes not null default 1, -- srv, med etc.
  pr_pprice numeric(8,2) not null default 0.00, -- net purchase price
  pr_nprice numeric(8,2) not null, -- net sale price
  pr_vat integer references vats default 1,

@@ -56,13 +56,18 @@ class Payment(QMainWindow):
 
     def radiocheck(self):
         if self.w.cashRb.isChecked():
-            self.w.changeLb.show()
-            self.w.change.show()
+            self.w.changeLb.setEnabled(True)
+            self.w.change.setEnabled(True)
             ch_conn(
                 self, 'valchanged', self.w.paymentSb.valueChanged, self.change)
+            self.w.prrecCb.setEnabled(True)
+        elif self.w.cashRb.isChecked() or self.w.dcard.isChecked():
+            self.w.prrecCb.setEnabled(True)
         else:
-            self.w.changeLb.hide()
-            self.w.change.hide()
+            self.w.changeLb.setEnabled(False)
+            self.w.change.setEnabled(False)
+            self.w.prrecCb.setChecked(False)
+            self.w.prrecCb.setEnabled(False)
             ch_conn(self, 'valchanged')
             
 if __name__ == '__main__':
