@@ -282,36 +282,58 @@ create table labels(
  lb_abbr varchar(15) unique,
  lb_txt varchar(255) unique);
 
-create table batchnos(
- batch_id serial primary key,
- batch varchar(25) not null);
-
 create table paymode(pay_id serial primary key,pay_mode varchar(20) not null,pay_ck bool not null default TRUE);
 
 create table products(
  pr_id serial primary key,
- pr_obs boolean not null default FALSE, -- to keep for old records
  pr_name varchar(80) not null,
  pr_short varchar(10) not null,
- pr_type integer references ptypes not null default 1, -- srv, med etc.
+ pr_type integer references ptypes not null default 1, -- srv, med, good etc.
  pr_pprice numeric(8,2) not null default 0.00, -- net purchase price
  pr_nprice numeric(8,2) not null, -- net sale price
  pr_vat integer references vats default 1,
  pr_perm boolean not null default FALSE, -- 0 OTC,  1 POM
  pr_u integer references units not null,
- pr_ingr integer references ingredients, -- ?
- pr_instr boolean not null default TRUE, -- ask for instructions
--- pr_wd integer, --references withdrawal? null?
- pr_ordu integer references units, -- ordering unit
- pr_upordu numeric(8,4), -- for assistance in price calc
- pr_barcode integer,
- pr_batch integer references batchnos,
- pr_stock numeric(9,3),
- pr_limit numeric(4,2), -- when to re-order
- pr_supplier integer references suppliers,
- pr_ordid varchar(30)); -- e.g. art.no.
+-- pr_ingr integer references ingredients, -- bitmask? separate table! if at all
+ pr_instr boolean not null default TRUE -- ask for instructions
+-- pr_upordu numeric(8,4), -- for assistance in price calc -- whatsthis?
+);
+
+create table batchnos(
+ chb_id serial primary key,
+ chb_prid integer references products,
+ chb_val varchar(30) not null);
+
+/* create table barcodes(
+ bcode_id serial primary key,
+ bcode_prid integer references products;
+ bcode_val integer);
+
+create table stocks(
+ st_id serial primary key,
+ st_prid integer not null references products,
+ st_num numeric(9,2) not null);
+
+create table limits(
+ l_id serial primary key,
+ l_prid integer not null references products,
+ l_val numeric(9,2) not null);
+
+create table pr_supplier(
+ prid integer not null references products,
+ prsup integer references suppliers,
+ prordid varchar(100));
+****************/
+
+/*create table prodoldprices( -- more efficient than obsoleting old prices
+ pop_id serial primary key,
+ pop_prid integer not null references products,
+ pop_npr numeric(8,2) not null,
+ pop_vat integer not null references vats,
+ pop_todate date not null);
 
 create table toorder(o_prid integer not null references products, o_date date);
+**************/
 
 /* 'validity' for vaccinations */
 create table validities(
@@ -349,19 +371,20 @@ create table app2prod(
  a2p_prid integer references products primary key,
  a2p_prod integer references applications not null);
 
-create table wd_apps( -- wd dependent on app type and dosage
- wda_id serial primary key,
- wda_app varchar(8));
-
-create table withdrawals( -- wartezeiten #d
+/*create table withdrawals( -- wartezeiten #d
  w_id serial primary key,
- w_prid integer references products not null,
+ w_prid integer references products,
  w_spec integer references species,
  w_app integer references wd_apps,
  w_meat integer not null,
  w_milk integer,
  w_eggs integer,
  w_obs boolean not null default FALSE);
+
+create table wd_apps( -- wd dependent on app type and/or dosage
+ wda_id serial primary key,
+ wda_app varchar(8),
+ wda_dosage varchar(120));*/
 
 create table invoices(invoice_id serial primary key, inv_no varchar(12) not null unique);
 

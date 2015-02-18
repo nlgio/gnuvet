@@ -706,5 +706,5 @@ insert into applications (app_keyword) values
 insert into app2prod (a2p_prid,a2p_prod) values
  (1,1), (10,1), (11,1), (12,1), (13,1), (17,1), (28,1), (36,1);
 
-insert into wd_apps(wda_app) values ('i.m.'), ('i.v.'), ('s.c.'), ('p.o.'),
-       ('i.m. 2'), ('i.v. 2'), ('s.c. 2'), ('p.o. 2');
+--insert into wd_apps(wda_app) values ('i.m.'), ('i.v.'), ('s.c.'), ('p.o.'),
+--       ('i.m. 2'), ('i.v. 2'), ('s.c. 2'), ('p.o. 2');
