@@ -282,7 +282,7 @@ create table labels(
  lb_abbr varchar(15) unique,
  lb_txt varchar(255) unique);
 
-create table paymode(pay_id serial primary key,pay_mode varchar(20) not null,pay_ck bool not null default TRUE);
+create table pay_modes(pm_id serial primary key,pm_mode varchar(20) not null,pm_ck bool not null default TRUE);
 
 create table products(
  pr_id serial primary key,
@@ -347,9 +347,9 @@ create table vtypes(
 
 create table vaccinations(
  vac_id serial primary key,
- vac_type integer references vtypes not null,
- vac_prid integer references products not null, -- used product
- vac_sid integer references products not null, -- service
+ vac_type integer not null references vtypes,
+ vac_prid integer not null references products, -- used product
+ vac_sid integer not null references products, -- service
  vac_validity integer references validities, -- not null ifd
  vac_spec integer references species); -- null: all, like rabies
 

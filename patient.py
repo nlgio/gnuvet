@@ -414,9 +414,9 @@ class Patient(QMainWindow):
         self.symp = args[5]
         prodid = querydb(
             self,
-            'insert into prod{}(consid,dt,type,txt,count,symp,staff,seq)values'
+            'insert into prod{}(consid,dt,prodid,count,symp,staff,seq)values'
             '(%s,%s,%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
-            (self.consid, self.startdt, args[2]['type'], args[2]['id'],
+            (self.consid, self.startdt, args[2]['id'],
              args[4], args[5], self.staffid, 1))
         if prodid is None:  return # db error
         prodid = prodid[0][0]
@@ -441,7 +441,7 @@ class Patient(QMainWindow):
         if not self.prevdata:
             self.w.htable.clear()
         nrow = [args[1]] # startdt
-        res = querydb( # "txt"
+        res = querydb( # "prodid"
             self,
             'select pr_name from products where pr_id=%s', (args[2]['id'],))
         if res is None:  return # db error
@@ -487,9 +487,9 @@ class Patient(QMainWindow):
         self.symp = args[5]
         prodid = querydb(
             self,
-            'insert into prod{}(consid,dt,type,txt,count,symp,staff,seq)values'
+            'insert into prod{}(consid,dt,prodid,count,symp,staff,seq)values'
             '(%s,%s,%s,%s,%s,%s,%s,%s) returning id'.format(self.pid), # hierwei
-            (self.consid, self.rundt, args[2]['type'], args[2]['id'],
+            (self.consid, self.rundt, args[2]['id'],
              args[4], args[5], self.staffid, 3))
         if prodid is None:  return # db error
         prodid = prodid[0][0]
@@ -566,9 +566,9 @@ class Patient(QMainWindow):
             self.symp = args[5] # should be 1, except for therapeutic vacc
         prodid = querydb(
             self,
-            'insert into prod{}(consid,dt,type,txt,count,symp,staff,seq)values'
+            'insert into prod{}(consid,dt,prodid,count,symp,staff,seq)values'
             '(%s,%s,%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
-            (self.consid, self.startdt, self.typevacc, args[2]['id'],
+            (self.consid, self.startdt, args[2]['id'],
              args[4], args[5], self.staffid, 1))
         if prodid is None:  return # db error
         prodid = prodid[0][0]
@@ -633,7 +633,7 @@ class Patient(QMainWindow):
         if not self.prevdata:
             self.w.htable.clear()
         nrow = [self.startdt]
-        res = querydb( # "txt"
+        res = querydb( # "prodid"
             self,
             'select pr_name,pr_u from products where pr_id=%s',
             (args[2]['id'],))
@@ -855,12 +855,11 @@ class Patient(QMainWindow):
                 self.curs.execute(
                     "create table prod{0}(id serial primary key,consid integer "
                     "not null references e{0},dt timestamp not null default "
-                    "now(),type integer not null references ptypes,txt "
-                    "integer not null references products,count numeric(8,2) "
-                    "not null default 1,symp integer not null references "
-                    "symptoms default 1,staff integer not null references "
-                    "staff default 1,seq integer not null default 3)".format(
-                        self.pid))
+                    "now(),prodid integer not null references products,count "
+                    "numeric(8,2) not null default 1,symp integer not null "
+                    "references symptoms default 1,staff integer not null "
+                    "references staff default 1,seq integer not null default 3)"
+                    .format(self.pid))
                 self.curs.execute(
                     "create table ch{0}(id serial primary key,consid integer "
                     "not null references e{0},dt timestamp not null default "
@@ -1370,9 +1369,9 @@ class Patient(QMainWindow):
                 (self.typehist,))
             self.curs.execute( # prod  # 0xe2 0x80 0x9e
                 'insert into tc{0}(consid,okey,dt,type,txt,count,symp,staff,'
-                'seq,prid,unit) select consid,id,dt,type,pr_name,count,symp,'
+                'seq,prid,unit) select consid,id,dt,pr_type,pr_name,count,symp,'
                 'stf_short,seq,pr_id,u_abbr from prod{0},products,units,staff '
-                'where txt=pr_id and pr_u=u_id and staff=stf_id'.format(
+                'where prodid=pr_id and pr_u=u_id and staff=stf_id'.format(
                     self.pid))
             self.curs.execute( # ch
                 'insert into tc{0}(consid,okey,dt,txt,symp,staff,seq) '

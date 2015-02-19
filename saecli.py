@@ -322,11 +322,10 @@ class Saecli(QMainWindow):
                 self.curs.execute(
                     'create table prod{0}(id serial primary key,consid integer '
                     'not null references e{0},dt timestamp not null default '
-                    'now(),type integer not null references ptypes,txt '
-                    'integer not null default 1,symp integer not null '
-                    'references symptoms default 1,staff integer not null '
-                    'references staff default 1,seq integer not null default '
-                    '3'.format(pid))
+                    'now(),prodid integer not null references products default '
+                    '1,symp integer not null references symptoms default 1,'
+                    'staff integer not null references staff default 1,seq '
+                    'integer not null default 3'.format(pid))
                 self.curs.execute(
                     "create table ch{0}(id serial primary key,consid integer "
                     "not null references e{0},dt timestamp not null default "

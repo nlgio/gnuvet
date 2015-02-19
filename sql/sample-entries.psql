@@ -114,17 +114,17 @@ insert into ch1(consid,dt,text,symp)values
  (5,'2008-05-08 11:24:12','o.B.',1),
  (6,'2009-05-10 10:12:34','o.B.',1);
 drop table if exists prod1 cascade;
-create table prod1(id serial primary key,consid integer not null references e1,dt timestamp not null default current_timestamp,type integer not null references ptypes,txt integer not null references products,count numeric(8,2) not null default 1,symp integer not null references symptoms default 1,staff integer not null references staff default 1,seq integer not null default 3);
-insert into prod1(consid,dt,type,txt,count,symp,seq)values
- (1,'2005-04-11 08:52:19',8,130,1,1,3),
- (2,'2005-05-10 10:43:32',8,131,1,1,3),
- (2,'2005-05-10 10:44:05',8,140,1,1,3),
- (3,'2006-05-12 11:11:23',8,133,1,1,3),
- (4,'2007-05-10 10:37:08',8,133,1,1,3),
- (4,'2007-05-10 10:37:43',8,140,1,1,3),
- (5,'2008-05-08 11:23:44',8,133,1,1,3),
- (6,'2009-05-10 10:12:00',8,133,1,1,3),
- (6,'2009-05-10 10:12:32',8,140,1,1,3);
+create table prod1(id serial primary key,consid integer not null references e1,dt timestamp not null default current_timestamp,prodid integer not null references products,count numeric(8,2) not null default 1,symp integer not null references symptoms default 1,staff integer not null references staff default 1,seq integer not null default 3);
+insert into prod1(consid,dt,prodid,count,symp,seq)values
+ (1,'2005-04-11 08:52:19',130,1,1,3),
+ (2,'2005-05-10 10:43:32',131,1,1,3),
+ (2,'2005-05-10 10:44:05',140,1,1,3),
+ (3,'2006-05-12 11:11:23',133,1,1,3),
+ (4,'2007-05-10 10:37:08',133,1,1,3),
+ (4,'2007-05-10 10:37:43',140,1,1,3),
+ (5,'2008-05-08 11:23:44',133,1,1,3),
+ (6,'2009-05-10 10:12:00',133,1,1,3),
+ (6,'2009-05-10 10:12:32',140,1,1,3);
 
 drop table if exists e20 cascade;
 create table e20(id serial primary key);
@@ -138,12 +138,12 @@ insert into ch20(consid,dt,text,symp)values
  (2,'2012-07-28 13:37:57.584051',E'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"\n<html><head><meta name="qrichtext" content="1" /><style type="text/css">\np,li { white-space: pre-wrap; }\n</style></head><body style=" font-family:''Sans Serif''; font-size:9pt; font-weight:400; font-style:normal;">\n<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">And now for <span style=" color:#ff0000;">something </span><span style=" color:#0000ff;">completely </span><span style=" color:#000000;">different...</span></p></body></html>',1);
 
 drop table if exists prod20;
-create table prod20(id serial primary key,consid integer not null references e20,dt timestamp not null default current_timestamp,type integer not null references ptypes,txt integer not null references products,count numeric(8,2) not null default 1,symp integer not null references symptoms default 1,staff integer not null references staff default 1,seq integer not null default 3);
-insert into prod20(consid,dt,type,txt,count,symp,seq)values
- (1,'2012-05-14 17:51:34.473996',6,37,1,12,1),
- (1,'2012-05-14 17:51:34.473996',2,5,14,12,3),
- (2,'2012-07-28 13:37:57.584051',6,37,1,1,1),
- (2,'2012-07-28 13:37:57.584051',4,16,1,1,3);
+create table prod20(id serial primary key,consid integer not null references e20,dt timestamp not null default current_timestamp,prodid integer not null references products,count numeric(8,2) not null default 1,symp integer not null references symptoms default 1,staff integer not null references staff default 1,seq integer not null default 3);
+insert into prod20(consid,dt,prodid,count,symp,seq)values
+ (1,'2012-05-14 17:51:34.473996',37,1,12,1),
+ (1,'2012-05-14 17:51:34.473996',5,14,12,3),
+ (2,'2012-07-28 13:37:57.584051',37,1,1,1),
+ (2,'2012-07-28 13:37:57.584051',16,1,1,3);
 
 drop table if exists weight16 cascade;
 create table weight16(w_id serial primary key,w_est boolean not null default '0',w_date timestamp not null default current_timestamp,weight numeric(7,3) not null,w_staff integer references staff not null default 1);
@@ -197,8 +197,8 @@ drop table if exists e16;
 create table e16(id serial primary key);
 insert into e16 default values;
 drop table if exists prod16 cascade;
-create table prod16(id serial primary key,consid integer not null references e16,dt timestamp not null default current_timestamp,type integer not null references ptypes,txt integer not null references products,count numeric(8,2) not null default 1,symp integer not null references symptoms default 1,staff integer not null references staff default 1,seq integer not null default 3);
-insert into prod16(consid,dt,type,txt)values(1,'2008-3-24 14:44:45',8,133);
+create table prod16(id serial primary key,consid integer not null references e16,dt timestamp not null default current_timestamp,prodid integer not null references products,count numeric(8,2) not null default 1,symp integer not null references symptoms default 1,staff integer not null references staff default 1,seq integer not null default 3);
+insert into prod16(consid,dt,prodid)values(1,'2008-3-24 14:44:45',133);
 drop table if exists ch16 cascade;
 create table ch16(id serial primary key,consid integer not null references e16,dt timestamp not null default current_timestamp,text varchar(1024) not null default '',symp integer not null references symptoms default 1,staff integer references staff not null default 1,seq integer not null default 2);
 insert into ch16(consid,dt,text)values(1,'2008-3-24 14:45:45','o.B.');
@@ -211,8 +211,8 @@ drop table if exists e19;
 create table e19(id serial primary key);
 insert into e19 default values;
 drop table if exists prod19;
-create table prod19(id serial primary key,consid integer not null references e19,dt timestamp not null default current_timestamp,type integer not null references ptypes,txt integer not null references products,count numeric(8,2) not null default 1,symp integer not null references symptoms default 1,staff integer not null references staff default 1,seq integer not null default 3);
-insert into prod19(consid,dt,type,txt)values(1,'2008-3-12 14:34:12',8,133);
+create table prod19(id serial primary key,consid integer not null references e19,dt timestamp not null default current_timestamp,prodid integer not null references products,count numeric(8,2) not null default 1,symp integer not null references symptoms default 1,staff integer not null references staff default 1,seq integer not null default 3);
+insert into prod19(consid,dt,prodid)values(1,'2008-3-12 14:34:12',133);
 drop table if exists ch19 cascade;
 create table ch19(id serial primary key,consid integer not null references e19,dt timestamp not null default current_timestamp,text varchar(1024) not null default '',symp integer not null references symptoms default 1,staff integer references staff not null default 1,seq integer not null default 2);
 insert into ch19(consid,dt,text)values(1,'2008-3-12 14:35:45','o.B.');
