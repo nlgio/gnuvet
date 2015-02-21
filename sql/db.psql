@@ -391,6 +391,7 @@ create table wd_apps( -- wd dependent on app type and/or dosage
  wda_dosage varchar(120));*/
 
 create table invoices(inv_id serial primary key,inv_no integer not null unique);
+-- cave 0er Jahre: select length(n::text)<10 -> +0
 
 create table appointments(
  app_id serial primary key,

@@ -1072,13 +1072,17 @@ class Patient(QMainWindow):
         """Get ptypes types colour for htable."""
         self.ptypes = [""]
         self.types = {}
-        res = querydb(self,'select pt_name,pt_id from ptypes order by pt_id')
+        res = querydb(self, 'select enum_range(null::ptype)')
         if res is None:  return # db error
-        for e in res:
-            setattr(self, 'type' + e[0], e[1])
-            self.types[e[0]] = e[1]
-            if e[0]+'_col' in self.options:
-                self.ptypes.append(self.options[e[0]+'_col'])
+        res = res[0][0]
+        res = res.split(',')
+        res[0] = res[0].replace('{', '')
+        res[-1] = res[-1].replace('}', '')
+        for i, e in enumerate(res):
+            setattr(self, 'type' + e, i)
+            self.types[e] = i
+            if e+'_col' in self.options:
+                self.ptypes.append(self.options[e+'_col'])
             else:
                 self.ptypes.append('black')
 
