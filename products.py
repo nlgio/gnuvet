@@ -1,5 +1,7 @@
 """From scratch, a new product, amount, symptom and history recording dialog."""
 # TODO:
+# reconsider markup things -- nec?
+# implement gaia
 # first startdt should be set from here by send_data set on confirm on consult
 # ck startdt on using 'selected' cons
 
@@ -166,14 +168,14 @@ class Products(QMainWindow):
             self.rundt = parent.rundt
             self.timer = parent.timer
         else: # devel else
-            self.typeother = 1
-            self.typemed   = 2
-            self.typeserv  = 3
-            self.typegood  = 4
-            self.typefood  = 5
-            self.typecons  = 6
-            self.typehist  = 7
-            self.typevacc  = 8
+            ## self.typeother = 1
+            ## self.typemed   = 2
+            ## self.typeserv  = 3
+            ## self.typegood  = 4
+            ## self.typefood  = 5
+            ## self.typecons  = 6
+            ## self.typehist  = 7
+            ## self.typevacc  = 8
             self.rundt = datetime.now()
             self.timer = Ticker(self)
             self.timer.run()
@@ -797,9 +799,8 @@ class Products(QMainWindow):
         self.startover()
         query = (
             'select pr_name,pr_short,pr_u,pr_nprice,vat_id,pr_id,pr_type,'
-            'pr_instr,pt_markup from products,ptypes,vats where not '
-            'pr_obs and {0} ilike %s and pr_vat=vat_id and pr_type=pt_id and '
-            'pr_type in (%s,%s) order by {0}')
+            'pr_instr from products,vats where not pr_obs and {0} ilike %s and '
+            'pr_vat=vat_id and pr_type in (%s,%s) order by {0}')
         if not prod:
             query = query.format('pr_name')
             self.waitstart()
@@ -840,19 +841,18 @@ class Products(QMainWindow):
         self.startover()
         query = (
             'select pr_name,pr_short,pr_u,pr_nprice,vat_id,pr_id,pr_type,'
-            'pr_instr,pt_markup from products,ptypes,vats where not '
-            'pr_obs and {0} {1} %s and pr_vat=vat_id and pr_type=pt_id and '
-            'pr_type not in (%s,%s) order by {0}')
+            'pr_instr from products,vats where not pr_obs and {0} {1} %s and '
+            'pr_vat=vat_id and pr_type not in (%s,%s) order by {0}')
         if prod.count('|'):
             likeword = 'similar to'
         else:
             likeword = 'ilike'
         query = query.format('{0}', likeword)
-        # 0 name 1 short 2 u_id 3 nprice 4 vat_id 5 id 6 type 7 instr 8 markup
+        # 0 name 1 short 2 u_id 3 nprice 4 vat_id 5 id 6 type 7 instr
         if not prod:
             query = query.format('pr_name')
             self.waitstart()
-            self.curs.execute(query, ('%', self.typevacc, self.typecons))
+            self.curs.execute(query, ('%', 'vac', 'con')) # hierwei get from db?
             self.fill_table(self.curs.fetchall())
         else:
             conds = (
@@ -894,18 +894,18 @@ class Products(QMainWindow):
         spec = spec[0][0]
         query = (
             'select pr_name,pr_short,pr_u,pr_nprice,pr_vat,pr_id,pr_type,'
-            'pr_instr,pt_markup from products,ptypes,vats,vaccinations '
-            'where not pr_obs and pr_vat=vat_id and pr_type=pt_id and '
+            'pr_instr from products,vats,vaccinations '
+            'where not pr_obs and pr_vat=vat_id and '
             'pr_type=%s and vac_sid=pr_id and vac_spec=%s {}'
             'order by pr_name')
         addit = str(self.w.pLe.text().toLatin1()).lower()
         if not addit:
             query = query.format('')
-            res = querydb(self, query, (self.typevacc, spec))
+            res = querydb(self, query, ('vac', spec))
         else:
             addit = '%{}%'.format(addit)
             query = query.format('and (pr_name ilike %s or pr_short ilike %s) ')
-            res = querydb(self, query, (self.typevacc, spec, addit, addit))
+            res = querydb(self, query, ('vac', spec, addit, addit))
         self.waitstart()
         if res is None:  return # db error
         self.fill_table(res)
@@ -1284,7 +1284,7 @@ class Products(QMainWindow):
         self.rundt = rdt
         self.symp = symp
         self.toggle_timer()
-        if prod == self.typecons:
+        if prod == 'con':
             self.list_cons()
         elif action == 'v':
             self.list_vaccs()
