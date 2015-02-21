@@ -6,6 +6,8 @@ startdt: datetime for entry -> this to save in db for one consid?
 """
 
 # TODO:
+# eliminate seq from prodP instP chP, sort in here
+# --> self.typehist, self.typecons???
 # add adding text w/o consult for e.g. calling information (vacc reminders etc)
 #     s. products.add_hist()
 # ck time not within constime?
@@ -414,10 +416,10 @@ class Patient(QMainWindow):
         self.symp = args[5]
         prodid = querydb(
             self,
-            'insert into prod{}(consid,dt,prodid,count,symp,staff,seq)values'
-            '(%s,%s,%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
+            'insert into prod{}(consid,dt,prodid,count,symp,staff)values'
+            '(%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
             (self.consid, self.startdt, args[2]['id'],
-             args[4], args[5], self.staffid, 1))
+             args[4], args[5], self.staffid))
         if prodid is None:  return # db error
         prodid = prodid[0][0]
         chid = querydb(
@@ -487,10 +489,10 @@ class Patient(QMainWindow):
         self.symp = args[5]
         prodid = querydb(
             self,
-            'insert into prod{}(consid,dt,prodid,count,symp,staff,seq)values'
-            '(%s,%s,%s,%s,%s,%s,%s,%s) returning id'.format(self.pid), # hierwei
+            'insert into prod{}(consid,dt,prodid,count,symp,staff)values'
+            '(%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
             (self.consid, self.rundt, args[2]['id'],
-             args[4], args[5], self.staffid, 3))
+             args[4], args[5], self.staffid))
         if prodid is None:  return # db error
         prodid = prodid[0][0]
         res = querydb(
@@ -566,10 +568,10 @@ class Patient(QMainWindow):
             self.symp = args[5] # should be 1, except for therapeutic vacc
         prodid = querydb(
             self,
-            'insert into prod{}(consid,dt,prodid,count,symp,staff,seq)values'
-            '(%s,%s,%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
+            'insert into prod{}(consid,dt,prodid,count,symp,staff)values'
+            '(%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
             (self.consid, self.startdt, args[2]['id'],
-             args[4], args[5], self.staffid, 1))
+             args[4], args[5], self.staffid))
         if prodid is None:  return # db error
         prodid = prodid[0][0]
         chid = querydb(
@@ -858,15 +860,15 @@ class Patient(QMainWindow):
                     "now(),prodid integer not null references products,count "
                     "numeric(8,2) not null default 1,symp integer not null "
                     "references symptoms default 1,staff integer not null "
-                    "references staff default 1,seq integer not null default 3)"
+                    "references staff default 1)"
                     .format(self.pid))
                 self.curs.execute(
                     "create table ch{0}(id serial primary key,consid integer "
                     "not null references e{0},dt timestamp not null default "
                     "now(),text varchar(1024) not null default '',symp "
                     "integer not null references symptoms default 1,staff "
-                    "integer not null references staff default 1,seq integer "
-                    "not null default 2)".format(self.pid))
+                    "integer not null references staff default 1)".format(
+                        self.pid))
             except OperationalError as e:
                 self.db_state(e)
                 return
@@ -1364,19 +1366,21 @@ class Patient(QMainWindow):
                 'integer not null default 0,dt timestamp not null,type integer '
                 'not null default %s,txt varchar(1024) not null,count numeric'
                 '(8,2) not null default 0,symp integer,unit varchar(5) not '
-                "null default '',staff varchar(5),seq integer not null,prid "
+                "null default '',staff varchar(5),seq smallint not null,prid "
                 'integer not null default 0)'.format(self.pid),
-                (self.typehist,))
+                (self.typehist,)) # hierwei
             self.curs.execute( # prod  # 0xe2 0x80 0x9e
                 'insert into tc{0}(consid,okey,dt,type,txt,count,symp,staff,'
                 'seq,prid,unit) select consid,id,dt,pr_type,pr_name,count,symp,'
-                'stf_short,seq,pr_id,u_abbr from prod{0},products,units,staff '
-                'where prodid=pr_id and pr_u=u_id and staff=stf_id'.format(
+                'stf_short,enumsortorder,pr_id,u_abbr from prod{0},products,'
+                'units,staff,pg_enum where prodid=pr_id and pr_u=u_id and staff'
+                '=stf_id and enumlabel::text=pr_type::text'.format(
                     self.pid))
             self.curs.execute( # ch
                 'insert into tc{0}(consid,okey,dt,txt,symp,staff,seq) '
-                'select consid,id,dt,text,symp,stf_short,seq from ch{0},'
-                'staff where staff=stf_id'.format(self.pid))
+                'select consid,id,dt,text,symp,stf_short,enumsortorder from '
+                'ch{0},staff,pg_enum where staff=stf_id and enumlabel::text='
+                "'hst'".format(self.pid))
         except (OperationalError, AttributeError) as e:
             self.db_state(e)
             return

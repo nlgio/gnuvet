@@ -54,11 +54,13 @@ create table markups(
  m_rate numeric(4,3) not null,
  m_obs boolean not null default FALSE);
 
--- service type: other med serv good food cons hist
+/* service type: other med serv good food cons hist
 create table ptypes(
  pt_id serial primary key,
  pt_name varchar(20) not null,
- pt_markup integer not null references markups default 1);
+ pt_markup integer not null references markups default 1);*/
+
+create type ptype as enum('vac','con','hst','med','srv','god','fod','oth');
 
 create table addresses(
  addr_id serial primary key,
@@ -288,9 +290,11 @@ create table products(
  pr_id serial primary key,
  pr_name varchar(80) not null,
  pr_short varchar(10) not null,
- pr_type integer references ptypes not null default 1, -- srv, med, good etc.
+-- pr_type integer references ptypes not null default 1, -- srv, med, good etc.
+ pr_type ptype not null default 'med',
  pr_pprice numeric(8,2) not null default 0.00, -- net purchase price
  pr_nprice numeric(8,2) not null, -- net sale price
+ pr_from date not null default '2010-01-01',
  pr_vat integer references vats default 1,
  pr_perm boolean not null default FALSE, -- 0 OTC,  1 POM
  pr_u integer references units not null,
@@ -325,12 +329,12 @@ create table pr_supplier(
  prordid varchar(100));
 ****************/
 
-/*create table prodoldprices( -- more efficient than obsoleting old prices
+/*create table prodoldprices( -- more efficient than obsoleting old prodprices
  pop_id serial primary key,
  pop_prid integer not null references products,
  pop_npr numeric(8,2) not null,
  pop_vat integer not null references vats,
- pop_todate date not null);
+ pop_fromdate date not null);
 
 create table toorder(o_prid integer not null references products, o_date date);
 **************/
@@ -386,7 +390,7 @@ create table wd_apps( -- wd dependent on app type and/or dosage
  wda_app varchar(8),
  wda_dosage varchar(120));*/
 
-create table invoices(invoice_id serial primary key, inv_no varchar(12) not null unique);
+create table invoices(inv_id serial primary key,inv_no integer not null unique);
 
 create table appointments(
  app_id serial primary key,
