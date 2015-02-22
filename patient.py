@@ -322,15 +322,15 @@ class Patient(QMainWindow):
     def add_prod(self, prod=None, action='p'):
         if not hasattr(self, 'productw'):
             import products
-            if action == 'h':
+            if action == 'hst':
                 self.productw = products.Products(self, action='h')
-            elif action == 'c':
+            elif action == 'con':
                 self.productw = products.Products(self, action='c')
             else:
                 self.productw = products.Products(self, prod=prod)
             self.productw.move(self.x()+50, self.y()+40)
         else:
-            if action == 'h': # untested
+            if action == 'hst': # untested
                 self.productw.action == 'h'
                 self.productw.sel_hist()
             else:
@@ -975,7 +975,7 @@ class Patient(QMainWindow):
         self.w.newconsFr.hide()
         self.w.addchPb.hide()
         ch_conn(self, 'esc', self.keycheck.esc, self.w.closePb.click)
-        self.add_prod(action='c')
+        self.add_prod(action='con')
         
     def cons_newq(self):
         """Ask for confirmation to book new cons."""
@@ -1070,7 +1070,7 @@ class Patient(QMainWindow):
         for e in res:
             self.chronics.append(e[0])
 
-    def get_ptypes(self): # hierwei summins wrong, maybe i+1?
+    def get_ptypes(self):
         """Get ptypes -> type colour for htable."""
         self.typecols = {}
         res = querydb(self, 'select enum_range(null::ptype)')
@@ -1080,7 +1080,6 @@ class Patient(QMainWindow):
         res[0] = res[0].replace('{', '')
         res[-1] = res[-1].replace('}', '')
         for e in res:
-            ## setattr(self, 'type' + e, i)
             if e+'_col' in self.options:
                 self.typecols[e] = self.options[e+'_col']
             else:
