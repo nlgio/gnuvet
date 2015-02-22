@@ -73,8 +73,8 @@ class Patient(QMainWindow):
     prod_queue = None
     row = symp = None
     startdt = None # start time of booking
-    typecons = 1 # id for cons type -> cons colour
-    typehist = 1 # id for hist type -> hist colour
+    ## typecons = 1 # id for cons type -> cons colour
+    ## typehist = 1 # id for hist type -> hist colour
     # devel
     timer = None
     # end devel
@@ -210,6 +210,8 @@ class Patient(QMainWindow):
                 self.db_state(self.db)
                 return # ?
             self.staffid = 1
+            # devel:
+            self.db.set_client_encoding('UTF-8')
         #    WIDGET CONNECTIONS # ?
         #    BUTTON CONNECTIONS
         self.w.closePb.clicked.connect(self.close)
@@ -393,11 +395,11 @@ class Patient(QMainWindow):
                 toinsert.append(l[0])
                 self.row2data.insert(pos, tuple(toinsert))
         self.w.htable.insert_row(trow, pos)
-        if l[8] != self.typehist:
+        if l[8] != 'hst':
             for c in self.w.htable.lrows[-1]:
                 c.setStyleSheet(
                     self.w.htable.gcellss.format(
-                        'white', self.ptypes[l[8]].lower(), 'lightgray'))
+                        'white', self.typecols[l[8]], 'lightgray'))
         if self.tt:
             self.w.htable.lrows[-1][4].setToolTip(self.tt)
     
@@ -449,19 +451,19 @@ class Patient(QMainWindow):
         if res is None:  return # db error
         res = res[0][0]
         nrow.extend([res, args[4], '', args[5], self.logshort, self.consid,
-                    prodid, self.typecons])
+                    prodid, 'con'])
         #startdt pr_name count symp stfshrt consid prod.id typecons
         self.addch_row(nrow, pos) # cons in htable
         if pos is not None:  pos += 1
         #rundt hist count=None symp stfshrt consid ch.id typehist
         self.addch_row( # hierwei:
             [args[1], args[6], None, '', args[5], self.logshort, # was args[0]
-             self.consid, chid, self.typehist], pos) # hist in htable
+             self.consid, chid, 'hst'], pos) # hist in htable
         self.w.htable.rows2contents(-2)
         if pos is None:  pos = -1
         self.w.htable.select_row(row=pos)
         self.prevdata = True
-        if self.prod_queue and self.prod_queue != self.typecons:
+        if self.prod_queue and self.prod_queue != 'con': # hierwei ck prod_queue
             prod = self.prod_queue
             self.prod_queue = None
             self.add_prod(prod)
@@ -642,12 +644,12 @@ class Patient(QMainWindow):
         if res is None:  return # db error
         res = res[0]
         nrow.extend([res[0], args[4], self.units[res[1]]['ab'], args[5],
-                     self.logshort, self.consid, prodid, self.typevacc])
+                     self.logshort, self.consid, prodid, 'vac'])
         self.addch_row(nrow, pos)
         if pos is not None:  pos += 1
         self.addch_row(
             [self.rundt, args[6], None, '', args[5], self.logshort,
-             self.consid, chid, self.typehist], pos) # hist in htable
+             self.consid, chid, 'hst'], pos) # hist in htable
         self.w.htable.rows2contents(-2)
         if pos is None:  pos = -1
         self.w.htable.select_row(row=pos)
@@ -659,14 +661,14 @@ class Patient(QMainWindow):
         """Check if to ask for new cons or not.
         Called by addconsPb, add_prep if not prevdata."""
         if prod is None or prod is False:
-            self.add_prod(action=self.typecons)
+            self.add_prod(action='con')
             return
         if self.contime and (
             (self.startdt is None or
              abs(self.rundt-self.startdt) > timedelta(0, self.contime) or
              not self.consid)):
             self.prod_queue = prod
-            self.add_prod(action=self.typecons)
+            self.add_prod(action='con')
         else:
             self.add_prod(prod)
     
@@ -696,7 +698,7 @@ class Patient(QMainWindow):
                 self,
                 'select acc_pid,acc_npr,vat_rate,count from acc{0},prod{1},'
                 'vats where acc_vat=vat_id and acc_prid=prod{1}.id and '
-                'acc_pid=%s and acc_paid is null'.format(
+                'acc_pid=%s'.format(
                     self.cid, p), (p,))
             if addend is None:  return # db error
             for e in addend:
@@ -797,7 +799,7 @@ class Patient(QMainWindow):
                 ##     "create table acc{}(acc_id serial primary key,acc_pid "
                 ##     "integer not null references patients,acc_prid integer "
                 ##     "not null references prod{},acc_npr numeric(9,2) not "
-                ##     "null,acc_vat integer not null references vats,acc_paid"
+                ##     "null,acc_vat integer not null references vats,acc_invd"
                 ##     " bool not null default false)".format(
                 ##         self.cid, self.pid)) # _acc_invno_?
                 self.curs.execute(
@@ -1068,23 +1070,21 @@ class Patient(QMainWindow):
         for e in res:
             self.chronics.append(e[0])
 
-    def get_ptypes(self):
-        """Get ptypes types colour for htable."""
-        self.ptypes = [""]
-        self.types = {}
+    def get_ptypes(self): # hierwei summins wrong, maybe i+1?
+        """Get ptypes -> type colour for htable."""
+        self.typecols = {}
         res = querydb(self, 'select enum_range(null::ptype)')
         if res is None:  return # db error
         res = res[0][0]
         res = res.split(',')
         res[0] = res[0].replace('{', '')
         res[-1] = res[-1].replace('}', '')
-        for i, e in enumerate(res):
-            setattr(self, 'type' + e, i)
-            self.types[e] = i
+        for e in res:
+            ## setattr(self, 'type' + e, i)
             if e+'_col' in self.options:
-                self.ptypes.append(self.options[e+'_col'])
+                self.typecols[e] = self.options[e+'_col']
             else:
-                self.ptypes.append('black')
+                self.typecols[e] = 'black'
 
     def get_vats(self): # is this overkill?
         if not hasattr(self, 'vats'):
@@ -1149,15 +1149,13 @@ class Patient(QMainWindow):
             self,
             # 0 p_name 1 xbreed 2 breed_name 3 sex 4 neutd 5 dob 6 dobest
             # 7 vicious 8 rip 9 bc1 10  bc2 11 bc3 12 l_id 13 l_name 14 anno
-            # 15 cid 16 title 17 csname 18 cfname 19 baddebt 20 telhome
-            # 21 telwork 22 mobile1 23 mobile2 24 housen 25 street 26 village
-            # 27 city 28 postcode 29 chronics 30 ident 31 petpass 32 insurance
-            # 33 lastseen 34 c_id
+            # 15 cid 16 title 17 csname 18 cfname 19 baddebt 20 housen
+            # 21 street 22 village 23 city 24 postcode 25 chronics 26 ident
+            # 27 petpass 28 insurance 29 lastseen
             "select p_name,xbreed,breed_name,sex,neutd,dob,dobest,vicious,"
             "rip,b1.bcol,b2.bcol,b3.bcol,l_id,l_name,p_anno,p_cid,t_title,"
-            "c_sname,c_fname,baddebt,c_telhome,c_telwork,c_mobile1,"
-            "c_mobile2,housen,street,village,city,postcode,chr,identno,"
-            "petpass,ins,p_last,p_cid "
+            "c_sname,c_fname,baddebt,housen,street,village,city,postcode,chr,"
+            "identno,petpass,ins,p_last "
             "from patients,breeds,clients,colours,addresses,titles,"
             "basecolours b1,basecolours b2,basecolours b3,locations where "
             "p_id=%s and p_cid=c_id and breed=breed_id and colour="
@@ -1172,7 +1170,7 @@ class Patient(QMainWindow):
         self.pat = []
         for r in res:
             nwidth = self.w.nameLb.width()
-            self.w.nameLb.setText(QString.fromLatin1(r[0])) # hierwei
+            self.w.nameLb.setText(r[0])#QString.fromLatin1(r[0])) # hierwei
             self.w.nameLb.adjustSize()
             self.pat.append(r[0])
             nwidth = self.w.nameLb.width() - nwidth
@@ -1219,19 +1217,15 @@ class Patient(QMainWindow):
                     self.w.bdLb.show()
                 else:
                     self.w.bdLb.hide()
-                self.w.telhLb.setText(r[20])
-                self.w.telwLb.setText(r[21])
-                self.w.mobile1Lb.setText(r[22])
-                self.w.mobile2Lb.setText(r[23])
-                self.w.addr1Lb.setText(', '.join([e for e in r[24:26] if e]))
-                self.w.addr2Lb.setText(', '.join([e for e in r[26:28] if e]))
-                self.w.postcodeLb.setText(r[28])
+                self.w.addr1Lb.setText(', '.join([e for e in r[20:22] if e]))
+                self.w.addr2Lb.setText(', '.join([e for e in r[22:24] if e]))
+                self.w.postcodeLb.setText(r[24])
                 self.ck_balance()
                 if self.dberr:  return
             tmp = ''
-            if r[29]: # chronics
+            if r[25]: # chronics
                 for i in xrange(len(self.chronics)):
-                    if r[29] & 2**i:
+                    if r[25] & 2**i:
                         tmp += self.chronics[i] + '<br>'
                 self.w.chrLb.setEnabled(1)
                 self.w.chrhLb.setText(tmp)
@@ -1247,7 +1241,7 @@ class Patient(QMainWindow):
                 self.cscrArea.show()
             else:
                 self.w.chrLb.setEnabled(0)
-            tmp = r[30] # id
+            tmp = r[26] # id
             if not tmp:
                 tmp = self.tr('n/a')
                 self.w.identLb.setEnabled(0)
@@ -1255,13 +1249,13 @@ class Patient(QMainWindow):
                 tmp = tmp
                 self.w.identLb.setEnabled(1)
             self.w.identLb.setText(tmp)
-            if r[31]: # petpass
-                self.w.petpassnoLb.setText(r[31])
+            if r[27]: # petpass
+                self.w.petpassnoLb.setText(r[27])
             else:
                 self.w.petpassnoLb.setText(self.tr('n/a'))
                 self.w.petpassnoLb.setEnabled(0)
-            ins = r[32]
-            self.w.lastseenLb.setText(r[33].date().strftime('%d.%m.%y'))
+            ins = r[28]
+            self.w.lastseenLb.setText(r[29].date().strftime('%d.%m.%y'))
             if r[13]: # loc
                 self.w.locLb.setText(self.tr('Loc: ') + r[13])
                 self.locshort = 'Loc: ' + r[13]
@@ -1291,6 +1285,56 @@ class Patient(QMainWindow):
                 self.w.locLb.setEnabled(0)
                 self.togglelocA.setEnabled(0)
                 self.togglelocA.setVisible(0)
+            res = querydb(
+                self,
+                'select phone_type,phone_num,phone_anno,phone_opt from phones '
+                'where phone_clid=%s order by phone_opt desc limit 4',
+                (self.cid,))
+            if res is None:  return # db error
+            best = res[0]
+            res.sort(key=lambda t: t[0])
+            telhome = telwork = mobile1 = mobile2 = None
+            for r in res:
+                if r[0] == 1:
+                    telhome = res.index(r)
+                elif r[0] == 2:
+                    telwork = res.index(r)
+                elif r[0] == 3 and not mobile1:
+                    mobile1 = res.index(r)
+                elif r[0] == 3:
+                    mobile2 = res.index(r)
+            if telhome:
+                if res[telhome] == best:
+                    telhome = res[telhome][1] + self.tr(' (best)')
+                else:
+                    telhome = res[telhome][1]
+                self.w.telhLb.setText(telhome)
+            else:
+                self.w.telhLb.setText(self.tr('n/a'))
+            if telwork:
+                if res[telwork] == best:
+                    telwork = res[telwork][1] + self.tr(' (best)')
+                else:
+                    telwork = res[telwork][1]
+                self.w.telwLb.setText(telwork)
+            else:
+                self.w.telwLb.setText(self.tr('n/a'))
+            if mobile1:
+                if res[mobile1] == best:
+                    mobile1 = res[mobile1][1] + self.tr(' (best)')
+                else:
+                    mobile1 = res[mobile1][1]
+                self.w.mobile1Lb.setText(mobile1)
+            else:
+                self.w.mobile1Lb.setText(self.tr('n/a'))
+            if mobile2:
+                if res[mobile2] == best:
+                    mobile2 = res[mobile2][1] + self.tr(' (best)')
+                else:
+                    mobile2 = res[mobile2][1]
+                self.w.mobile2Lb.setText(mobile2)
+            else:
+                self.w.mobile2Lb.setText(self.tr('n/a'))
             if ins:
                 res = querydb(
                     self,
@@ -1367,12 +1411,11 @@ class Patient(QMainWindow):
         try:
             self.curs.execute(
                 'create temporary table tc{}(consid integer not null,okey '
-                'integer not null default 0,dt timestamp not null,type integer '
-                'not null default %s,txt varchar(1024) not null,count numeric'
-                '(8,2) not null default 0,symp integer,unit varchar(5) not '
-                "null default '',staff varchar(5),seq smallint not null,prid "
-                'integer not null default 0)'.format(self.pid),
-                (self.typehist,)) # hierwei
+                'integer not null default 0,dt timestamp not null,type ptype '
+                "not null default 'hst',txt varchar(1024) not null,count "
+                'numeric(8,2) not null default 0,symp integer,unit varchar(5) '
+                "not null default '',staff varchar(5),seq smallint not null,"
+                'prid integer not null default 0)'.format(self.pid))
             self.curs.execute( # prod  # 0xe2 0x80 0x9e
                 'insert into tc{0}(consid,okey,dt,type,txt,count,symp,staff,'
                 'seq,prid,unit) select consid,id,dt,pr_type,pr_name,count,symp,'
