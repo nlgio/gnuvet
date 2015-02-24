@@ -22,12 +22,13 @@ drop database if exists gnuvet;
 -- create role gnuvet createdb createrole login encrypted password 'GnuVetPassword' replication;
 -- create role gvuser login; -- this for later, the -- well -- gvusers group
 -- grant connect temp
-create database gnuvet;
+
+-- test 150223:
+set client_encoding to 'UTF-8';
+create database gnuvet encoding 'UTF-8'; -- test 150223
 
 \c gnuvet
 
--- test 141117:
-set client_encoding to 'UTF-8';
 
 create table boxroles(
  boxr_id serial primary key,
@@ -124,10 +125,10 @@ create table clients(
 create table phones( -- client phones
 -- phone_id serial primary key,
  phone_clid integer not null references clients,
- phone_type smallint not null default 1, -- 1 home  2 work  3 mobile  4 other
+ phone_opt smallint not null default 1, -- 1 best
  phone_num varchar(25) not null default '',
  phone_anno varchar(25) not null default '',
- phone_opt smallint not null);
+ unique(phone_clid,phone_num));
 
 -- keys presumably overkill for up to medium-sized practice:
 --create index c_sname on clients(c_sname);

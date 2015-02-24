@@ -97,7 +97,7 @@ update patients set identno='040096100106864',petpass='040-0101555' where p_id=2
 
 -- update clients set c_telhome='01675 478 322',c_mobile1='07726 898 122',c_email='enno.vet@gmx.net' where c_sname='Deimel';
 update clients set c_email='enno.vet@gmx.net' where c_sname='Deimel';
-insert into phones values(2,1,'01675 478 322','',2),(2,3,'07726 898 122','',1);
+insert into phones values(2,2,'01675 478 322',''),(2,2,'07726 898 122',''),(2,1,'+43(0)664 657 60 55','');
 
 update clients set baddebt='1' where c_id=17;
 
@@ -256,6 +256,9 @@ insert into acc2(acc_pid,acc_prid,acc_npr,acc_vat)values
  (20,2,6.02,2),
  (20,3,20,1),
  (20,4,1.28,2);
+
+--drop table if exists pay2 cascade;
+--create table pay2(pay_id serial primary key,pay_date date not null default current_date,pay_amount numeric(9,2)not null default 0);
 
 insert into appointments(app_dt,app_text,app_cid,app_pid,app_staffid,app_dur)values
  ('2013-5-31 9:30','Cat spay',null,null,1,'1:00'),
