@@ -1,6 +1,7 @@
 """Search Add Edit Client window."""
 # TODO:
-# should hide mobile2, patient, somehow col_hide don't seem to work
+# ck phone things
+# should hide phone4, patient, somehow col_hide don't seem to work
 # adapt to saepat.py
 # check query_string (insb f qstring)
 # action: a add  e edit  s search  c select
@@ -116,6 +117,8 @@ class Saecli(QMainWindow):
             import dbmod
             dbh = dbmod.Db_handler('enno')
             self.db = dbh.db_connect()
+            # devel:
+            self.db.set_client_encoding('UTF-8')
             self.staffid = 1
             self.dbA.setEnabled(False)
             aboutA.setEnabled(False)
@@ -283,9 +286,7 @@ class Saecli(QMainWindow):
                 adr = suc
         cli = [self.w.ctitleDd.itemData(
             self.w.ctitleDd.currentIndex(), 32).toInt()[0]]
-        for le in (self.w.snameLe, self.w.mnameLe, self.w.fnamele,
-                   self.w.telhomeLe, self.w.telworkLe, self.w.mobile1Le,
-                   self.w.mobile2Le, self.w.emailLe):
+        for le in (self.w.snameLe,self.w.mnameLe,self.w.fnamele,self.w.emailLe):
             cli.append(le.text().toLatin1())
         cli.insert(4, adr)
         cli.append(date.today())
@@ -294,12 +295,19 @@ class Saecli(QMainWindow):
         suc = querydb( # leave out baddebt on new client?
             self,
             'insert into clients(c_title,c_sname,c_mname,c_fname,c_address,'
-            'c_telhome,c_telwork,c_mobile1,c_mobile2,c_email,c_reg,c_anno)'
-            'values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) returning c_id', cli)
+            'c_email,c_reg,c_anno)'
+            'values(%s,%s,%s,%s,%s,%s,%s,%s) returning c_id', cli)
         if suc is None:  return # db error
         self.cid = suc[0][0]
+        phone1 = self.w.phone1Le.text()
+        phone2 = self.w.phone2Le.text()
+        phone3 = self.w.phone3Le.text()
+        phone4 = self.w.phone4Le.text()
+        ## suc = querydb( # hierwei
+        ##     self,
+        ##     'insert into phones(ddd) values()', (tuple,))
         self.db.commit()
-        self.create_tables()
+        ## self.create_tables()
     
     def create_tables(self):
         """Create accounting tables for new client and nn patient."""
@@ -665,7 +673,7 @@ class Saecli(QMainWindow):
                 query_where += ((query_where and ' and ' or '') + q + " ilike '"
                                 + wildcard(prep_txt(Le.text().toLatin1(),
                                                     True)) + "'")
-        for le in ('telhome', 'telwork', 'mobile1', 'mobile2', 'email'):
+        for le in ('phone1', 'phone2', 'phone3', 'phone4', 'email'):
             Le = getattr(self.w, le+'Le')
             if Le.text():
                 q = 'c_' + le
@@ -723,10 +731,10 @@ class Saecli(QMainWindow):
         self.w.cityLe.clear()
         self.w.regionLe.clear()
         self.w.postcodeLe.clear()
-        self.w.telhomeLe.clear()
-        self.w.telworkLe.clear()
-        self.w.mobile1Le.clear()
-        self.w.mobile2Le.clear()
+        self.w.phone1Le.clear()
+        self.w.phone2Le.clear()
+        self.w.phone3Le.clear()
+        self.w.phone4Le.clear()
         self.w.emailLe.clear()
         self.w.pnameLe.clear()
         self.w.annoTe.clear()

@@ -1,5 +1,6 @@
 """Client window."""
 # TODO:
+# see playground re payment before continuing here
 # add buttons for patient: New MarkAsRIP
 #     ChangeOwner only from patient window
 #  and resp Actions/functions
@@ -113,6 +114,8 @@ class Client(QMainWindow):
             import dbmod
             dbh = dbmod.Db_handler('enno')
             self.db = dbh.db_connect()
+            # devel:
+            ##self.db.set_client_encoding('UTF-8')
             self.staffid = 1
             from options import defaults as options
             self.options = options
@@ -150,9 +153,7 @@ class Client(QMainWindow):
         res = querydb(
             self,
             'select t_title,c_sname,c_mname,c_fname,housen,street,village,city,'
-            'region,postcode,'
-            ## 'c_telhome,c_telwork,c_mobile1,c_mobile2,'
-            'c_email,'
+            'region,postcode,c_email,'
             'baddebt,c_reg,c_last,c_anno from clients,titles,addresses where '
             't_id=c_title and c_address=addr_id and c_id=%s',
             (self.cid,))
@@ -166,10 +167,6 @@ class Client(QMainWindow):
             self.w.addr1Lb.setText(', '.join([s for s in e[4:6] if s]))
             self.w.addr2Lb.setText(', '.join([s for s in e[6:8] if s]))
             self.w.addr3Lb.setText(e[9])
-            ## self.w.telhomeLb.setText(self.tr('Home: ') + e[10])
-            ## self.w.telworkLb.setText(self.tr('Work: ') + e[11])
-            ## self.w.mobile1Lb.setText(e[12])
-            ## self.w.mobile2Lb.setText(e[13])
             self.w.emailLb.setText(e[10])
             self.w.bdPix.setVisible(e[11])
             self.w.regdateLb.setText(e[12].strftime('%d.%m.%y'))
@@ -180,37 +177,38 @@ class Client(QMainWindow):
                 self.w.annotxtLb.setText(
                     'This is our first client, being the first sentient being '
                     'to have brought patients to our GnuVet practice.')
-        phones = querydb(
+        res = querydb(
             self,
-            'select phone_num,phone_anno from phones where phone_clid=%s '
-            'order by phone_opt,phone_type', (self.cid,))
-        if phones is None:  return # db error
-        phones = [e[0]+' '+e[1] for e in phones]
-        if not phones:
+            'select phone_num,phone_anno from phones ' # hierwei
+            'where phone_clid=%s order by phone_opt', (self.cid,))
+        if res is None:  return # db error
+        if not res:
             self.w.telDd.addItem(self.tr('n/a'))
-            self.w.telDd.setEnbaled(False)
+            self.w.telDd.setEnabled(False)
         else:
-            for p in phones:
-                self.w.telDd.addItem(p)
+            addend = ' (best) '
+            for p in res:
+                self.w.telDd.addItem(p[0] + addend + p[1])
+                if addend:
+                    addend = ' '
         # hierwei here was table creation
         cbal = D('0.00')
-        pats = querydb(
+        res = querydb(
             self,
-            'select p_id from patients where p_cid=%s', (self.cid,))
-        if pats is None:  return # db error
-        pats = [e[0] for e in pats]
-        for p in pats:
-            # hierwei: error if no accN table!
-            # hierwei: unsinn for balance don't need patients!
-            addend = querydb(
+            "select tablename from pg_tables where tablename like 'pay{}'"
+            .format(self.cid))
+        if res is None:  return # db error
+        if not res or not res[0]:
+            bal = querydb(
                 self,
-                'select acc_npr,vat_rate,count from acc{0},prod{1},vats '
-                'where acc_vat=vat_id and acc_prid=prod{1}.id and acc_pid='
-                '%s and not acc_paid'.format(self.cid, p), (p,))
-            if addend is None:  return # db error
-            for e in addend:
-                cbal += money(gprice(e[0], e[1]), e[2])
-        self.w.balanceLb.setText(str(cbal))
+                'select sum(acc_npr*(1+vat_rate)) from acc{},vats where acc_vat'
+                '=vat_id'.format(self.cid))
+        else:
+            bal = querydb(
+                self,
+                'select sum(acc_npr*(1+vat_rate)-(select sum(pay_amount) from '
+                'pay{0}) from acc{0} where acc_vat=vat_id') # hierwei
+        self.w.balanceLb.setText(D(str(cbal)))
         
     def closeEvent(self, ev):
         if hasattr(self, 'gaia') and self.gaia:
@@ -272,7 +270,7 @@ class Client(QMainWindow):
                 e[9] and 'v' or '',
                 e[10] and 'rip' or ''])
             self.w.plist.cell(len(self.w.plist.lrows)-1, 1).setToolTip(e[3])
-        self.w.plist.set_colwidth(0, 100)
+        self.w.plist.set_colwidth(0, 100) # hierwei adjust width
         self.w.plist.set_colwidth(1, 100)
         self.w.plist.set_colwidth(2, 100)
         self.w.plist.set_colwidth(3, 200)

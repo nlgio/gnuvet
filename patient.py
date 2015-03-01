@@ -6,6 +6,7 @@ startdt: datetime for entry -> this to save in db for one consid?
 """
 
 # TODO:
+# see playground re payment and balance before continuing here
 # eliminate seq from prodP instP chP, sort in here
 # --> self.typehist, self.typecons???
 # add adding text w/o consult for e.g. calling information (vacc reminders etc)
@@ -810,10 +811,9 @@ class Patient(QMainWindow):
                     "inv_vat integer not null references vats default 1)".
                     format(self.cid))
                 ## self.curs.execute(
-                ##     "create table pay{0}(pay_id serial primary key,pay_invno "
-                ##     "integer not null references acc{0}(acc_invno),pay_date "
-                ##     "date not null default current_date,pay_amount numeric(9,2)"
-                ##     "not null)".format(self.cid))
+                ##     "create table pay{0}(pay_id serial primary key,"
+                ##     "pay_date date not null default current_date,"
+                ##     "pay_amount numeric(9,2)not null)".format(self.cid))
             except OperationalError as e:
                 self.db_state(e)
                 return
@@ -1286,54 +1286,17 @@ class Patient(QMainWindow):
                 self.togglelocA.setVisible(0)
             res = querydb(
                 self,
-                'select phone_type,phone_num,phone_anno,phone_opt from phones '
-                'where phone_clid=%s order by phone_opt desc limit 4',
+                'select phone_opt,phone_num,phone_anno from phones '
+                'where phone_clid=%s order by phone_opt',
                 (self.cid,))
             if res is None:  return # db error
-            best = res[0]
-            res.sort(key=lambda t: t[0])
-            telhome = telwork = mobile1 = mobile2 = None
-            for r in res:
-                if r[0] == 1:
-                    telhome = res.index(r)
-                elif r[0] == 2:
-                    telwork = res.index(r)
-                elif r[0] == 3 and not mobile1:
-                    mobile1 = res.index(r)
-                elif r[0] == 3:
-                    mobile2 = res.index(r)
-            if telhome:
-                if res[telhome] == best:
-                    telhome = res[telhome][1] + self.tr(' (best)')
-                else:
-                    telhome = res[telhome][1]
-                self.w.telhLb.setText(telhome)
-            else:
-                self.w.telhLb.setText(self.tr('n/a'))
-            if telwork:
-                if res[telwork] == best:
-                    telwork = res[telwork][1] + self.tr(' (best)')
-                else:
-                    telwork = res[telwork][1]
-                self.w.telwLb.setText(telwork)
-            else:
-                self.w.telwLb.setText(self.tr('n/a'))
-            if mobile1:
-                if res[mobile1] == best:
-                    mobile1 = res[mobile1][1] + self.tr(' (best)')
-                else:
-                    mobile1 = res[mobile1][1]
-                self.w.mobile1Lb.setText(mobile1)
-            else:
-                self.w.mobile1Lb.setText(self.tr('n/a'))
-            if mobile2:
-                if res[mobile2] == best:
-                    mobile2 = res[mobile2][1] + self.tr(' (best)')
-                else:
-                    mobile2 = res[mobile2][1]
-                self.w.mobile2Lb.setText(mobile2)
-            else:
-                self.w.mobile2Lb.setText(self.tr('n/a'))
+            addend = ''
+            if min([e[0] for e in res]) != max([e[0] for e in res]):
+                addend = ' (best) '
+            for i in xrange(len(res)): # hierwei, elide?
+                self.w.phoneDd.addItem(res[i][1] + addend + res[i][2])
+                if addend:
+                    addend = ''
             if ins:
                 res = querydb(
                     self,

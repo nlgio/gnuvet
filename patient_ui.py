@@ -10,7 +10,7 @@
 # TODO:
 
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import (QApplication, QFont, QFrame, QLabel, QLineEdit,
+from PyQt4.QtGui import (QApplication,QComboBox,QFont,QFrame,QLabel,QLineEdit,
                          QPixmap, QPushButton, QWidget)
 from tle import QTextLEdit
 from gtable import Gtable
@@ -56,14 +56,8 @@ class Ui_Patient(object):
         self.ripLb = QLabel(self.centralwidget)
         self.ripLb.setGeometry(251, 10, 17, 20)
         self.ripLb.setPixmap(QPixmap(":/images/rip.png"))
-        self.telwLb = QLabel(self.centralwidget)
-        self.telwLb.setGeometry(615, 110, 131, 19)
-        self.mobile2Lb = QLabel(self.centralwidget)
-        self.mobile2Lb.setGeometry(760, 110, 131, 19)
-        self.mobile1Lb = QLabel(self.centralwidget)
-        self.mobile1Lb.setGeometry(760, 90, 131, 19)
-        self.telhLb = QLabel(self.centralwidget)
-        self.telhLb.setGeometry(615, 90, 131, 19)
+        self.phoneDd = QComboBox(self.centralwidget)
+        self.phoneDd.setGeometry(615, 90, 300, 21)
         self.addr2Lb = QLabel(self.centralwidget)
         self.addr2Lb.setGeometry(615, 50, 241, 19)
         self.locLb = QLabel(self.centralwidget)

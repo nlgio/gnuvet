@@ -53,11 +53,8 @@ class Ui_Client(object):
             Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
         self.telLb = QLabel(self.centralwidget)
 	self.telLb.setGeometry(10, 90, 40, 19)
-        # devel:
-        # end devel
         self.telDd = QComboBox(self.centralwidget)
         self.telDd.setGeometry(60, 88, 270, 22)
-        
         self.bdPix = QLabel(self.centralwidget)
         self.bdPix.setGeometry(300, 10, 17, 20)
         self.bdPix.setPixmap(QPixmap(":/images/redflag.png"))
@@ -108,15 +105,16 @@ class Ui_Client(object):
     def retranslateUi(self, Client):
         Client.setWindowTitle(tl("GnuVet: Client"))
         # devel:
-        self.nameLb.setText(tl("Mr Client N"))
-        self.addr1Lb.setText(tl("House Street"))
-        self.addr2Lb.setText(tl("Village, City"))
-        self.addr3Lb.setText(tl("B76 0BA"))
-        self.telLb.setText(tl("Tel:"))
-        self.balanceLb.setText(tl("0.00"))
-        self.ldateLb.setText(tl("30.04.2009"))
-        self.regdateLb.setText(tl("18.12.2008"))
-        self.telDd.addItem(tl('+43 664 675 60 22'))
+        if __name__ == '__main__':
+            self.nameLb.setText(tl("Mr Client N"))
+            self.addr1Lb.setText(tl("House Street"))
+            self.addr2Lb.setText(tl("Village, City"))
+            self.addr3Lb.setText(tl("B76 0BA"))
+            self.telLb.setText(tl("Tel:"))
+            self.balanceLb.setText(tl("0.00"))
+            self.ldateLb.setText(tl("30.04.2009"))
+            self.regdateLb.setText(tl("18.12.2008"))
+            self.telDd.addItem(tl('+43 664 675 60 22'))
         # end devel
         self.annoLb.setText(tl("Annotations:"))
         self.bdPix.setToolTip(tl("Bad Debtor"))
