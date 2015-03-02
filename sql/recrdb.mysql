@@ -1,7 +1,0 @@
-#!/bin/bash
-mysqladmin -f drop gnuvet
-set -e
-mysql < db.sql
-mysql < populate.sql
-mysql < sample-entries.sql
-[ $? -eq 0 ] && echo "Db re-created."
