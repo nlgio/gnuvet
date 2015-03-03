@@ -5,6 +5,11 @@ rundt: running datetime.
 startdt: datetime for entry -> this to save in db for one consid?
 """
 
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 # TODO:
 # see playground re payment and balance before continuing here
 # add adding text w/o consult for e.g. calling information (vacc reminders etc)

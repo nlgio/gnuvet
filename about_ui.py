@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '../../4qt/gnuvet/about.ui'
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
 #
-# Created: Sun May 16 01:07:33 2010
-#      by: PyQt4 UI code generator 4.4.2
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
 #
-# WARNING! All changes made in this file will be lost!
+# Initially created: Sun May 16 01:07:33 2010 by: PyQt4 UI code generator 4.4.2
 
 from PyQt4.QtGui import QApplication, QLabel, QFont, QPushButton
 

@@ -1,10 +1,10 @@
 /*
  * sql/db.psql: script to build the gnuvet database in postgres
  *   TAKE CARE THIS IS FOR DEVEL.  PRODUCTION NEEDS DIFFERENT.
- * Copyright (c) 2010 Enno Deimel MRCVS <enno dot vet at gmx dot net>
+ * Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
  *
  * This file is part of gnuvet, published under the GNU General Public License
- * (GPL in short).  See the file GPL for more Information.
+ * version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
  *
  * After having created the gnuvet db, aptly named `gnuvet'
  * -- for instance with /usr/bin/createdb -- on the db machine, you can roll

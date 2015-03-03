@@ -1,4 +1,9 @@
 """Search Add Edit Client window."""
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 # TODO:
 # ck phone things
 # should hide phone4, patient, somehow col_hide don't seem to work

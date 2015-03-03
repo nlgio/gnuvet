@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-# Form implementation generated from reading ui file 'path/to/client.ui'
+
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
 #
-# Created: Fri Feb 18 13:30:31 2011
-#      by: PyQt4 UI code generator 4.7.3
-#
-# WARNING! All changes made in this file will be lost!
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# Initially created: Fri Feb 18 13:30:31 2011 by: PyQt4 UI code generator 4.7.3
 
 # TODO:
 # why's menubar smaller than in other windows?

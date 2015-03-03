@@ -1,10 +1,10 @@
 /*
  * sql/populate.psql: script to populate the gnuvet postgres db
  *
- * Copyright (c) 2012 Enno Deimel <enno dot vet at gmx dot net>
+ * Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
  *
  * This file is part of gnuvet, published under the GNU General Public License
- * (GPL in short).  See the file GPL for more Information.
+ * version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
  *
  */
 

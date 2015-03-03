@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'products.ui'
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
 #
-# Created: Fri Aug  6 14:53:59 2010
-#      by: PyQt4 UI code generator 4.7.3
-#
-# WARNING! All changes made in this file will be lost!
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# Initially created: Fri Aug  6 14:53:59 2010 by: PyQt4 UI code generator 4.7.3
 
 # TODO:
 # eliminate palette things for styleSheet s. for instance gtable.py

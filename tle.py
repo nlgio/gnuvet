@@ -7,6 +7,11 @@ If maxlen == 0, no text limitation takes place.
 Alas, Qt doesn't know how to properly use the 'selection buffer'.
 QTextLEdit.remainder() returns the number of remaining free chars.
 """
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 # todo:
 # hopefully nothing
 from PyQt4.QtCore import pyqtSignal, Qt

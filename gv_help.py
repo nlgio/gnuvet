@@ -1,4 +1,9 @@
 """The help module."""
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 from os import uname, path
 from PyQt4.QtCore import QUrl, pyqtSignal
 from PyQt4.QtGui import QMainWindow, QMenu

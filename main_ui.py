@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainform.ui'
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
 #
-# Created: Mon Apr 19 13:36:59 2010
-#      by: PyQt4 UI code generator 4.4.2
-#
-# WARNING! All changes made in this file will be lost!
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# Initially created: Mon Apr 19 13:36:59 2010 by: PyQt4 UI code generator 4.4.2
 
 from PyQt4.QtGui import (QApplication, QFont, QFrame, QLabel, QLineEdit,
                          QMenu, QPixmap, QPushButton, QShortcut, QWidget,)
