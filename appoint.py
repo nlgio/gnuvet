@@ -630,6 +630,7 @@ border-radius: 3px;
             c.selectable = False
         data = self.get_weekdata(startday)
         sizeref = self.w.calendar.cell(0, 1)
+        # 0 id  1 dt  2 text  3 cid  4 pid  5 staffid  6 status
         for e in data:
             csname, pname = self.getnames(e[3], e[4])
             entry = self.mkentry(
@@ -821,10 +822,12 @@ border-radius: 3px;
         nc.setWordWrap(False)
         nc.elidetext(entry)
         nc.setToolTip(entry)
-        if appstat == 'd':
+        if appstat == 'd': # done
             nc.setStyleSheet("background: lightgreen")
-        elif appstat == 'm':
+        elif appstat == 'm': # missed
             nc.setStyleSheet("background: red")
+        elif appstat == 'w': # waiting
+            nc.setStyleSheet("background: orange")
 
     def opencli(self, cell):
         """Open client window."""
