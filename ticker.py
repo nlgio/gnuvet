@@ -2,6 +2,11 @@
 Intended to deliver a sufficiently precise clock source for ch documentation.
 Relies on system clock."""
 
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 from threading import Timer
 from datetime import datetime, timedelta
 from PyQt4.QtCore import pyqtSignal, QObject

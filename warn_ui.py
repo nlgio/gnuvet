@@ -1,7 +1,11 @@
 """Warning window -- replacing QMessageBox."""
 
-# Created: Tue May  8 15:54:35 2012
-#      by: ed
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# Created from scratch: Tue May  8 15:54:35 2012 by: ed
 
 from PyQt4.QtGui import (QApplication, QFont, QLabel, QPixmap, QPushButton,)
 from PyQt4.QtCore import Qt # alignment

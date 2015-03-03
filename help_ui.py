@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '../../4qt/gnuvet/help.ui'
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
 #
-# Created: Sat May 15 18:16:39 2010
-#      by: PyQt4 UI code generator 4.4.2
-#
-# WARNING! All changes made in this file will be lost!
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# Initially created: Sat May 15 18:16:39 2010 by: PyQt4 UI code generator 4.4.2
 
 from PyQt4.QtGui import (QWidget, QToolButton, QIcon, QPixmap, QTextBrowser,
                          QApplication)

@@ -1,4 +1,15 @@
 """Appointment setting dialog."""
+
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# TODO:
+# app collisions?  -> ck_app!
+# added: db_reconnect -- without really implementing it:
+#     user passwd host?
+
 from datetime import datetime, timedelta # date, time
 from psycopg2 import OperationalError
 from PyQt4.QtCore import pyqtSignal
@@ -7,11 +18,6 @@ from keycheck import Keycheck
 from util import ch_conn, newaction, querydb
 from datefix_ui import Ui_Datefix
 import gv_qrc
-
-# todo:
-# app collisions?  -> ck_app!
-# added: db_reconnect -- without really implementing it:
-#     user passwd host?
 
 class Datefix(QMainWindow):
     # signals

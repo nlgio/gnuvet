@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'payment.ui'
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
 #
-# Created: Sun Feb  8 13:57:36 2015
-#      by: PyQt4 UI code generator 4.11.2
-#
-# WARNING! All changes made in this file will be lost!
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# Initially created: Sun Feb  8 13:57:36 2015 by: PyQt4 UI code generator 4.11.2
 
 # TODO:
 # Wie Umlaute, z.B. UEberweisung, in deutsch?  Scheint kein Problem zu sein.

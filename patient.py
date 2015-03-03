@@ -5,10 +5,13 @@ rundt: running datetime.
 startdt: datetime for entry -> this to save in db for one consid?
 """
 
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 # TODO:
 # see playground re payment and balance before continuing here
-# eliminate seq from prodP instP chP, sort in here
-# --> self.typehist, self.typecons???
 # add adding text w/o consult for e.g. calling information (vacc reminders etc)
 #     s. products.add_hist()
 # ck time not within constime?
@@ -212,7 +215,7 @@ class Patient(QMainWindow):
                 return # ?
             self.staffid = 1
             # devel:
-            self.db.set_client_encoding('UTF-8')
+            ##self.db.set_client_encoding('UTF-8')
         #    WIDGET CONNECTIONS # ?
         #    BUTTON CONNECTIONS
         self.w.closePb.clicked.connect(self.close)
@@ -673,7 +676,7 @@ class Patient(QMainWindow):
         else:
             self.add_prod(prod)
     
-    def ck_balance(self): # hierwei recheck this on diff pats of same cli
+    def ck_balance(self): # hierwei rewrite nec
         """Calculate current balance of client and patient."""
         pats = querydb(self, 'select p_id from patients where p_cid=%s',
                        (self.cid,))

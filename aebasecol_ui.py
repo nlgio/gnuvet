@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'aebasecol.ui'
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
 #
-# Created: Mon Dec 22 21:53:13 2014
-#      by: PyQt4 UI code generator 4.11.2
-#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# Initially created: Mon Dec 22 21:53:13 2014 by: PyQt4 UI code generator 4.11.2
 
 from PyQt4.QtGui import (QApplication, QCheckBox, QFont, QFrame, QLabel,
                          QLineEdit, QPixmap, QPushButton, QRadioButton,

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2012 Enno Deimel <enno dot vet at gmx dot net>
+ *
+ * This file is part of gnuvet, published under the GNU General Public License
+ * (GPL in short).  See the file GPL for more Information.
+ */
+
 --insert into boxroles (boxr_name) values
 -- ('master server'),('local server'),('workstation');
 

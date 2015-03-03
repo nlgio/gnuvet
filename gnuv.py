@@ -1,5 +1,10 @@
 #!/usr/bin/python
 """The GnuVet main program."""
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 # TODO:
 # add ch_conn?
 # special search (medication, clin hist)

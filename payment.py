@@ -1,5 +1,10 @@
 """Payment dialog -- to be called from client only."""
 
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 from decimal import Decimal
 from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtGui import (QMainWindow, QAction)

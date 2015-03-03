@@ -1,6 +1,11 @@
 # -*- coding: latin-1  -*-
 """GnuVet Version, Help and Copyleft"""
 
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 version  = "GnuVet 1.0.1 pre-alpha"
 help = dict(
     en = """Usage: gnuvet [options]
@@ -19,12 +24,12 @@ copyleft = dict(
 
 Powered by Python, (Py)Qt4 and PostGreSQL.
 
-Copyright 2012 Enno Deimel.
+Copyright 2015 Enno Deimel.
 """,
     de = """GnuVet ist Freie und Quelloffene Software und steht unter der GNU Public License (GPL), und es gibt keinerlei Garantie irgendwölcher Art, nicht einmal die Garantie der BRAUCHBARKEIT für IRGENDETWAS Besonderes.
 
 Realisiert mit Python, (Py)Qt4 und PostGreSQL.
 
-Copyright 2012 Enno Deimel.
+Copyright 2015 Enno Deimel.
 """,
     )

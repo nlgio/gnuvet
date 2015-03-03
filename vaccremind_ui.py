@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
 # Form implementation modified from saepat_ui.py
 # trial without centralwidget -- in work
 #
-# Created: Sun Nov 23 19:48:50
-#      by: ed
-#
-# WARNING! All changes made in this file will be lost!
+# Created: Sun Nov 23 19:48:50 by: ed
 
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import (QApplication, QCheckBox, QFont, QFrame, QLabel,

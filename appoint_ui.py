@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from scratch
-# Created: Sat May 18 21:28:50 2013
-#      by: gnuvet
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# Form implementation generated from scratch Sat May 18 21:28:50 2013
 
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import (QApplication,QComboBox,QFont,QFrame,QLabel,QPixmap,

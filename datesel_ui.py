@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from scratch
-# Created: Wed May 22 16:41:23
-#      by: gnuvet
+# Copyright (c) 2015 Dipl.Tzt. Enno Deimel <ennodotvetatgmxdotnet>
+#
+# This file is part of gnuvet, published under the GNU General Public License
+# version 3 or later (GPLv3+ in short).  See the file LICENSE for information.
+
+# Form implementation generated from scratch Wed May 22 16:41:23
 
 from PyQt4.QtGui import (QApplication,QDateEdit,QPushButton)
 
