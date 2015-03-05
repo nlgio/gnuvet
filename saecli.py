@@ -331,7 +331,7 @@ class Saecli(QMainWindow):
             pid = suc[0][0]
             try:
                 self.curs.execute(
-                    'create table e{}(id serial primary key'.format(pid))
+                    'create table e{}(id serial primary key)'.format(pid))
                 self.curs.execute(
                     'create table prod{0}(id serial primary key,consid integer '
                     'not null references e{0},dt timestamp not null default '
