@@ -207,13 +207,13 @@ class Client(QMainWindow):
         if not res or not res[0]:
             bal = querydb(
                 self,
-                'select sum(acc_npr*(1+vat_rate)) from acc{},vats where acc_vat'
+                'select sum(acc_npr*(1+vat_rate))from acc{},vats where acc_vat'
                 '=vat_id'.format(self.cid))
         else:
             bal = querydb(
                 self,
-                'select sum(acc_npr*(1+vat_rate)-(select sum(pay_amount) from '
-                'pay{0}) from acc{0} where acc_vat=vat_id') # hierwei
+                'select sum(acc_npr*(1+vat_rate)-(select sum(pay_amount)from '
+                'pay{0})from acc{0} where acc_vat=vat_id') # hierwei
         self.w.balanceLb.setText(D(str(cbal)))
         
     def closeEvent(self, ev):
@@ -322,13 +322,6 @@ if __name__ == '__main__':
     ding.show()
     exit(a.exec_())
 
-
-## unpaid:
-##     select sum(acc_npr*(1+vat_rate)) from acc{},vats where acc_vat=vat_id and not acc_paid
-## outstanding:
-##     select sum(acc_npr*(1+vat_rate)) from acc{},vats where acc_vat=vat_id and acc_paid is null
-# acc_paid: default false.  null: 'paid' but payment not confirmed (cc, dd etc.)
-## nonono!
-        ## self.confpayA = newaction(
-        ##     self, '&Confirm payments',
-        ##     'Confirm outstanding payments have been met', 'Ctrl+C')
+    ## self.confpayA = newaction(
+    ##     self, '&Confirm payments',
+    ##     'Confirm outstanding payments have been met', 'Ctrl+C')

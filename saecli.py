@@ -301,7 +301,7 @@ class Saecli(QMainWindow):
             self,
             'insert into clients(c_title,c_sname,c_mname,c_fname,c_address,'
             'c_email,c_reg,c_anno)'
-            'values(%s,%s,%s,%s,%s,%s,%s,%s) returning c_id', cli)
+            'values(%s,%s,%s,%s,%s,%s,%s,%s)returning c_id', cli)
         if suc is None:  return # db error
         self.cid = suc[0][0]
         phone1 = self.w.phone1Le.text()
@@ -325,7 +325,7 @@ class Saecli(QMainWindow):
         if not tables[0][0]:
             suc = querydb(
                 self,
-                "insert into patients(p_name,p_cid,p_reg)values('nn',%s,%s) "
+                "insert into patients(p_name,p_cid,p_reg)values('nn',%s,%s)"
                 "returning p_id", (self.cid, date.today()))
             if suc is None:  return # db error
             pid = suc[0][0]
@@ -337,21 +337,20 @@ class Saecli(QMainWindow):
                     'not null references e{0},dt timestamp not null default '
                     'now(),prodid integer not null references products default '
                     '1,symp integer not null references symptoms default 1,'
-                    'staff integer not null references staff default 1,seq '
-                    'integer not null default 3'.format(pid))
+                    'staff integer not null references staff default 1'.format(
+                        pid))
                 self.curs.execute(
                     "create table ch{0}(id serial primary key,consid integer "
                     "not null references e{0},dt timestamp not null default "
                     "now(),text varchar(1024) not null default '',symp "
                     "integer not null references symptoms default 1,staff "
-                    "integer not null references staff default 1,seq integer "
-                    "not null default 2)".format(pid))
+                    "integer not null references staff default 1".format(pid))
                 self.curs.execute(
                     'create table acc{}(acc_id serial primary key,acc_pid '
                     'integer not null references patients,acc_prid integer not '
                     'null references prod{},acc_npr numeric(9,2) not null,'
-                    'acc_vat integer not null references vats,acc_paid bool not'
-                    'null default false'.format(self.cid,self.pid))
+                    'acc_vat integer not null references vats,acc_paid bool '
+                    'default false'.format(self.cid,self.pid))
             except OperationalError as e:
                 self.db_state(e)
                 return

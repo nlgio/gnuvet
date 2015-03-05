@@ -336,7 +336,7 @@ class Weight(QMainWindow):
             return
         try:
             self.curs.execute(
-                "select count(*) from pg_tables where tablename='weight%s'",
+                "select count(*)from pg_tables where tablename='weight%s'",
                 (p_id,))
             count = self.curs.fetchall()[0][0] # WEIGHT
         except OperationalError:
@@ -594,17 +594,16 @@ class Weight(QMainWindow):
         """Add weight entry to db and list."""
         if not len(self.weights):
             self.curs.execute(
-                'create table weight%s (w_id serial primary key,w_est boolean '
+                'create table weight%s(w_id serial primary key,w_est boolean '
                 'not null default FALSE, w_date timestamp not null default '
                 'current_timestamp,weight numeric(7,3) not null,'
-                'w_staff integer '
-                'references staff not null)', (self.p_id,))
+                'w_staff integer references staff not null)', (self.p_id,))
             self.db.commit()
         wdt = self.w.wDe.dateTime().toPyDateTime()
         wdt = datetime(
             wdt.year, wdt.month, wdt.day, wdt.hour, wdt.minute, wdt.second)
         self.curs.execute(
-            'insert into weight%s (w_est,w_date,weight,w_staff) values '
+            'insert into weight%s(w_est,w_date,weight,w_staff)values'
             '(%s, %s, %s, %s)',
             (self.p_id, self.w.estCb.isChecked(), wdt,
              self.w.wSb.value(), self.staffid))

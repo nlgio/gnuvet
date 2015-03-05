@@ -143,7 +143,7 @@ class Aebasecol(QMainWindow):
         ##data.append(ck combination radiobuttons)
         suc = querydb(self,
                       'insert into basecolours(bcol,bc_speccode,bc_combine)'
-                      'values(%1, %2, %3) returning bcol_id', data)
+                      'values(%1, %2, %3)returning bcol_id', data)
         if suc is None:  return # db error
         # ...
         self.newbc.emit(tuple)

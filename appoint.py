@@ -321,7 +321,7 @@ border-radius: 3px;
             suc = querydb(
                 self,
                 'insert into appointments(app_dt,app_text,app_cid,app_pid,'
-                'app_staffid,app_dur,app_status) values (%s,%s,%s,%s,%s,%s,%s) '
+                'app_staffid,app_dur,app_status)values(%s,%s,%s,%s,%s,%s,%s)'
                 'returning app_id',
                 (self.savedata[0],self.savedata[1],self.savedata[2],
                  self.savedata[3],self.savedata[4],self.savedata[5],

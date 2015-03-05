@@ -539,7 +539,7 @@ class Saepat(QMainWindow):
         else:
             suc = querydb(
                 self,
-                'insert into neuts (neut_id,neut_date) values (%s, %s)'
+                'insert into neuts(neut_id,neut_date)values(%s, %s)'
                 'returning neut_id', (pid, not neutdu and ndate or None))
         if suc is None:  return # db error
         self.db.commit()
@@ -1347,7 +1347,7 @@ class Saepat(QMainWindow):
             query_s = (
                 'insert into patients(p_name,p_cid,breed,xbreed,dob,dobest,'
                 'colour,sex,neutd,vicious,p_reg,p_anno,loc,identno,rip,'
-                'ins)values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) '
+                'ins)values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
                 'returning p_id')
             if self.w.neutdateRb.isChecked():
                 neut = True

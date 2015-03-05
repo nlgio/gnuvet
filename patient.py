@@ -311,7 +311,7 @@ class Patient(QMainWindow):
             consid = self.row2data[self.row][0]
             dbdt = querydb(
                 self,
-                'select max(dt) from prod{} where consid=%s'.format(
+                'select max(dt)from prod{} where consid=%s'.format(
                     self.pid), (consid,))
             if dbdt is None:  return # db error
             dbdt = dbdt[0][0]
@@ -423,7 +423,7 @@ class Patient(QMainWindow):
         prodid = querydb(
             self,
             'insert into prod{}(consid,dt,prodid,count,symp,staff)values'
-            '(%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
+            '(%s,%s,%s,%s,%s,%s)returning id'.format(self.pid),
             (self.consid, self.startdt, args[2]['id'],
              args[4], args[5], self.staffid))
         if prodid is None:  return # db error
@@ -496,7 +496,7 @@ class Patient(QMainWindow):
         prodid = querydb(
             self,
             'insert into prod{}(consid,dt,prodid,count,symp,staff)values'
-            '(%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
+            '(%s,%s,%s,%s,%s,%s)returning id'.format(self.pid),
             (self.consid, self.rundt, args[2]['id'],
              args[4], args[5], self.staffid))
         if prodid is None:  return # db error
@@ -575,7 +575,7 @@ class Patient(QMainWindow):
         prodid = querydb(
             self,
             'insert into prod{}(consid,dt,prodid,count,symp,staff)values'
-            '(%s,%s,%s,%s,%s,%s) returning id'.format(self.pid),
+            '(%s,%s,%s,%s,%s,%s)returning id'.format(self.pid),
             (self.consid, self.startdt, args[2]['id'],
              args[4], args[5], self.staffid))
         if prodid is None:  return # db error
@@ -606,7 +606,7 @@ class Patient(QMainWindow):
         if not res:
             succ = querydb(
                 self,
-                'insert into vdues values (%s,%s,%s) returning vd_vdue',
+                'insert into vdues values(%s,%s,%s)returning vd_vdue',
                 (self.pid,vtype,vval))
         else:
             succ = querydb(
@@ -723,7 +723,7 @@ class Patient(QMainWindow):
         if res is None:  return # db error
         prev = []
         if res:
-            prev.extend(querydb(self,'select max(id) from ch{}'.format(
+            prev.extend(querydb(self,'select max(id)from ch{}'.format(
                 self.pid)))
             if prev is None:  return # db error
             if prev and prev[0][0]:  return True # data in ch
@@ -733,14 +733,14 @@ class Patient(QMainWindow):
                 self.pid))
         if res is None:  return # db error
         if not res:  return False # no such table
-        res = querydb(self, 'select max(id) from prod{}'.format(self.pid))
+        res = querydb(self, 'select max(id)from prod{}'.format(self.pid))
         if res is None:  return # db error
         if res and res[0][0]: return True # data in prod
         return False
     
     def ck_consid(self):
         """Check: create new consid or use existing one w/o corresp entries."""
-        consid = querydb(self, 'select max(id) from e{}'.format(self.pid))
+        consid = querydb(self, 'select max(id)from e{}'.format(self.pid))
         if consid is None:  return # db error
         if not consid[0][0]: # [(None,)]
             consid = querydb(
@@ -753,12 +753,12 @@ class Patient(QMainWindow):
         consid = consid[0][0]
         res = querydb(
             self,
-            'select count(id) from prod{} where consid=%s'.format(self.pid),
+            'select count(id)from prod{} where consid=%s'.format(self.pid),
             (consid,))
         if res is None:  return # db error
         res.extend(querydb(
             self,
-            'select count(id) from ch{} where consid=%s'.format(self.pid),
+            'select count(id)from ch{} where consid=%s'.format(self.pid),
             (consid,)))
         if res is None:  return # db error
         for e in res:
@@ -810,7 +810,7 @@ class Patient(QMainWindow):
                     "create table inv{0}(inv_id serial primary key,inv_no "
                     "integer not null references acc{0}(_acc_invno_),inv_pid "
                     "integer not null references patients,inv_prid integer not "
-                    "null references products,inv_npr numeric(9,2) not null,"
+                    "null references products,inv_npr numeric(9,2)not null,"
                     "inv_vat integer not null references vats default 1)".
                     format(self.cid))
                 ## self.curs.execute(
@@ -863,14 +863,14 @@ class Patient(QMainWindow):
                     "create table prod{0}(id serial primary key,consid integer "
                     "not null references e{0},dt timestamp not null default "
                     "now(),prodid integer not null references products,count "
-                    "numeric(8,2) not null default 1,symp integer not null "
+                    "numeric(8,2)not null default 1,symp integer not null "
                     "references symptoms default 1,staff integer not null "
                     "references staff default 1)"
                     .format(self.pid))
                 self.curs.execute(
                     "create table ch{0}(id serial primary key,consid integer "
                     "not null references e{0},dt timestamp not null default "
-                    "now(),text varchar(1024) not null default '',symp "
+                    "now(),text varchar(1024)not null default '',symp "
                     "integer not null references symptoms default 1,staff "
                     "integer not null references staff default 1)".format(
                         self.pid))
@@ -945,7 +945,7 @@ class Patient(QMainWindow):
         self.rundt   = res[0][1]
         res = querydb(
             self,
-            'select max(dt) from ch{} where consid=%s'.format(
+            'select max(dt)from ch{} where consid=%s'.format(
                 self.pid), (self.consid,))
         if res is None:  return # db error
         if res[0][0] > self.rundt:
@@ -1377,19 +1377,19 @@ class Patient(QMainWindow):
             self.curs.execute(
                 'create temporary table tc{}(consid integer not null,okey '
                 'integer not null default 0,dt timestamp not null,type ptype '
-                "not null default 'hst',txt varchar(1024) not null,count "
-                'numeric(8,2) not null default 0,symp integer,unit varchar(5) '
+                "not null default 'hst',txt varchar(1024)not null,count "
+                'numeric(8,2)not null default 0,symp integer,unit varchar(5)'
                 "not null default '',staff varchar(5),seq smallint not null,"
                 'prid integer not null default 0)'.format(self.pid))
             self.curs.execute( # prod  # 0xe2 0x80 0x9e
                 'insert into tc{0}(consid,okey,dt,type,txt,count,symp,staff,'
-                'seq,prid,unit) select consid,id,dt,pr_type,pr_name,count,symp,'
+                'seq,prid,unit)select consid,id,dt,pr_type,pr_name,count,symp,'
                 'stf_short,enumsortorder,pr_id,u_abbr from prod{0},products,'
                 'units,staff,pg_enum where prodid=pr_id and pr_u=u_id and staff'
                 '=stf_id and enumlabel::text=pr_type::text'.format(
                     self.pid))
             self.curs.execute( # ch
-                'insert into tc{0}(consid,okey,dt,txt,symp,staff,seq) '
+                'insert into tc{0}(consid,okey,dt,txt,symp,staff,seq)'
                 'select consid,id,dt,text,symp,stf_short,enumsortorder from '
                 'ch{0},staff,pg_enum where staff=stf_id and enumlabel::text='
                 "'hst'".format(self.pid))
@@ -1423,7 +1423,7 @@ class Patient(QMainWindow):
         self.paym.move(self.x()+50, self.y()+40)
         self.paym.show()
         # put here from book_cons where it made no sense:
-        invno = querydb(self,'select max(inv_no) from invoices')
+        invno = querydb(self,'select max(inv_no)from invoices')
         if invno is None:  return # db error
         ninvno = self.startdt.strftime('%Y%m%d0001')
         if ninvno > invno:
@@ -1432,7 +1432,7 @@ class Patient(QMainWindow):
             invno += 1
         self.invno_id = querydb(
             self,
-            'insert into invoices(inv_no)values(%s) returning invoice_id',
+            'insert into invoices(inv_no)values(%s)returning invoice_id',
             (invno,))
         if self.invno_id is None:  return # db error
         self.invno_id = self.invno_id[0][0]

@@ -805,7 +805,7 @@ class Products(QMainWindow):
         query = (
             'select pr_name,pr_short,pr_u,pr_nprice,vat_id,pr_id,pr_type,'
             'pr_instr from products,vats where not pr_obs and {0} ilike %s and '
-            'pr_vat=vat_id and pr_type in (%s,%s) order by {0}')
+            'pr_vat=vat_id and pr_type in(%s,%s)order by {0}')
         if not prod:
             query = query.format('pr_name')
             self.waitstart()
@@ -847,7 +847,7 @@ class Products(QMainWindow):
         query = (
             'select pr_name,pr_short,pr_u,pr_nprice,vat_id,pr_id,pr_type,'
             'pr_instr from products,vats where not pr_obs and {0} {1} %s and '
-            'pr_vat=vat_id and pr_type not in (%s,%s) order by {0}')
+            'pr_vat=vat_id and pr_type not in(%s,%s)order by {0}')
         if prod.count('|'):
             likeword = 'similar to'
         else:
