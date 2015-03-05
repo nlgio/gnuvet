@@ -257,7 +257,7 @@ create table acc2(
  acc_prid integer not null references prod20,
  acc_npr numeric(9,2) not null,
  acc_vat integer not null references vats default 1,
- acc_invd bool not null default False);
+ acc_paid bool default False);
 insert into acc2(acc_pid,acc_prid,acc_npr,acc_vat)values
  (20,1,20,1),
  (20,2,6.02,2),

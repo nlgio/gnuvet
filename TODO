@@ -1,3 +1,4 @@
+150305 put create table(s) accC, invC, payC, chP, insP, prodP into util
 150223 sort out encoding, thought that by now all was UTF-8 but apparently isn't
 150223 db: reestablish phone_opt,drop phone_type (also client,patient,saeclient) -- done?
 150222 patient: ck prod_queue add_prod(action=...) re new ptypes -- done?

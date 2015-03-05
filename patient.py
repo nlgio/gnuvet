@@ -790,8 +790,8 @@ class Patient(QMainWindow):
                 return
             self.db.commit()
             
-    def ck_inv(self): # hierwei: only create tables if summin booked
-        """Check invoice tables accN, invN, payN -- create if not exist."""
+    def ck_inv(self): # hierwei: only create tables if summin booked -> util
+        """Check invoice tables accN, invN, payN?"""
         res = querydb(
             self,
             "select tablename from pg_tables where tablename='inv{}'".format(
@@ -799,13 +799,6 @@ class Patient(QMainWindow):
         if res is None:  return # db error
         if not res: # no such table: create accC, invC, payC
             try: # hierwei: commented for devel as acc2 exists
-                ## self.curs.execute(
-                ##     "create table acc{}(acc_id serial primary key,acc_pid "
-                ##     "integer not null references patients,acc_prid integer "
-                ##     "not null references prod{},acc_npr numeric(9,2) not "
-                ##     "null,acc_vat integer not null references vats,acc_invd"
-                ##     " bool not null default false)".format(
-                ##         self.cid, self.pid)) # _acc_invno_?
                 self.curs.execute(
                     "create table inv{0}(inv_id serial primary key,inv_no "
                     "integer not null references acc{0}(_acc_invno_),inv_pid "
@@ -813,10 +806,6 @@ class Patient(QMainWindow):
                     "null references products,inv_npr numeric(9,2)not null,"
                     "inv_vat integer not null references vats default 1)".
                     format(self.cid))
-                ## self.curs.execute(
-                ##     "create table pay{0}(pay_id serial primary key,"
-                ##     "pay_date date not null default current_date,"
-                ##     "pay_amount numeric(9,2)not null)".format(self.cid))
             except OperationalError as e:
                 self.db_state(e)
                 return
