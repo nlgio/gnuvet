@@ -285,7 +285,7 @@ class Saecli(QMainWindow):
             suc = querydb(
                 self,
                 'insert into addresses(housen,street,village,city,region,'
-                'postcode)values(%s,%s,%s,%s,%s,%s) returning addr_id', adr)
+                'postcode)values(%s,%s,%s,%s,%s,%s)returning addr_id', adr)
             if suc is None:  return # db error
             if suc[0][0]:
                 adr = suc
@@ -304,14 +304,30 @@ class Saecli(QMainWindow):
             'values(%s,%s,%s,%s,%s,%s,%s,%s)returning c_id', cli)
         if suc is None:  return # db error
         self.cid = suc[0][0]
-        phone1 = self.w.phone1Le.text()
-        phone2 = self.w.phone2Le.text()
-        phone3 = self.w.phone3Le.text()
-        phone4 = self.w.phone4Le.text()
-        ## suc = querydb( # hierwei
-        ##     self,
-        ##     'insert into phones(ddd) values()', (tuple,))
-        self.db.commit()
+        phones = []
+        if self.w.phone1Le.text():
+            phones.append('({},{},\'{}\',\'{}\')'.format(
+                self.cid, self.phone1oSb.value(),
+                self.w.phone1Le.text(), self.w.phone1annoLe.text()))
+        if self.w.phone2Le.text():
+            phones.append('({},{},\'{}\',\'{}\')'.format(
+                self.cid, self.phone2oSb.value(),
+                self.w.phone2Le.text(), self.w.phone2annoLe.text()))
+        if self.w.phone3Le.text():
+            phones.append('({},{},\'{}\',\'{}\')'.format(
+                self.cid, self.phone3oSb.value(),
+                self.w.phone3Le.text(), self.w.phone3annoLe.text()))
+        if self.w.phone4Le.text():
+            phones.append('({},{},\'{}\',\'{}\')'.format(
+                self.cid, self.phone4oSb.value(),
+                self.w.phone4Le.text(), self.w.phone4annoLe.text()))
+        phones = ','.join(phones)
+        if phones:
+            suc = querydb(
+                self,
+                'insert into phones values{}returning phone_cid'.format(phones))
+            if suc is None:  return # db error
+            self.db.commit()
         ## self.create_tables()
     
     def create_tables(self):
@@ -337,20 +353,20 @@ class Saecli(QMainWindow):
                     'not null references e{0},dt timestamp not null default '
                     'now(),prodid integer not null references products default '
                     '1,symp integer not null references symptoms default 1,'
-                    'staff integer not null references staff default 1'.format(
+                    'staff integer not null references staff default 1)'.format(
                         pid))
                 self.curs.execute(
                     "create table ch{0}(id serial primary key,consid integer "
                     "not null references e{0},dt timestamp not null default "
                     "now(),text varchar(1024) not null default '',symp "
                     "integer not null references symptoms default 1,staff "
-                    "integer not null references staff default 1".format(pid))
+                    "integer not null references staff default 1)".format(pid))
                 self.curs.execute(
                     'create table acc{}(acc_id serial primary key,acc_pid '
                     'integer not null references patients,acc_prid integer not '
                     'null references prod{},acc_npr numeric(9,2) not null,'
                     'acc_vat integer not null references vats,acc_paid bool '
-                    'default false'.format(self.cid,self.pid))
+                    'default false)'.format(self.cid,self.pid))
             except OperationalError as e:
                 self.db_state(e)
                 return

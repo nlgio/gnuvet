@@ -124,11 +124,11 @@ create table clients(
 
 create table phones( -- client phones
 -- phone_id serial primary key,
- phone_clid integer not null references clients,
+ phone_cid integer not null references clients,
  phone_opt smallint not null default 1, -- 1 best
  phone_num varchar(25) not null default '',
  phone_anno varchar(25) not null default '',
- unique(phone_clid,phone_num));
+ unique(phone_cid,phone_num));
 
 -- keys presumably overkill for up to medium-sized practice:
 --create index c_sname on clients(c_sname);

@@ -285,7 +285,8 @@ class Patient(QMainWindow):
                 self.symptoms[e[0]] = dict(symp=e[1], shrt=e[2])
         self.markups = {}
         if self.options['usemark']:
-            res = querydb(self, 'select m_id,m_name,m_rate from markups')
+            res = querydb(
+                self, 'select m_id,m_name,m_rate from markups where not m_obs')
             if res is None:  return # db error
             for e in res:
                 self.markups[e[0]] = dict(n=e[1], r=e[2])

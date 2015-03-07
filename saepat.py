@@ -531,6 +531,7 @@ class Saepat(QMainWindow):
         ndat = querydb(
             self,
             'select neut_id,neut_date from neuts where neut_id=%s', (pid,))
+        if ndat is None:  return # db error
         if len(ndat):
             suc = querydb(
                 self,
