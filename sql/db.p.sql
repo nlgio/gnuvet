@@ -28,7 +28,7 @@ set client_encoding to 'UTF-8';
 create database gnuvet encoding 'UTF-8'; -- test 150223
 
 \c gnuvet
-
+create table century(cent serial primary key); -- will psql & gv exist in 2100?
 
 create table boxroles(
  boxr_id serial primary key,

@@ -28,7 +28,8 @@ def gprice(nprice=0, vatrate=0):
 def money(val, mult=1):
     if not 'Decimal' in locals():
         from decimal import Decimal
-    return (val * mult).quantize(Decimal('0.00'))
+    val = val * mult
+    return (Decimal(str(val)).quantize(Decimal('0.00')))
 
 def newaction(caller=None, txt='', stip=None, short=None, icon=None):
     if icon:

@@ -16,6 +16,9 @@
 -- local gnuvet gnuv md5
 -- host gnuvet gvuser 192.168.0.0/16 md5 (IPv4 example)
 
+insert into century values(20);
+select setval('century_cent_seq', 20);
+
 insert into staffroles(staffrole_name) values
  ('master'), ('vet'), ('nurse'), ('reception'), ('helper'), ('work experience');
 
